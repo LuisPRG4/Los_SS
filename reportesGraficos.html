@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Los SS - Reportes</title>
+  <link rel="icon" type="image/png" href="fav/los ss.png" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/ayuda.css" />
+  <script src="js/chart.js"></script>
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <header class="header-elegante">
+    <div class="header-container">
+      <img src="logo/LOS SS.png" alt="Logo" class="logo-libre" />
+      <div class="texto-header">
+        <h1 class="titulo-header">📊 Reportes</h1>
+        <p class="descripcion-header">
+          Analiza tus datos con gráficos interactivos. Visualiza tendencias,
+          productos más vendidos y comportamiento de clientes.
+        </p>
+      </div>
+    </div>
+  </header>
+
+  <nav>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul id="navMenu">
+      <li><a href="index.html">🏠 Inicio</a></li>
+      <li><a href="inventario.html">🧃 Inventario</a></li>
+      <li><a href="mermas.html">📉 Mermas</a></li>
+      <li><a href="pedidos.html">📦 Pedidos</a></li>
+      <li><a href="clientes.html">👥 Clientes</a></li>
+      <li><a href="finanzas.html">💰 Finanzas</a></li>
+      <li><a href="proveedores.html">🚚 Proveedores</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
+      <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+      <li><a href="novedades.html">Novedades</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <!-- Tipo de gráfico sin onchange inline -->
+    <section>
+      <label for="tipoGrafico">📊 Tipo de gráfico:</label>
+      <select id="tipoGrafico">
+        <option value="pie">🎂 Pastel</option>
+        <option value="bar">📊 Barras</option>
+        <option value="line">📈 Líneas</option>
+      </select>
+    </section>
+
+    <!-- Botón exportar Excel con id corregido -->
+    <section>
+      <button id="btnExportarExcel">Exportar ventas a Excel</button>
+    </section>
+
+    <!-- Filtrar fechas sin onclick -->
+    <section>
+      <h2>📅 Filtrar por Rango de Fechas</h2>
+      <label>Desde: <input type="date" id="fechaInicio" /></label>
+      <label>Hasta: <input type="date" id="fechaFin" /></label>
+      <button id="btnFiltrar">Filtrar</button>
+    </section>
+
+    <!-- Agrupar sin onchange -->
+    <section>
+      <label for="tipoAgrupacion">📆 Agrupar por:</label>
+      <select id="tipoAgrupacion">
+        <option value="ninguno">Sin agrupación</option>
+        <option value="semana">Semana</option>
+        <option value="mes">Mes</option>
+      </select>
+    </section>
+
+    <section>
+      <h2>📂 Reportes Especiales</h2>
+
+      <section>
+        <div style="text-align: center; margin-bottom: 10px;">
+          <button
+            onclick="alternarBotonesReportes()"
+            style="
+              background: linear-gradient(135deg, #5b2d90, #a57d3c, #d4af37);
+              color: white;
+              padding: 10px 20px;
+              border: none;
+              border-radius: 12px;
+              cursor: pointer;
+              box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            "
+          >
+            🎯 Ver Reportes Especiales
+          </button>
+        </div>
+
+        <div
+          id="botonesReportesEspeciales"
+          style="display: none; margin-bottom: 15px"
+        >
+          <div
+            style="
+              display: flex;
+              flex-wrap: wrap;
+              justify-content: center;
+              gap: 10px;
+            "
+          >
+            <!-- Aquí quitamos onclick inline y agregamos clase boton-reporte y data-tipo -->
+            <button class="boton-reporte" data-tipo="credito">💳 Ventas a Crédito</button>
+            <button class="boton-reporte" data-tipo="contado">💵 Ventas Contado</button>
+            <button class="boton-reporte" data-tipo="cobranzas">💰 Cobranzas</button>
+            <button class="boton-reporte" data-tipo="porProducto">🧃 Por Producto</button>
+            <button class="boton-reporte" data-tipo="porFecha">📆 Por Fecha</button>
+            <button class="boton-reporte" data-tipo="recurrentes">🔄 Recurrentes</button>
+          </div>
+        </div>
+      </section>
+
+      <div
+        id="buscadorEspecial"
+        style="display: none; margin: 10px 0"
+      >
+        <input
+          type="text"
+          id="filtroEspecial"
+          placeholder="🔍 Buscar por cliente..."
+        />
+      </div>
+
+      <ul id="listaEspecial"></ul>
+    </section>
+
+    <section>
+      <h2>📈 Tipo de Pago</h2>
+      <canvas id="graficoTipoPago" width="400" height="400"></canvas>
+    </section>
+
+    <section>
+      <h2>🍹 Productos Más Vendidos</h2>
+      <canvas id="graficoProducto" width="400" height="400"></canvas>
+    </section>
+
+    <section>
+      <h2>👤 Ventas por Cliente</h2>
+      <canvas id="graficoCliente" width="400" height="400"></canvas>
+    </section>
+
+    <!-- Ayuda contextual -->
+    <section id="ayuda">
+      <div class="h2title">
+        <h2>📊 Módulo de Reportes</h2>
+      </div>
+      <h3>📝 ¿Cómo usar este módulo?</h3>
+      <div class="parrafito">
+        <p>
+          Este módulo está diseñado para que puedas visualizar de manera clara y
+          ordenada el comportamiento de tus ventas, clientes y productos. A
+          través de gráficos interactivos y filtros, puedes entender mejor el
+          rendimiento de tu negocio.
+        </p>
+      </div>
+      <ul>
+        <li>📅 Filtra ventas por fechas para analizar periodos específicos.</li>
+        <li>🎨 Elige el tipo de gráfico que prefieras: pastel, barras o líneas.</li>
+        <li>📦 Visualiza los productos más vendidos y las preferencias de tus clientes.</li>
+        <li>👥 Revisa ventas agrupadas por cliente o por tipo de pago.</li>
+        <li>
+          🧾 Consulta reportes especiales como
+          <strong>ventas a crédito</strong> o
+          <strong>cobranzas</strong> con buscador incorporado.
+        </li>
+        <li>📤 Exporta los datos fácilmente a <strong>Excel</strong> para informes más formales.</li>
+      </ul>
+
+      <p class="parrafito">
+        Este espacio es tu centro de análisis. Úsalo para tomar decisiones más acertadas y hacer crecer tu negocio con inteligencia y estilo 💼📈.
+      </p>
+
+      <button id="cerrarAyuda">Cerrar Ayuda</button>
+    </section>
+
+    <button class="btn-ayuda" onclick="mostrarAyuda()">❔</button>
+  </main>
+
+  <script src="js/db.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+  <script src="js/reportes.js"></script>
+  <script src="js/nav-highlighter.js" defer></script>
+
+  <script>
+    // Función para abrir y cerrar menú
+    function toggleMenu() {
+      document.getElementById("navMenu").classList.toggle("open");
+    }
+
+    // Verificar sesión (igual que antes)
+    if (sessionStorage.getItem("sesionIniciada") !== "true") {
+      window.location.href = "login.html";
+    }
+
+    // Mostrar ayuda
+    function mostrarAyuda() {
+      const ayuda = document.getElementById("ayuda");
+      ayuda.classList.add("visible");
+      ayuda.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    // Cerrar ayuda
+    document.getElementById("cerrarAyuda").addEventListener("click", () => {
+      document.getElementById("ayuda").classList.remove("visible");
+    });
+
+    // Alternar botones reportes especiales
+    function alternarBotonesReportes() {
+      const contenedor = document.getElementById("botonesReportesEspeciales");
+      contenedor.style.display =
+        contenedor.style.display === "none" || contenedor.style.display === ""
+          ? "block"
+          : "none";
+    }
+
+    // Aquí agregamos listeners que llaman tus funciones async en reportes.js
+    document.addEventListener("DOMContentLoaded", () => {
+      // Cuando cambias el tipo de gráfico, actualizar
+      document
+        .getElementById("tipoGrafico")
+        .addEventListener("change", async () => {
+          await actualizarTodosLosGraficos();
+        });
+
+      // Filtrar por fechas con botón
+      document.getElementById("btnFiltrar").addEventListener("click", async () => {
+        await aplicarFiltroFechas();
+      });
+
+      // Exportar ventas a Excel con listener al botón con id correcto
+      document
+        .getElementById("btnExportarExcel")
+        .addEventListener("click", async () => {
+          try {
+            await exportarVentasExcel();
+          } catch (error) {
+            alert("Error al exportar: " + error.message);
+            console.error(error);
+          }
+        });
+
+      // Agrupar por semana, mes o ninguno
+      document
+        .getElementById("tipoAgrupacion")
+        .addEventListener("change", async () => {
+          await actualizarTodosLosGraficos();
+        });
+
+      // Botones reportes especiales sin onclick inline,
+      // escuchamos clicks y llamamos alternarLista con el data-tipo
+      document.querySelectorAll(".boton-reporte").forEach((boton) => {
+        boton.addEventListener("click", async () => {
+          const tipo = boton.dataset.tipo;
+          if (tipo) {
+            await alternarLista(tipo);
+          }
+        });
+      });
+
+      // Buscador especial filtra lista
+      document
+        .getElementById("filtroEspecial")
+        .addEventListener("input", filtrarListaEspecial);
+
+      // Inicializamos todos los gráficos al cargar
+      actualizarTodosLosGraficos();
+    });
+  </script>
+
+  <!-- SERVICE WORKER -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("sw.js")
+          .then((registration) => {
+            console.log(
+              "Service Worker registrado con éxito. Alcance:",
+              registration.scope
+            );
+          })
+          .catch((error) => {
+            console.error("Fallo el registro del Service Worker:", error);
+          });
+      });
+    }
+  </script>
+</body>
+</html>

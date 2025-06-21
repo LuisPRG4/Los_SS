@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Los SS - Inventario</title>
+  <link rel="icon" type="image/png" href="fav/los ss.png">
+
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/ayuda.css" />
+
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"> </div>
+
+  <header class="header-elegante">
+  <div class="header-container">
+    <img src="logo/LOS SS.png" alt="Logo" class="logo-libre" />
+    <div class="texto-header">
+      <h1 class="titulo-header">🧃 Inventario</h1>
+      <p class="descripcion-header">Administra todos tus productos, controla el stock, establece niveles mínimos, máximos, costos, precios y mantén tu inventario siempre actualizado y organizado.</p>
+    </div>
+  </div>
+</header>
+
+<nav>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul id="navMenu">
+      <li><a href="index.html">🏠 Inicio</a></li>
+      <li><a href="inventario.html">🧃 Inventario</a></li>
+      <li><a href="mermas.html">📉 Mermas</a></li>
+      <li><a href="pedidos.html">📦 Pedidos</a></li>
+      <li><a href="clientes.html">👥 Clientes</a></li>
+      <li><a href="finanzas.html">💰 Finanzas</a></li>
+      <li><a href="proveedores.html">🚚 Proveedores</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
+      <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+      <li><a href="novedades.html"> Novedades</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section>
+      <h2>➕ Agregar / Editar Producto</h2>
+        <label>Producto:</label>
+      <input type="text" id="nombre" placeholder="Nombre del producto" />
+        <label>Ingresa el stock:</label>
+      <input type="number" id="stock" placeholder="Stock" />
+
+        <label>Stock mínimo (opcional):</label>
+      <input type="number" id="stockMin" placeholder="Mínimo permitido" />
+
+        <label>Stock máximo (opcional):</label>
+      <input type="number" id="stockMax" placeholder="Máximo permitido" />
+
+        <label>Vendidos:</label>
+      <input type="number" id="vendidos" placeholder="Vendidos" />
+        <label>Ingresa el costo del producto:</label>
+      <input type="number" id="costo" placeholder="Costo ($)" step="0.01" />
+        <label>Ingresa el precio de venta:</label>
+      <input type="number" id="precio" placeholder="Precio ($)" step="0.01" />
+        <label>Imagen del producto (Opcional):</label>
+      <input type="file" id="imagen" accept="image/*" />
+
+        <div id="previewImagen" style="margin-top: 10px;">
+          <img id="imagenPreview" src="" alt="Previsualización" width="80" style="display:none; border-radius: 8px; box-shadow: 0 0 5px #ccc;" />
+        </div>
+        <label>Selecciona un proveedor (Opcional):</label>
+      <select id="proveedor">
+        <option value="">Seleccione un proveedor</option>
+        <option value="Propio">Propio</option>
+      </select>
+
+      <div class="form-buttons"> 
+        <button id="btnGuardar" onclick="guardarProducto()">Guardar</button>
+        <!--BOTÓN PARA CANCELAR LA EDICIÓN DE UN PRODUCTO-->
+        <button id="btnCancelar" onclick="cancelarEdicion()" class="btn-cancelar" style="display:none;">Cancelar</button>   
+      </div>
+
+  </section>
+
+    <section>
+      <h2>📃 Lista de Productos</h2>
+      <ul id="listaProductos"></ul>
+    </section>
+
+    <!-- Ayuda contextual para Inventario -->
+  <section id="ayuda">
+    <div class="h2title"> 
+      <h2>🧃 Módulo Inventario</h2>
+    </div>
+
+  <h3>📦 ¿Cómo usar este módulo?</h3>
+
+  <div class="parrafito">
+    <p>
+      Aquí puedes administrar todos los productos de tu negocio. Puedes registrar su nombre, stock actual,
+      niveles mínimos y máximos, el costo de adquisición, precio de venta, imagen del producto y proveedor.
+      Esto te permitirá tener un control exacto del inventario disponible y actuar a tiempo ante faltantes.
+    </p>
+  </div>
+
+  <ul>
+    <li>🔹 Completa el formulario con la información del producto y presiona "Guardar" para registrarlo.</li>
+    <li>🔹 El botón ✏️ permite editar un producto. Los datos se cargarán en el formulario automáticamente.</li>
+    <li>🔹 El botón 🗑️ elimina el producto seleccionado.</li>
+    <li>🔹 Puedes establecer un stock mínimo y máximo para recibir alertas cuando un producto esté escaso.</li>
+  </ul>
+
+  <button id="cerrarAyuda">Cerrar Ayuda</button>
+  </section>
+
+<!-- Botón flotante de ayuda -->
+  <button class="btn-ayuda" onclick="mostrarAyuda()">❔</button>
+
+  </main>
+
+  <script src="js/db.js"></script>
+  <script src="js/inventario.js"></script>
+  <script src="js/nav-highlighter.js" defer></script>
+
+    <script>
+      function toggleMenu() {
+      document.getElementById("navMenu").classList.toggle("open");
+    }
+    </script>
+
+    <script>
+  if (sessionStorage.getItem("sesionIniciada") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+
+<!--SCRIPT PARA EL BOTÓN FLOTANTE DE AYUDA-->
+<script>
+  function mostrarAyuda() {
+    const ayuda = document.getElementById("ayuda");
+    ayuda.classList.add("visible");
+    ayuda.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  document.getElementById("cerrarAyuda").addEventListener("click", () => {
+    document.getElementById("ayuda").classList.remove("visible");
+  });
+</script>
+
+<!-- SERVICE WORKER-->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // La ruta del Service Worker es simplemente '/sw.js' porque está en la raíz
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('Service Worker registrado con éxito. Alcance:', registration.scope);
+        })
+        .catch(error => {
+          console.error('Fallo el registro del Service Worker:', error);
+        });
+    });
+  }
+</script>
+
+</body>
+</html>

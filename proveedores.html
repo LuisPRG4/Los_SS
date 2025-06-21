@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Los SS - Proveedores</title>
+  <link rel="icon" type="image/png" href="fav/los ss.png">
+
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/ayuda.css"/>
+
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"></div>
+
+  <header class="header-elegante">
+  <div class="header-container">
+    <img src="logo/LOS SS.png" alt="Logo" class="logo-libre" />
+    <div class="texto-header">
+      <h1 class="titulo-header">🚚 Proveedores</h1>
+      <p class="descripcion-header">Administra la información de tus proveedores y mejora el control sobre tus abastecimientos y relaciones comerciales.</p>
+    </div>
+  </div>
+</header>
+
+<nav>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul id="navMenu">
+      <li><a href="index.html">🏠 Inicio</a></li>
+      <li><a href="inventario.html">🧃 Inventario</a></li>
+      <li><a href="mermas.html">📉 Mermas</a></li>
+      <li><a href="pedidos.html">📦 Pedidos</a></li>
+      <li><a href="clientes.html">👥 Clientes</a></li>
+      <li><a href="finanzas.html">💰 Finanzas</a></li>
+      <li><a href="proveedores.html">🚚 Proveedores</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
+      <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+      <li><a href="novedades.html"> Novedades</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section>
+      <h2>➕ Agregar Proveedor</h2>
+        <label>Ingresa el nombre del proveedor:</label>
+      <input type="text" id="nombreProveedor" placeholder="Nombre del proveedor" />
+        <label>Ingresa la empresa o marca del proveedor:</label>
+      <input type="text" id="empresa" placeholder="Empresa o marca" />
+        <label>Número de contacto del proveedor:</label>
+      <input type="number" id="telefono" placeholder="Teléfono" />
+        <label>Producto que suministra:</label>
+      <input type="text" id="productos" placeholder="Productos" />
+
+      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+        <button onclick="agregarProveedor()" id="btnGuardarProveedor" class="btn-primario">Guardar Proveedor</button>
+        <button onclick="cancelarEdicionProveedor()" id="btnCancelarProveedor" class="btn-cancelar" style="display:none;">Cancelar</button>
+      </div>
+
+
+    </section>
+
+    <section>
+      <h2>📋 Lista de Proveedores</h2>
+      <input type="text" id="buscadorProveedores" placeholder="🔍 Buscar proveedores..." oninput="filtrarProveedores()" />
+      <ul id="listaProveedores"></ul>
+    </section>
+
+    <!-- Ayuda contextual para Proveedores -->
+  <section id="ayuda">
+    <div class="h2title"> 
+      <h2>🚚 Módulo Proveedores</h2> 
+    </div> 
+      <h3>📝 ¿Cómo usar este módulo?</h3>
+     <div class="parrafito">
+    <p>
+      Este módulo está diseñado para que puedas llevar un registro ordenado y detallado de todos los proveedores que abastecen 
+      tu negocio. Desde marcas grandes hasta entregas personales, aquí puedes documentarlos fácilmente.
+    </p>
+  </div>
+
+  <ul>
+    <li>📥 Usa el formulario para ingresar datos como el <strong>nombre del proveedor</strong>, la <strong>empresa</strong> o marca que representa, su <strong>teléfono</strong> y el <strong>producto</strong> que suministra.</li>
+    <li>🔍 Utiliza el buscador para filtrar proveedores por nombre, producto, empresa o número de contacto.</li>
+    <li>✏️ Podrás <strong>editar</strong> proveedores si cometes un error o necesitas actualizar algún dato.</li>
+    <li>🗑️ También puedes <strong>eliminarlos</strong> si ya no colaboran con tu negocio.</li>
+  </ul>
+
+    <button id="cerrarAyuda">Cerrar Ayuda</button>
+  </section>
+
+    <!-- Botón flotante de ayuda -->
+  <button class="btn-ayuda" onclick="mostrarAyuda()">❔</button>
+
+  </main>
+
+  <script src="js/db.js"></script>
+  <script src="js/proveedores.js"></script>
+  <script src="js/nav-highlighter.js" defer></script>
+
+    <script>
+      function toggleMenu() {
+      document.getElementById("navMenu").classList.toggle("open");
+    }
+    </script>
+
+    <script>
+  if (sessionStorage.getItem("sesionIniciada") !== "true") {
+    window.location.href = "login.html";
+  }
+</script>
+
+<!--SCRIPT PARA EL BOTÓN FLOTANTE DE AYUDA-->
+<script>
+  function mostrarAyuda() {
+    const ayuda = document.getElementById("ayuda");
+    ayuda.classList.add("visible");
+    ayuda.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  document.getElementById("cerrarAyuda").addEventListener("click", () => {
+    document.getElementById("ayuda").classList.remove("visible");
+  });
+</script>
+
+<!-- SERVICE WORKER-->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // La ruta del Service Worker es simplemente '/sw.js' porque está en la raíz
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('Service Worker registrado con éxito. Alcance:', registration.scope);
+        })
+        .catch(error => {
+          console.error('Fallo el registro del Service Worker:', error);
+        });
+    });
+  }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      await abrirDB();
+      console.log("IndexedDB lista en proveedores.html ✅");
+    } catch (e) {
+      console.error("Error al abrir IndexedDB desde proveedores.html:", e);
+    }
+  });
+</script>
+
+
+</body>
+</html>

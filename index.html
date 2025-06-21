@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Los SS - Inicio</title>
+
+  <!-- Ícono para la pestaña en el navegador -->
+  <link rel="icon" type="image/png" href="fav/los ss.png">
+
+  <!-- Ícono para pantalla de inicio en Android -->
+  <link rel="manifest" href="manifest.json">
+
+  <link rel="stylesheet" href="css/style.css" />
+  
+</head>
+<body>
+  <div id="toastContainer" class="toast-container"> </div>
+
+ <header class="header-elegante">
+  <div class="header-container">
+    <img src="logo/LOS SS.png" alt="Logo" class="logo-libre" />
+    <div class="texto-header">
+      <h1 class="titulo-header">🏡 Inicio</h1>
+      <p class="descripcion-header">Explora los indicadores clave de tu negocio. Desde aquí puedes monitorear rápidamente tus ventas, productos destacados y alertas importantes.</p>
+    </div>
+  </div>
+</header>
+
+  <nav>
+    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+    <ul id="navMenu">
+      <li><a href="index.html">🏠 Inicio</a></li>
+      <li><a href="inventario.html">🧃 Inventario</a></li>
+      <li><a href="mermas.html">📉 Mermas</a></li>
+      <li><a href="pedidos.html">📦 Pedidos</a></li>
+      <li><a href="clientes.html">👥 Clientes</a></li>
+      <li><a href="finanzas.html">💰 Finanzas</a></li>
+      <li><a href="proveedores.html">🚚 Proveedores</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
+      <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+      <li><a href="novedades.html"> Novedades</a></li>
+    </ul>
+  </nav>
+
+  <main>
+    <section class="kpi-box">
+      <h2>📈 Indicadores</h2>
+      <div class="kpis">
+        <div class="kpi"><strong>Ventas Hoy:</strong> $<span id="ventasHoy">0</span></div>
+        <div class="kpi"><strong>Ventas Semana:</strong> $<span id="ventasSemana">0</span></div>
+        <div class="kpi"><strong>Más Vendido:</strong> <span id="productoTop">-</span></div>
+      </div>
+    </section>
+
+    <section class="alertas">
+      <h2>⚠️ Alertas de Stock Bajo</h2>
+      <ul id="alertasStock"></ul>
+    </section>
+  </main>
+
+  <script src="js/db.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/nav-highlighter.js" defer></script>
+
+  <script>
+    function toggleMenu() {
+      document.getElementById("navMenu").classList.toggle("open");
+    }
+
+    if (sessionStorage.getItem("sesionIniciada") !== "true") {
+      window.location.href = "login.html";
+    }
+
+    function cerrarSesion() {
+      sessionStorage.removeItem("sesionIniciada");
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <div id="button" class="button-sesion">
+
+    <button onclick="cerrarSesion()">Cerrar sesión</button>
+
+  </div>
+
+  <!-- SERVICE WORKER-->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      // La ruta del Service Worker es simplemente '/sw.js' porque está en la raíz
+      navigator.serviceWorker.register('sw.js')
+        .then(registration => {
+          console.log('Service Worker registrado con éxito. Alcance:', registration.scope);
+        })
+        .catch(error => {
+          console.error('Fallo el registro del Service Worker:', error);
+        });
+    });
+  }
+</script>
+
+</body>
+</html>
