@@ -9,7 +9,7 @@ async function hash(texto) {
 // Establecer usuario por primera vez (puedes comentar esta parte luego de usarla una vez)
 (async () => {
   const usuario = "Los SS";
-  const contrasena = await hash("luis");
+  const contrasena = await hash("9424");
   localStorage.setItem("credenciales", JSON.stringify({ usuario, contrasena }));
 })();
 
