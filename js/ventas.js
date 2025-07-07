@@ -12,6 +12,19 @@ let productosVenta = []; // Array temporal para los productos de la venta actual
 // Añadir esta variable global al inicio del archivo
 let abonoEnProceso = false;
 
+let currentPageVentas = 1;
+const rowsPerPageVentas = 10;
+
+const sortOptionsVentas = [
+  { key: 'fecha', label: 'Fecha' },
+  { key: 'cliente', label: 'Cliente' },
+  { key: 'ingreso', label: 'Monto' }
+];
+let sortKeyVentas = 'fecha';
+let sortAscVentas = false;
+
+let mostrarArchivadas = false; // Controla si se muestran ventas archivadas
+
 async function guardarVentas() {
     // Las ventas ya se guardan/actualizan a través de las funciones de db.js en registrarVenta.
     // Esta función solo necesita recargar los gráficos si es necesario.
@@ -191,7 +204,8 @@ async function registrarVenta() {
         fecha: obtenerFechaVenta(),
         montoPendiente: montoPendiente,
         estadoPago: estadoPago,
-        observaciones: document.getElementById('observacionesVenta').value.trim()
+        observaciones: document.getElementById('observacionesVenta').value.trim(),
+        archivado: false // Nueva bandera
     };
 
     try {
@@ -312,11 +326,36 @@ async function mostrarVentas(filtradas) {
         filtradas = ventas;
     }
 
+    // Aplicar orden antes de continuar
+    filtradas.sort((a,b)=>{
+        let valA, valB;
+        switch(sortKeyVentas){
+          case 'cliente': valA = (a.cliente||'').toLowerCase(); valB=(b.cliente||'').toLowerCase(); break;
+          case 'ingreso': valA = a.ingreso||0; valB=b.ingreso||0; break;
+          case 'fecha': default:
+            valA = new Date(a.fecha);
+            valB = new Date(b.fecha);
+        }
+        if (valA < valB) return sortAscVentas? -1: 1;
+        if (valA > valB) return sortAscVentas? 1: -1;
+        return 0;
+    });
+
     const lista = document.getElementById("listaVentas");
     lista.innerHTML = "";
 
+    // Filtrar según archivado
+    if (!mostrarArchivadas) {
+        filtradas = filtradas.filter(v=>!v.archivado);
+    } else {
+        filtradas = filtradas.filter(v=>v.archivado);
+    }
+
     if (filtradas.length === 0) {
         lista.innerHTML = `<p class="text-center text-gray-400">No hay ventas registradas.</p>`;
+        // Limpiar paginación si no hay datos
+        const pagCont = document.getElementById('paginacionVentas');
+        if (pagCont) pagCont.innerHTML = '';
         return;
     }
 
@@ -378,6 +417,23 @@ async function mostrarVentas(filtradas) {
             const card = crearCardVenta(venta, id);
             lista.appendChild(card);
         });
+    }
+
+    // Al final de mostrarVentas, aplicar paginación (se llama tras crear todos los elementos)
+    setTimeout(() => {
+        if (window.PaginacionUtils?.paginarDOM) {
+            PaginacionUtils.paginarDOM('#listaVentas', '.venta-card, .venta-credito-card', currentPageVentas, rowsPerPageVentas, 'paginacionVentas', (nuevaPag) => {
+                currentPageVentas = nuevaPag;
+            });
+        }
+    }, 0);
+
+    // --- Si hay botón de toggle archivadas, actualizar contador ---
+    if (document.getElementById('btnToggleArchivadas')) {
+        document.getElementById('btnToggleArchivadas').textContent = mostrarArchivadas ? '📂 Ocultar archivadas' : '📂 Mostrar archivadas';
+    }
+    if (document.getElementById('btnEliminarArchivadas')) {
+        document.getElementById('btnEliminarArchivadas').style.display = mostrarArchivadas ? '' : 'none';
     }
 }
 
@@ -497,6 +553,7 @@ function crearCardVenta(venta, id) {
             <button onclick="cargarVenta(${id})" class="btn-editar">✏️ Editar</button>
             <button onclick="revertirVenta(${id})" class="btn-revertir">↩️ Revertir</button>
             <button onclick="eliminarVentaPermanente(${id})" class="btn-eliminar">🗑 Eliminar</button>
+            ${venta.archivado ? `<button onclick="restaurarVenta(${id})" class="btn-restaurar">↩️ Restaurar</button>` : `<button onclick="archivarVenta(${id})" class="btn-archivar">🗄️ Archivar</button>`}
             ${venta.tipoPago === 'credito' && venta.estadoPago !== 'Pagado Total' 
                 ? `<button onclick="abrirModalAbono(${id})" class="btn-abonar">💰 Abonar</button>` : ''}
             <button onclick="mostrarRecibo(${id})" class="btn-recibo">🧾 Recibo</button>
@@ -1429,6 +1486,8 @@ function cancelarEdicionVenta() {
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         await abrirDB();
+        initSortVentas();
+        initArchivadoUI();
 
         ventas = await obtenerTodasLasVentas();
         clientes = await obtenerTodosLosClientes();
@@ -1856,7 +1915,7 @@ async function mostrarRecibo(id) {
         }
 
         // Teléfono de contacto del negocio (ejemplo)
-        document.getElementById('recibo-telefono').textContent = '+58 416-6963821';
+        document.getElementById('recibo-telefono').textContent = '+58 424-0000000';
 
         // Estado de la venta
         document.getElementById('recibo-estado').textContent = venta.estadoPago;
@@ -2120,4 +2179,119 @@ async function guardarReciboPDF() {
         console.error("Error al guardar recibo como PDF:", error);
         mostrarToast("❌ Error al guardar el recibo", "error");
     }
+}
+
+// ---- Control de ordenación ----
+function initSortVentas() {
+  const contenedor = document.getElementById('sortVentasContainer');
+  const lista = document.getElementById('listaVentas');
+  if (!lista) return; // página no tiene ventas
+  let wrapper = contenedor;
+  if (!wrapper) {
+    wrapper = document.createElement('div');
+    wrapper.id = 'sortVentasContainer';
+    wrapper.style.textAlign = 'right';
+    lista.parentNode.insertBefore(wrapper, lista);
+  }
+
+  let select = document.getElementById('sortVentas');
+  if (!select) {
+    select = document.createElement('select');
+    select.id = 'sortVentas';
+    select.style.margin = '10px 0';
+    sortOptionsVentas.forEach(opt => {
+      const option = document.createElement('option');
+      option.value = opt.key;
+      option.textContent = `Ordenar por ${opt.label}`;
+      select.appendChild(option);
+    });
+    wrapper.appendChild(select);
+    // Botón asc/desc
+    const btnDir = document.createElement('button');
+    btnDir.id = 'btnSortDirVentas';
+    btnDir.textContent = '🔽';
+    btnDir.style.marginLeft = '6px';
+    wrapper.appendChild(btnDir);
+
+    select.addEventListener('change', () => {
+      sortKeyVentas = select.value;
+      mostrarVentas();
+    });
+
+    btnDir.addEventListener('click', () => {
+      sortAscVentas = !sortAscVentas;
+      btnDir.textContent = sortAscVentas ? '🔼' : '🔽';
+      mostrarVentas();
+    });
+  }
+}
+
+// ===== Archivado =====
+async function archivarVenta(id){
+    try{
+        const venta= ventas.find(v=>v.id===id);
+        if(!venta){mostrarToast('Venta no encontrada','error');return;}
+        venta.archivado=true;
+        await actualizarVenta(id,venta);
+        mostrarToast('Venta archivada 🗄️','success');
+        mostrarVentas();
+    }catch(e){console.error(e);mostrarToast('Error al archivar','error');}
+}
+
+async function restaurarVenta(id){
+    try{
+        const venta= ventas.find(v=>v.id===id);
+        if(!venta){mostrarToast('Venta no encontrada','error');return;}
+        venta.archivado=false;
+        await actualizarVenta(id,venta);
+        mostrarToast('Venta restaurada','success');
+        mostrarVentas();
+    }catch(e){console.error(e);mostrarToast('Error al restaurar','error');}
+}
+
+function toggleMostrarArchivadas(){
+    mostrarArchivadas = !mostrarArchivadas;
+    mostrarVentas();
+}
+
+function initArchivadoUI(){
+    const lista = document.getElementById('listaVentas');
+    if(!lista) return;
+    let btn = document.getElementById('btnToggleArchivadas');
+    if(!btn){
+        btn = document.createElement('button');
+        btn.id='btnToggleArchivadas';
+        btn.className='btn-archivar-toggle';
+        btn.style.margin='10px 6px 10px 0';
+        btn.onclick=toggleMostrarArchivadas;
+        lista.parentNode.insertBefore(btn, lista);
+    }
+    btn.textContent = mostrarArchivadas ? '📂 Ocultar archivadas' : '📂 Mostrar archivadas';
+
+    let btnDel = document.getElementById('btnEliminarArchivadas');
+    if(!btnDel){
+        btnDel = document.createElement('button');
+        btnDel.id='btnEliminarArchivadas';
+        btnDel.className='btn-eliminar-archivadas';
+        btnDel.style.margin='10px 0';
+        btnDel.textContent='🗑 Eliminar archivadas';
+        btnDel.onclick=eliminarVentasArchivadas;
+        btn.parentNode.insertBefore(btnDel, btn.nextSibling);
+    }
+    btnDel.style.display = mostrarArchivadas ? '' : 'none';
+}
+
+async function eliminarVentasArchivadas(){
+  const ventasArchivadas = ventas.filter(v=>v.archivado);
+  if(ventasArchivadas.length===0){mostrarToast('No hay ventas archivadas','info');return;}
+  const confirmar = await mostrarConfirmacion(`Se eliminarán ${ventasArchivadas.length} venta(s) archivadas. ¿Deseas continuar?`,'Eliminar archivadas');
+  if(!confirmar) return;
+  try{
+     for(const v of ventasArchivadas){
+        await eliminarVentaPermanente(v.id);
+     }
+     ventas = await obtenerTodasLasVentas();
+     mostrarToast('Ventas archivadas eliminadas','success');
+     mostrarVentas();
+  }catch(e){console.error(e);mostrarToast('Error al eliminar archivadas','error');}
 }
