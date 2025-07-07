@@ -1,0 +1,32 @@
+/* Controles de paginación genéricos */
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 15px 0;
+}
+
+.btn-pagination {
+  padding: 6px 10px;
+  border: 1px solid #d4af37;
+  background-color: #fffaf0;
+  color: #4b3500;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.btn-pagination:hover:not(:disabled) {
+  background-color: #d4af37;
+  color: #fff;
+}
+
+.btn-pagination:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.btn-pagination.active {
+  background-color: #a58b36;
+  color: #fff;
+} 
