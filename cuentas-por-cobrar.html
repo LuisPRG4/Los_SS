@@ -14,6 +14,7 @@
 
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/pagination.css">
     <link rel="stylesheet" href="css/ayuda.css" />
     <link rel="stylesheet" href="css/calendar.css" />
     <link rel="stylesheet" href="css/whatsapp.css" />
@@ -48,6 +49,7 @@
             <li><a href="finanzas.html">💰 Finanzas</a></li>
             <li><a href="novedades.html">🐶 Novedades</a></li>
             <li><a href="pedidos.html">📦 Pedidos</a></li>
+            <li><a href="datos.html">💾 Datos</a></li>
         </ul>
     </nav>
 
@@ -94,6 +96,7 @@
             <h2>🔝 Clientes más morosos</h2>
             <ul id="listaRankingMorosos"></ul>
         </section>
+
 
         <section class="kpi-box">
             <h2>📈 Resumen de Cuentas</h2>
@@ -157,8 +160,9 @@
     </ul>
     <button id="cerrarAyuda">Cerrar Ayuda</button>
     </section>
+
         
-   <!-- Mini menú lateral con botón de flecha -->
+   <!-- Mini menú lateral con botón de flechita -->
     <div id="miniMenuLateral" class="expandido">
         <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
         <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
@@ -225,6 +229,8 @@
 
     <script src="js/db.js"></script>
     <script src="js/calendar.js"></script> <!-- ¡NUEVA LÍNEA CLAVE! -->
+
+    <script src="js/pagination.js" defer></script>
     <script src="js/cuentas-por-cobrar.js"></script>
     <script src="js/nav-highlighter.js" defer></script>
     <script src="js/chatbot-ayuda.js" defer></script>
@@ -235,6 +241,7 @@
             document.getElementById("navMenu").classList.toggle("open");
         }
 
+        // Redirección si la sesión no está iniciada (se mantiene aquí para seguridad)
         if (sessionStorage.getItem("sesionIniciada") !== "true") {
             window.location.href = "login.html";
         }
