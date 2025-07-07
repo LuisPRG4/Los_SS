@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     
     // Comprobar si hay una sesión activa
     checkActiveSession();
+    
+    // Actualizar badges en accesos rápidos
+    updateQuickAccessBadges();
 });
 
 /**
@@ -348,4 +351,21 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
+}
+
+async function updateQuickAccessBadges(){
+   try{
+       await abrirDB();
+       const ventas = await obtenerTodasLasVentas() || [];
+       const pendientes = ventas.filter(v=> v.tipoPago === 'credito' && v.estadoPago !== 'Pagado Total').length;
+       const cxcBtn = document.querySelector('.quick-button[data-badge="cxc"] .badge-count');
+       if(cxcBtn){
+           if(pendientes>0){
+               cxcBtn.style.display='block';
+               cxcBtn.textContent = pendientes>99 ? '99+' : pendientes;
+           }else{
+               cxcBtn.style.display='none';
+           }
+       }
+   }catch(e){console.error('Error badge',e);}
 }
