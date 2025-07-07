@@ -1,0 +1,92 @@
+/* ===== Navegación principal (extraído de style.css) ===== */
+
+nav {
+  background-color: #fffaf0;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 30px;
+  text-align: center;
+  border: 1px solid #d4af37;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 0;
+  padding: 0;
+}
+
+nav a {
+  text-decoration: none;
+  font-weight: bold;
+  padding: 8px 15px;
+  border-radius: 8px;
+  background-color: #ffffff;
+  border: 1px solid #d5bfff;
+  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+  color: #4b3500; /* Color sólido, sin degradado */
+  /* Se elimina el degradado y la animación shimmer */
+  background-image: none !important;
+  -webkit-text-fill-color: #4b3500 !important;
+  animation: none !important;
+}
+
+nav a:hover {
+  background-color: #a58b36;
+  color: #ffffff;
+}
+
+nav a.active {
+  background-color: #a58b36;
+  border-color: #d4af37;
+  color: #ffffff;
+}
+
+nav a.active:hover {
+  background-color: #a58b36;
+  color: #ffffff;
+}
+
+/* ===== Botón Menú Hamburguesa ===== */
+.menu-toggle {
+  display: none; /* Oculto por defecto en escritorio */
+  font-size: 1.5rem;
+  cursor: pointer;
+  background: linear-gradient(145deg, #f7e1b8, #c6a663);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 90px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+/* ===== Navegación Responsive ===== */
+@media (max-width: 768px) {
+  nav ul {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  nav a {
+    width: 100%;
+    text-align: center;
+  }
+
+  /* Menú hamburguesa */
+  .menu-toggle {
+    display: block;
+    margin-bottom: auto;
+  }
+
+  nav ul {
+    display: none; /* Oculto por defecto */
+    margin-top: 10px;
+  }
+
+  nav ul.open {
+    display: flex; /* Se muestra al activar la hamburguesa */
+  }
+} 
