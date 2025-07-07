@@ -1,0 +1,9 @@
+{
+  "ventas": {
+    "registrarMultiproducto": "<strong>¿Cómo registrar una venta con varios productos?</strong><p>Selecciona un producto, indica la cantidad y pulsa \"Agregar Producto\". Repite este proceso para todos los productos que desees incluir.</p>",
+    "tiposPago": "<strong>¿Qué opciones de pago hay?</strong><p>Puedes elegir entre <strong>Contado</strong> (efectivo, transferencia, pago móvil) o <strong>Crédito</strong> (con fecha de vencimiento).</p>"
+  },
+  "inventario": {
+    "errorStock": "<strong>Errores comunes con el stock:</strong><ul><li>No ingresar números negativos o textos en los campos de stock.</li><li>Asegúrate de que el stock máximo sea mayor o igual al stock mínimo.</li><li>Verifica que el stock actual no sea menor que el stock mínimo para evitar alertas constantes.</li></ul>"
+  }
+} 
