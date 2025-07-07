@@ -6,6 +6,17 @@ let ventas = []; // <--- ASEGÚRATE DE QUE ESTA LÍNEA EXISTA
 let currentVentaIdAbono = null; // Para el modal de abonos
 let abonoEnProceso = false;
 
+let currentPageCuentas = 1;
+const rowsPerPageCuentas = 10;
+
+const sortOptionsCxC = [
+  { key: 'fechaVencimiento', label: 'Vencimiento' },
+  { key: 'cliente', label: 'Cliente' },
+  { key: 'montoPendiente', label: 'Monto pendiente' }
+];
+let sortKeyCxC = 'fechaVencimiento';
+let sortAscCxC = true;
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         await abrirDB(); // Abre la base de datos
@@ -38,6 +49,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             btnExportarHistorialPagadasPDF.style.display = "none"; // <--- Esta es la línea
         }
         // --- FIN DE LA LÍNEA ---
+
+        initSortCxC();
 
         await cargarYMostrarCuentasPorCobrar();
 
@@ -163,6 +176,15 @@ async function cargarYMostrarCuentasPorCobrar() {
         // Forzar un refresco de los eventos después de actualizar la UI
         agregarEventosHistorial();
 
+        // Aplicar paginación después de renderizar las tarjetas
+        setTimeout(() => {
+            if (window.PaginacionUtils?.paginarDOM) {
+                PaginacionUtils.paginarDOM('#listaCuentasPorCobrar', '.venta-credito-card', currentPageCuentas, rowsPerPageCuentas, 'paginacionCuentas', (nuevaPag) => {
+                    currentPageCuentas = nuevaPag;
+                });
+            }
+        }, 0);
+
     } catch (error) {
         console.error("Error al cargar y mostrar cuentas por cobrar:", error);
         mostrarToast("Error al cargar cuentas por cobrar ❌", 'error');
@@ -170,6 +192,21 @@ async function cargarYMostrarCuentasPorCobrar() {
 }
 
 function mostrarCuentasEnUI(cuentasParaMostrar) {
+    // Ordenar segun sortKeyCxC antes de filtros adicionales
+    cuentasParaMostrar.sort((a,b)=>{
+      let valA,valB;
+      switch(sortKeyCxC){
+        case 'cliente': valA=(a.cliente||'').toLowerCase(); valB=(b.cliente||'').toLowerCase(); break;
+        case 'montoPendiente': valA=a.montoPendiente||0; valB=b.montoPendiente||0; break;
+        case 'fechaVencimiento': default:
+          valA=new Date(a.detallePago?.fechaVencimiento||'9999-12-31');
+          valB=new Date(b.detallePago?.fechaVencimiento||'9999-12-31');
+      }
+      if (valA < valB) return sortAscCxC? -1: 1;
+      if (valA > valB) return sortAscCxC? 1: -1;
+      return 0;
+    });
+
     const listaCuentas = document.getElementById("listaCuentasPorCobrar");
     listaCuentas.innerHTML = "";
 
@@ -177,23 +214,6 @@ function mostrarCuentasEnUI(cuentasParaMostrar) {
         listaCuentas.innerHTML = `<p class="mensaje-lista">No hay cuentas por cobrar pendientes que coincidan con los filtros.</p>`;
         return;
     }
-
-    // Ordenar las ventas: primero las vencidas, luego las próximas, luego las demás, por fecha.
-    cuentasParaMostrar.sort((a, b) => {
-        const now = new Date();
-        const dateA = new Date(a.detallePago.fechaVencimiento || '9999-12-31'); // Poner fecha lejana si no hay vencimiento
-        const dateB = new Date(b.detallePago.fechaVencimiento || '9999-12-31');
-
-        const isAVencida = dateA < now && a.montoPendiente > 0;
-        const isBVencida = dateB < now && b.montoPendiente > 0;
-
-        if (isAVencida && !isBVencida) return -1; // A viene antes si está vencida y B no
-        if (!isAVencida && isBVencida) return 1;  // B viene antes si está vencida y A no
-
-        // Si ambos o ninguno están vencidos, ordenar por la fecha de vencimiento (ascendente)
-        return dateA - dateB;
-    });
-
 
     cuentasParaMostrar.forEach(venta => {
         const card = crearCardVentaCredito(venta);
@@ -1616,4 +1636,36 @@ function cerrarTodosLosModales() {
             modal.style.display = 'none';
         }
     });
+}
+
+function initSortCxC(){
+  const lista = document.getElementById('listaCuentasPorCobrar');
+  if(!lista) return;
+  let wrapper=document.getElementById('sortCxCContainer');
+  if(!wrapper){
+    wrapper=document.createElement('div');
+    wrapper.id='sortCxCContainer';
+    wrapper.style.textAlign='right';
+    lista.parentNode.insertBefore(wrapper, lista);
+  }
+  let select=document.getElementById('sortCxC');
+  if(!select){
+    select=document.createElement('select');
+    select.id='sortCxC';
+    select.style.margin='10px 0';
+    sortOptionsCxC.forEach(opt=>{
+      const option=document.createElement('option');
+      option.value=opt.key;
+      option.textContent=`Ordenar por ${opt.label}`;
+      select.appendChild(option);
+    });
+    wrapper.appendChild(select);
+    const btnDir=document.createElement('button');
+    btnDir.id='btnSortDirCxC';
+    btnDir.textContent='🔽';
+    btnDir.style.marginLeft='6px';
+    wrapper.appendChild(btnDir);
+    select.addEventListener('change',()=>{sortKeyCxC=select.value;cargarYMostrarCuentasPorCobrar();});
+    btnDir.addEventListener('click',()=>{sortAscCxC=!sortAscCxC;btnDir.textContent=sortAscCxC?'🔼':'🔽';cargarYMostrarCuentasPorCobrar();});
+  }
 }
