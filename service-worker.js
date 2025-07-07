@@ -51,6 +51,7 @@ const urlsToCache = [
   `${REPO_PREFIX}css/novedades.css`,
   `${REPO_PREFIX}css/stockAlert.css`,
   `${REPO_PREFIX}css/style.css`,
+  `${REPO_PREFIX}css/navigation.css`,
   `${REPO_PREFIX}css/tablaVentas.css`,
   `${REPO_PREFIX}css/tailwind.min.css`,
   `${REPO_PREFIX}css/ventas.css`,
@@ -114,6 +115,7 @@ const urlsToCache = [
   // Resources:
   `${REPO_PREFIX}resources/GPT.png`,
   `${REPO_PREFIX}resources/ICONO BOLSITA.png`,
+  `${REPO_PREFIX}resources/chatbot-respuestas.json`,
 ];
 
 // Función para verificar si un archivo es crítico
