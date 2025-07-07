@@ -8,12 +8,13 @@
 
   <link rel="stylesheet" href="css/style.css"/>
   <link rel="stylesheet" href="css/navigation.css">
-  <link rel="stylesheet" href="css/ventas.css"/> 
+  <link rel="stylesheet" href="css/ventas.css"/>
+  <link rel="stylesheet" href="css/pagination.css">
   <link rel="stylesheet" href="css/ayuda.css">
   <link rel="stylesheet" href="css/chatbot-ayuda.css" />
   <link rel="stylesheet" href="css/form-decoration.css" />
   <link rel="stylesheet" href="css/tablaVentas.css" />
-  <link rel="stylesheet" href="css/recibo-venta.css" /> 
+  <link rel="stylesheet" href="css/recibo-venta.css" /> <!-- NUEVO CSS PARA RECIBO -->
   <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
   <!-- Librería JsBarcode para códigos de barras -->
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
@@ -46,11 +47,12 @@
       <li><a href="finanzas.html">💰 Finanzas</a></li>
       <li><a href="novedades.html">🐶 Novedades</a></li>
        <li><a href="pedidos.html">📦 Pedidos</a></li>
+       <li><a href="datos.html">💾 Datos</a></li>
     </ul>
   </nav>
 
   <main>
-    <section id="formularioVenta" class="golden-decorated-form"> 
+    <section id="formularioVenta" class="golden-decorated-form"> <!-- ¡NUEVA CLASE AÑADIDA AQUÍ! -->
   <h2>➕ Registrar Venta Multiproducto</h2>
 
   <label for="clienteVenta">Cliente:</label>
@@ -71,7 +73,7 @@
   <button onclick="agregarProductoAVenta()">➕ Agregar Producto</button>
 
   <!--TABLA-->
-  <table class="productos-venta-table"> 
+  <table class="productos-venta-table"> <!-- ¡NUEVA CLASE AQUI! -->
     <thead>
         <tr>
             <th>Producto</th>
@@ -238,6 +240,11 @@
   </main>
 
   <script src="js/db.js"></script>
+
+  
+
+  <script src="js/pagination.js" defer></script> <!-- 1º -->
+
   <script src="js/ventas.js"></script>
   <script src="js/nav-highlighter.js" defer></script>
   <script src="js/chatbot-ayuda.js" defer></script>
