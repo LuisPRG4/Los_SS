@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const cerrarAyuda = document.getElementById("cerrarAyuda");
   const toggleMiniMenu = document.getElementById("toggleMiniMenu");
 
-  const respuestasChatbot = {
+  let respuestasChatbot = {
   inventario: {
     errorStock: `
       <strong>Errores comunes con el stock:</strong>
@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
   mermas: {
   motivosMerma: `
     <strong>¿Qué motivo debo elegir?</strong>
-    <p>Selecciona el que más se ajuste a la causa de la pérdida: vencido, dañado, roto, o “Otro” si no está en la lista.</p>
+    <p>Selecciona el que más se ajuste a la causa de la pérdida: vencido, dañado, roto, o "Otro" si no está en la lista.</p>
     <p>Esto te ayudará a llevar mejores reportes en el futuro.</p>
   `,
   productoNoAparece: `
@@ -104,12 +104,12 @@ document.addEventListener("DOMContentLoaded", () => {
     <p>Sí, al registrar una merma, se descuenta la cantidad del stock automáticamente.</p>
   `,
   motivoOtro: `
-    <strong>¿Qué pasa si selecciono “Otro”?</strong>
+    <strong>¿Qué pasa si selecciono "Otro"?</strong>
     <p>Podrás escribir el motivo específico en el campo que aparece. Así puedes personalizar el motivo según el caso.</p>
   `,
   exportarMerma: `
     <strong>¿Cómo exportar el historial?</strong>
-    <p>Usa el botón “⬇️ Exportar” y elige entre PDF o Excel para guardar un reporte de tus mermas.</p>
+    <p>Usa el botón "⬇️ Exportar" y elige entre PDF o Excel para guardar un reporte de tus mermas.</p>
   `,
   errorCantidad: `
     <strong>¿Qué hago si me equivoqué en la cantidad?</strong>
@@ -413,5 +413,99 @@ novedades: {
 
   respuesta.innerHTML = texto;
 };
+
+  // ──────────────────────────────────────────────
+  // Carga dinámica de respuestas desde archivo JSON externo
+  // y generación automática de botones + buscador
+  // ──────────────────────────────────────────────
+
+  const JSON_PATH = "resources/chatbot-respuestas.json";
+
+  // IIFE asíncrona para cargar base de conocimiento una vez iniciado el DOM
+  (async function cargarBaseConocimiento() {
+    try {
+      const resp = await fetch(JSON_PATH);
+      if (resp.ok) {
+        const data = await resp.json();
+        // Combina lo que ya existe con lo que viene del archivo (el JSON sobrescribe si hay claves iguales)
+        respuestasChatbot = { ...respuestasChatbot, ...data };
+      } else {
+        console.warn("No se encontró "+JSON_PATH+"; se usará la base embebida.");
+      }
+    } catch (err) {
+      console.error("Error cargando la base externa del chatbot:", err);
+    }
+
+    // Cuando termina la carga (o falla) generamos los botones dinámicos
+    generarPreguntasDinamicas();
+  })();
+
+  // Devuelve el identificador de módulo a partir del <h3> del panel
+  function detectarModuloChatbot() {
+    const h3 = document.querySelector("#panelChatbot h3");
+    if (!h3) return null;
+    const texto = h3.textContent.toLowerCase();
+    const mapa = {
+      inventario: "inventario",
+      clientes: "clientes",
+      mermas: "mermas",
+      ventas: "ventas",
+      proveedores: "proveedores",
+      "cuentas por cobrar": "cuentasPorCobrar",
+      reportes: "reportes",
+      finanzas: "finanzas",
+      pedidos: "pedidos",
+      novedades: "novedades",
+    };
+    for (const clave in mapa) {
+      if (texto.includes(clave)) return mapa[clave];
+    }
+    return null;
+  }
+
+  // Construye los botones de preguntas y el buscador dentro del contenedor
+  function generarPreguntasDinamicas() {
+    const modulo = detectarModuloChatbot();
+    const contenedor = document.getElementById("chatbotContenido");
+    if (!contenedor || !modulo || !respuestasChatbot?.[modulo]) return;
+
+    // Crea / reutiliza buscador
+    let buscador = document.getElementById("chatbotSearch");
+    if (!buscador) {
+      buscador = document.createElement("input");
+      buscador.id = "chatbotSearch";
+      buscador.placeholder = "Escribe tu duda…";
+      buscador.classList.add("buscadorChatbot");
+      contenedor.prepend(buscador);
+    }
+
+    const preguntas = Object.entries(respuestasChatbot[modulo]);
+
+    const render = (lista) => {
+      // Elimina botones creados previamente para evitar duplicados
+      contenedor.querySelectorAll("button.preguntaDinamica").forEach(b => b.remove());
+      lista.forEach(([clave]) => {
+        const btn = document.createElement("button");
+        btn.className = "preguntaDinamica";
+        btn.textContent = formatearClavePreg(clave);
+        btn.onclick = () => window.mostrarRespuesta(clave);
+        contenedor.appendChild(btn);
+      });
+    };
+
+    buscador.onkeyup = (e) => {
+      const filtro = e.target.value.toLowerCase();
+      const filtradas = preguntas.filter(([k]) => k.toLowerCase().includes(filtro));
+      render(filtradas);
+    };
+
+    // Render inicial sin filtro
+    render(preguntas);
+  }
+
+  // Convierte camelCase o notación similar en texto legible
+  function formatearClavePreg(clave) {
+    return clave.replace(/([A-Z])/g, " $1").replace(/^./, m => m.toUpperCase()).trim() + "?";
+  }
 
 });
