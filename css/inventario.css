@@ -15,6 +15,17 @@
     }
 }
 
+/* Scroll snap para móvil */
+@media (max-width: 600px) {
+    .productos-grid {
+        scroll-snap-type: y mandatory;
+        overflow-y: auto;
+    }
+    .modern-card {
+        scroll-snap-align: start;
+    }
+}
+
 /* Estilo básico para el mensaje si no hay productos */
 .mensaje-lista {
     text-align: center;
