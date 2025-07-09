@@ -34,7 +34,7 @@
             <li><a href="index.html">🏠 Inicio</a></li>
             <li><a href="inventario.html">🧃 Inventario</a></li>
             <li><a href="mermas.html">📉 Mermas</a></li>
-            <li><a href="ventas.html">🛒 Ventas</a></li>
+            <li><a href="ventas.html">🧾 Ventas</a></li>
             <li><a href="clientes.html">👥 Clientes</a></li>
             <li><a href="proveedores.html">🚚 Proveedores</a></li>
             <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
@@ -126,6 +126,16 @@
                 <button id="descargarPlantillaBtn" class="btn btn-utility">
                     <i class="fas fa-download"></i> Descargar Plantilla </button>
             </div>
+        </section>
+
+        <section class="inventory-search">
+            <input type="search" id="busquedaInput" placeholder="Buscar producto..." />
+            <select id="ordenarSelect">
+                <option value="nombre">Ordenar por Nombre</option>
+                <option value="stock">Stock</option>
+                <option value="precio">Precio</option>
+                <option value="vendidos">Vendidos</option>
+            </select>
         </section>
 
         <section>
