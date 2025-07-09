@@ -93,8 +93,10 @@ const urlsToCache = [
   `${REPO_PREFIX}fav/SALAZAR.png`,
 
   // Fonts:
+  `${REPO_PREFIX}fonts/DMSerifText-Regular.ttf`,
   `${REPO_PREFIX}fonts/Handlee-Regular.ttf`,
   `${REPO_PREFIX}fonts/Montserrat-Italic.ttf`,
+  `${REPO_PREFIX}fonts/Nabla-Regular-VariableFont_EDPT,EHLT.ttf`,
   `${REPO_PREFIX}fonts/Playfair.ttf`,
 
   // Icons:
