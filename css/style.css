@@ -30,6 +30,20 @@ body {
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'DMSerifText';
+    src: url('../fonts/DMSerifText-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Nabla-Regular';
+    src: url('../fonts/Nabla-Regular-VariableFont_EDPT,EHLT.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 header {
     margin-bottom: 10px;
 }
@@ -78,7 +92,7 @@ header {
 }
 
 .titulo-header {
-    font-family: 'Handlee', cursive;
+    font-family: 'DMSerifText', cursive;
     font-size: 2rem;
     color: #4b3500;
     margin: 0 0 6px 0;
@@ -1308,4 +1322,27 @@ section button {
     .kpi span {
         font-size: 1.5em;
     }
+}
+
+/* Inventario - Buscador */
+.inventory-search {
+    text-align: center;
+    margin-bottom: 15px;
+}
+.inventory-search input[type="search"] {
+    padding: 10px 14px;
+    border-radius: 20px;
+    border: 1px solid #aaa;
+    max-width: 400px;
+}
+
+.inventory-search select {
+    padding: 10px 14px;
+    border-radius: 20px;
+    border: 1px solid #aaa;
+    max-width: 400px;
+    display: block;
+    margin: 10px auto;
+    background-color: #fff;
+    cursor: pointer;
 }
