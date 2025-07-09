@@ -44,6 +44,13 @@ body {
     font-style: normal;
 }
 
+@font-face {
+    font-family: 'Montserrat-Italic';
+    src: url('../fonts/Montserrat-Italic.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 header {
     margin-bottom: 10px;
 }
@@ -100,11 +107,12 @@ header {
 }
 
 .descripcion-header {
-    font-size: 0.95rem;
+    font-size: 0.90rem;
     color: #4b3500;
     font-style: italic;
     margin: 0;
     animation: desvanecer 1.2s ease;
+    font-family: Montserrat-Italic; /* BORRAR PARA LLEVAR A DEFECTO */
 }
 
 /* Estilos de navegación trasladados a css/navigation.css para mejor mantenimiento */
