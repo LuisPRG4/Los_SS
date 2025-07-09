@@ -3,11 +3,30 @@
 let productos = [];
 let editIndex = null;
 let editId = null;
+let terminoBusqueda = "";
+let criterioOrden = "nombre";
+
+// Mapeo de colores por categoría para cabecera
+const categoriaColores = {
+    "Lácteos": "#ff9aa2",
+    "Bebidas": "#a0ced9",
+    "Snacks": "#fbc687",
+    "Cereales": "#ffb7b2",
+    "Carnes": "#d4a5a5",
+    "Vegetales": "#bde0c6",
+    "Frutas": "#ffd97d",
+    "Limpieza": "#c5c6c7",
+    "Panadería": "#f6d6ad",
+    "Abarrotes": "#c9cba3",
+    "Congelados": "#9ec1cf",
+    "Refrigerados": "#a2d2ff",
+    "Otros": "#dec0f1"
+};
 
 document.addEventListener("DOMContentLoaded", async () => {
     await abrirDB(); // Asegúrate de que abrirDB() esté definido en db.js y funcione correctamente.
     productos = await obtenerTodosLosProductos();
-    mostrarProductos();
+    aplicarFiltros();
     cargarProveedores();
     setupPreview();
 
@@ -36,6 +55,24 @@ document.addEventListener("DOMContentLoaded", async () => {
         btnCancelar.addEventListener("click", cancelarEdicion);
     }
     // --- FIN: Asegurar que el botón de Cancelar tenga su evento ---
+
+    // --- Buscador en tiempo real ---
+    const busquedaInput = document.getElementById("busquedaInput");
+    if (busquedaInput) {
+        busquedaInput.addEventListener("input", (e) => {
+            terminoBusqueda = e.target.value.toLowerCase();
+            aplicarFiltros();
+        });
+    }
+
+    // --- Selector de ordenamiento ---
+    const ordenarSelect = document.getElementById("ordenarSelect");
+    if (ordenarSelect) {
+        ordenarSelect.addEventListener("change", (e) => {
+            criterioOrden = e.target.value;
+            aplicarFiltros();
+        });
+    }
 });
 
 function mostrarProductos(filtrados = productos) {
@@ -55,16 +92,37 @@ function mostrarProductos(filtrados = productos) {
 
 function crearCardProducto(producto) {
     const card = document.createElement("div");
-    card.className = "modern-card";
+    card.className = "modern-card fade-in";
+
+    // Determinar si el stock está por debajo del mínimo o por encima del máximo
+    const tieneMin = producto.stockMin !== null && producto.stockMin !== undefined;
+    const tieneMax = producto.stockMax !== null && producto.stockMax !== undefined;
+    if (tieneMin && producto.stock <= producto.stockMin) {
+        card.classList.add("stock-low");
+    } else if (tieneMax && producto.stock >= producto.stockMax) {
+        card.classList.add("stock-high");
+    } else {
+        // Umbrales por defecto cuando no hay mínimos/máximos definidos
+        if (producto.stock <= 1) {
+            card.classList.add("stock-low");
+        } else if (producto.stock >= 10) {
+            card.classList.add("stock-high");
+        }
+    }
 
     const imagenProductoUrl = producto.imagen || 'https://placehold.co/100x100/e0e0e0/5B2D90?text=Producto';
+
+    const colorHeader = categoriaColores[producto.categoria] || "#d4af37";
+    const headerStyle = `background: linear-gradient(90deg, ${colorHeader} 0%, transparent 100%);`;
 
     const stockMinDisplay = producto.stockMin ?? 'N/D';
     const stockMaxDisplay = producto.stockMax ?? 'N/D';
 
+    const indicadorTexto = card.classList.contains("stock-low") ? " 🔴" : (card.classList.contains("stock-high") ? " 🟢" : "");
+
     card.innerHTML = `
-        <div class="card-header">
-            <h3 title="${producto.nombre}">${producto.nombre}</h3>
+        <div class="card-header" style="${headerStyle}">
+            <h3 title="${producto.nombre}">${producto.nombre}${indicadorTexto}</h3>
             <span class="card-meta">Categoría: ${producto.categoria || 'Sin Categoría'}</span>
         </div>
         <div class="card-content">
@@ -82,6 +140,8 @@ function crearCardProducto(producto) {
             <p><strong>Stock Máximo:</strong> ${stockMaxDisplay}</p>
         </div>
         <div class="card-actions">
+            <button onclick="ajustarStock(${producto.id}, -1)" class="btn-minus">➖ 1</button>
+            <button onclick="ajustarStock(${producto.id}, 1)" class="btn-plus">➕ 1</button>
             <button onclick="cargarProductoParaEdicion(${producto.id})" class="btn-edit">✏️ Editar</button>
             <button onclick="eliminarProductoDesdeUI(${producto.id})" class="btn-delete">🗑️ Eliminar</button>
         </div>
@@ -203,7 +263,7 @@ async function guardarProductoFinal(producto) {
     }
 
     productos = await obtenerTodosLosProductos();
-    mostrarProductos();
+    aplicarFiltros();
     limpiarCampos();
 }
 
@@ -477,4 +537,60 @@ async function descargarPlantillaInventarioJSON() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     mostrarToast('Plantilla de inventario JSON descargada ✅');
+}
+
+// Filtra productos por nombre (puedes ampliar con otros criterios)
+function aplicarFiltros() {
+    let filtrados = productos.filter((p) =>
+        p.nombre.toLowerCase().includes(terminoBusqueda)
+    );
+    filtrados = ordenarLista(filtrados);
+    mostrarProductos(filtrados);
+}
+
+function ordenarLista(lista) {
+    const copia = [...lista];
+    switch (criterioOrden) {
+        case "nombre":
+            copia.sort((a, b) => a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" }));
+            break;
+        case "stock":
+            copia.sort((a, b) => (a.stock || 0) - (b.stock || 0));
+            break;
+        case "precio":
+            copia.sort((a, b) => (a.precio || 0) - (b.precio || 0));
+            break;
+        case "vendidos":
+            copia.sort((a, b) => (a.vendidos || 0) - (b.vendidos || 0));
+            break;
+        default:
+            break;
+    }
+    return copia;
+}
+
+// Ajustar stock en ±1 desde la tarjeta
+async function ajustarStock(idProducto, delta) {
+    const index = productos.findIndex(p => p.id === idProducto);
+    if (index === -1) {
+        mostrarToast("Producto no encontrado", "error");
+        return;
+    }
+    const producto = { ...productos[index] };
+    const nuevoStock = producto.stock + delta;
+    if (nuevoStock < 0) {
+        mostrarToast("El stock no puede ser negativo", "error");
+        return;
+    }
+
+    producto.stock = nuevoStock;
+    try {
+        await actualizarProducto(producto.id, producto);
+        productos[index] = producto;
+        mostrarToast(delta > 0 ? "Stock incrementado ✅" : "Stock decrementado ✅");
+        aplicarFiltros();
+    } catch (error) {
+        console.error("Error al ajustar stock:", error);
+        mostrarToast("Error al actualizar stock", "error");
+    }
 }
