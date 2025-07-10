@@ -406,7 +406,7 @@ function crearCardVentaCredito(venta) {
     const clienteDatos = clientes.find(c => c.nombre === nombreCliente);
     if (clienteDatos?.telefono) {
         const localNum = clienteDatos.telefono.replace(/\\D/g, '');
-        const numeroIntl = `52${localNum}`; // Asumimos México
+        const numeroIntl = `58${localNum}`; // Asumimos Venezuela
         const mensaje = encodeURIComponent(`Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
 
         const enlace = generarEnlaceWhatsApp(numeroIntl, `Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
@@ -1440,7 +1440,7 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
                         <strong>Cliente:</strong> ${venta.cliente}
                         ${clienteData.telefono ? (() => {
                             const localNum = clienteData.telefono.replace(/\\D/g, '');
-                            const numeroIntl = `52${localNum}`; // Asumimos México
+                            const numeroIntl = `58${localNum}`; // Asumimos Venezuela
                             const enlace = generarEnlaceWhatsApp(numeroIntl, `Hola ${clienteData.nombre || ''}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
                             return `<a href="${enlace}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
                         })() : ''}
