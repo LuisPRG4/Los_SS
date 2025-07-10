@@ -50,7 +50,6 @@ body {
     font-weight: normal;
     font-style: normal;
 }
-
 header {
     margin-bottom: 10px;
 }
@@ -640,6 +639,10 @@ label {
 
     .descripcion-header {
         font-size: 0.85rem;
+    }
+
+    .connection-icon {
+        display: none !important;
     }
 }
 
@@ -1353,4 +1356,20 @@ section button {
     margin: 10px auto;
     background-color: #fff;
     cursor: pointer;
+}
+
+/* Indicador de conexión */
+.connection-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.6rem;
+    transition: color 0.3s ease;
+    pointer-events: none;
+}
+.connection-icon.offline {
+    color: #e74c3c;
+}
+.connection-icon.online {
+    color: #27ae60;
 }
