@@ -25,6 +25,7 @@
                 <h1 class="titulo-header">🧃 Inventario</h1>
                 <p class="descripcion-header">Administra todos tus productos, controla el stock, establece niveles mínimos, máximos, costos, precios y mantén tu inventario siempre actualizado y organizado.</p>
             </div>
+            <span id="connectionStatus" class="connection-icon online" title="En línea">●</span>
         </div>
     </header>
 
@@ -188,6 +189,7 @@
     <script src="js/inventario.js"></script>
     <script src="js/nav-highlighter.js" defer></script>
     <script src="js/chatbot-ayuda.js"></script>
+    <script src="js/connection-status.js"></script>
 
     <script>
         function toggleMenu() {
@@ -211,6 +213,30 @@
         document.getElementById("cerrarAyuda").addEventListener("click", () => {
             document.getElementById("ayuda").classList.remove("visible");
         });
+    </script>
+
+    <script>
+        (function(){
+            const icon = document.getElementById('connectionStatus');
+            if(!icon) return;
+
+            function actualizarEstado(){
+                const enLinea = navigator.onLine;
+                if(enLinea){
+                    icon.classList.remove('offline');
+                    icon.classList.add('online');
+                    icon.title = 'En línea';
+                } else {
+                    icon.classList.remove('online');
+                    icon.classList.add('offline');
+                    icon.title = 'Sin conexión';
+                }
+            }
+
+            window.addEventListener('online', actualizarEstado);
+            window.addEventListener('offline', actualizarEstado);
+            actualizarEstado();
+        })();
     </script>
 
 </body>
