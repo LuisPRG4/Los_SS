@@ -409,9 +409,7 @@ function crearCardVentaCredito(venta) {
         const mensaje = encodeURIComponent(`Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
 
         const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
-        const enlace = esMovil
-            ? `https://wa.me/52${numero}?text=${mensaje}`
-            : `https://web.whatsapp.com/send?phone=52${numero}&text=${mensaje}`;
+        const enlace = generarEnlaceWhatsApp(numero, `Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
 
         const botonWhatsapp = document.createElement("a");
         botonWhatsapp.href = enlace;
@@ -1440,7 +1438,10 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
                     </div>
                     <div class="detalle-item">
                         <strong>Cliente:</strong> ${venta.cliente}
-                        ${clienteData.telefono ? `<a href="https://wa.me/52${clienteData.telefono.replace(/\D/g, '')}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>` : ''}
+                        ${clienteData.telefono ? (() => {
+                            const linkWA = generarEnlaceWhatsApp(clienteData.telefono, `Hola ${clienteData.nombre || ''}, tienes una cuenta pendiente con nosotros.`);
+                            return `<a href="${linkWA}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
+                        })() : ''}
                     </div>
                     <div class="detalle-item">
                         <strong>Tipo de Pago:</strong> ${venta.tipoPago.charAt(0).toUpperCase() + venta.tipoPago.slice(1)}
@@ -1668,4 +1669,15 @@ function initSortCxC(){
     select.addEventListener('change',()=>{sortKeyCxC=select.value;cargarYMostrarCuentasPorCobrar();});
     btnDir.addEventListener('click',()=>{sortAscCxC=!sortAscCxC;btnDir.textContent=sortAscCxC?'🔼':'🔽';cargarYMostrarCuentasPorCobrar();});
   }
+}
+
+// === Utilidad para generar enlaces de WhatsApp ===
+function generarEnlaceWhatsApp(numeroRaw, mensajeRaw = '') {
+  const numero = String(numeroRaw).replace(/\D/g, ''); // Solo dígitos
+  const mensaje = mensajeRaw ? encodeURIComponent(mensajeRaw) : '';
+  const isMobile = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
+  if (isMobile) {
+    return `whatsapp://send?phone=52${numero}${mensaje ? `&text=${mensaje}` : ''}`;
+  }
+  return `https://web.whatsapp.com/send?phone=52${numero}${mensaje ? `&text=${mensaje}` : ''}`;
 }
