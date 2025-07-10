@@ -10,8 +10,9 @@
   <link rel="stylesheet" href="css/navigation.css">
   <link rel="stylesheet" href="css/ayuda.css" />
   <link rel="stylesheet" href="css/chatbot-ayuda.css">
-  <link rel="stylesheet" href="css/form-decoration.css">
+  <link rel="stylesheet" href="css/form-decoration.css"> <!-- ¡NUEVA LÍNEA CLAVE! -->
   <link rel="stylesheet" href="css/cards-general.css"/>
+  <link rel="stylesheet" href="css/fontawesome web/css/all.min.css"> <!-- Íconos FontAwesome -->
   
 </head>
 <body>
@@ -21,9 +22,10 @@
     <div class="header-container">
       <img src="logo/BIOMÉTRICA.png" alt="Logo" class="logo-libre" />
       <div class="texto-header">
-        <h1 class="titulo-header">📉 Merma</h1>
-        <p class="descripcion-header">Registra productos dañados, vencidos u otros descartes para mantener tu inventario limpio y actualizado.</p>
+        <h1 class="titulo-header">📉 Mermas</h1>
+        <p class="descripcion-header">Registra pérdidas por caducidad, merma o daño y mantén tu inventario actualizado.</p>
       </div>
+      <span class="connection-icon online" title="En línea">●</span>
     </div>
   </header>
 
@@ -33,7 +35,7 @@
       <li><a href="index.html">🏠 Inicio</a></li>
       <li><a href="inventario.html">🧃 Inventario</a></li>
       <li><a href="mermas.html">📉 Mermas</a></li>
-      <li><a href="ventas.html">🛒 Ventas</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
       <li><a href="clientes.html">👥 Clientes</a></li>
       <li><a href="proveedores.html">🚚 Proveedores</a></li>
       <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
@@ -46,7 +48,7 @@
   </nav>
 
   <main>
-    <section id="formularioMerma" class="golden-decorated-form">
+    <section id="formularioMerma" class="golden-decorated-form"> <!-- ¡NUEVA CLASE AÑADIDA AQUÍ! -->
       <h2>➕ Registrar Merma</h2>
 
       <label>Producto:</label>
@@ -105,9 +107,11 @@
       </div>
         </div>
 
+      <!-- Cambiado de <ul> a <div> y añadida clase para layout de cuadrícula -->
       <div id="listaMermas" class="mermas-grid"></div>
     </section>
 
+    <!-- Ayuda contextual -->
     <section id="ayuda">
       <div class="h2title"><h2>📉 Módulo Merma</h2></div>
       <h3>❓ ¿Cómo usar este módulo?</h3>
@@ -124,12 +128,14 @@
       <button id="cerrarAyuda">Cerrar Ayuda</button>
     </section>
 
+    <!-- Mini menú lateral con botón de flechita -->
 <div id="miniMenuLateral" class="expandido">
   <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
   <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
   <button id="toggleMiniMenu" class="miniBoton dorado toggleArrow" title="Ocultar menú">➡️</button>
 </div>
 
+<!-- Panel del chatbot para Mermas -->
 <div id="panelChatbot">
   <button class="cerrarBtn" id="cerrarChatbot">×</button>
   <h3>Chatbot - Mermas</h3>
@@ -139,7 +145,7 @@
     <button onclick="mostrarRespuesta('productoNoAparece')">¿Qué hacer si el producto no aparece?</button>
     <button onclick="mostrarRespuesta('editarMerma')">¿Puedo editar una merma registrada?</button>
     <button onclick="mostrarRespuesta('afectaInventario')">¿Esto afecta al inventario?</button>
-    <button onclick="mostrarRespuesta('motivoOtro')">¿Qué pasa si selecciono “Otro”?</button>
+    <button onclick="mostrarRespuesta('motivoOtro')">¿Qué pasa si selecciono "Otro"?</button>
     <button onclick="mostrarRespuesta('exportarMerma')">¿Cómo exportar el historial?</button>
     <button onclick="mostrarRespuesta('errorCantidad')">¿Qué hago si me equivoqué en la cantidad?</button>
   </div>
@@ -152,6 +158,7 @@
   <script src="js/mermas.js"></script>
   <script src="js/nav-highlighter.js" defer></script>
   <script src="js/chatbot-ayuda.js" defer></script>
+  <script src="js/connection-status.js"></script>
   
   <script>
     function toggleMenu() {
