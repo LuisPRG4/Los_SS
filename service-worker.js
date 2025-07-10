@@ -1,7 +1,6 @@
 // Archivo: service-worker.js
-
 // Incrementamos la versión y agregamos timestamp para forzar actualización
-const CACHE_NAME = "los-ss-cache-v13";
+const CACHE_NAME = "los-ss-cache-v14";
 const APP_VERSION = "1.0.5"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
@@ -57,8 +56,8 @@ const urlsToCache = [
   `${REPO_PREFIX}css/tailwind.min.css`,
   `${REPO_PREFIX}css/ventas.css`,
   `${REPO_PREFIX}css/whatsapp.css`,
-  `${REPO_PREFIX}css/update-button.css`, // ¡Asegúrate de incluir este nuevo CSS!
-  `${REPO_PREFIX}css/recibo-venta.css`, // Nuevo CSS para el recibo de venta
+  `${REPO_PREFIX}css/update-button.css`,
+  `${REPO_PREFIX}css/recibo-venta.css`,
 
   // JS:
   `${REPO_PREFIX}js/calendar.js`,
@@ -80,7 +79,8 @@ const urlsToCache = [
   `${REPO_PREFIX}js/reportes.js`,
   `${REPO_PREFIX}js/script.js`,
   `${REPO_PREFIX}js/ventas.js`,
-  `${REPO_PREFIX}js/sw-register.js`, // ¡Asegúrate de incluir este JS!
+  `${REPO_PREFIX}js/sw-register.js`, 
+  `${REPO_PREFIX}js/connection-status.js`,
 
   // Archivos externos (siempre y cuando GitHub Pages pueda acceder a ellos)
   `https://unpkg.com/xlsx/dist/xlsx.full.min.js`,
