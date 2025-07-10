@@ -6,14 +6,14 @@
   <title>Los SS - Pedidos</title>
   <link rel="icon" type="image/png" href="fav/SALAZAR.png">
 
-  <link rel="stylesheet" href="css/tailwind.min.css">
+  <link rel="stylesheet" href="css/tailwind.min.css"> <!--TAILWIND CSS-->
 
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/navigation.css">
   <link rel="stylesheet" href="css/ayuda.css">
   <link rel="stylesheet" href="css/chatbot-ayuda.css">
-  <link rel="stylesheet" href="css/form-decoration.css">
-  <link rel="stylesheet" href="css/cards-general.css">
+  <link rel="stylesheet" href="css/form-decoration.css"> <!-- ¡NUEVA LÍNEA CLAVE! -->
+  <link rel="stylesheet" href="css/cards-general.css"> <!-- ¡NUEVA LÍNEA CLAVE! -->
   <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
 
 </head>
@@ -28,6 +28,7 @@
       <h1 class="titulo-header">📦 Pedidos</h1>
       <p class="descripcion-header">Registra y gestiona los pedidos de tus clientes con facilidad. Controla el estado de cada pedido y asegura una entrega eficiente.</p>
     </div>
+    <span class="connection-icon online" title="En línea">●</span>
   </div>
 </header>
 
@@ -37,7 +38,7 @@
       <li><a href="index.html">🏠 Inicio</a></li>
       <li><a href="inventario.html">🧃 Inventario</a></li>
       <li><a href="mermas.html">📉 Mermas</a></li>
-      <li><a href="ventas.html">🛒 Ventas</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
       <li><a href="clientes.html">👥 Clientes</a></li>
       <li><a href="proveedores.html">🚚 Proveedores</a></li>
       <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
@@ -50,7 +51,7 @@
   </nav>
 
   <main>
-    <section class="golden-decorated-form">
+    <section class="golden-decorated-form"> <!-- ¡NUEVA CLASE AÑADIDA AQUÍ! -->
   <h2>➕ Nuevo Pedido</h2>
   
   <label>Selecciona el cliente:</label>
@@ -91,7 +92,7 @@
 
             <section>
           <h2>📋 Lista de Pedidos</h2>
-          
+          <!-- Cambiado de <ul> a <div> y añadida clase para layout de cuadrícula -->
           <div id="listaPedidos" class="pedidos-grid"></div>
         </section>
 
@@ -102,7 +103,7 @@
   </div> 
 
     <style>.btn-limpiar-pedidos {
-      background-color: #d4af37;
+      background-color: #d4af37; /* Antes: background-color: #5b2d90; */
       color: white;
       padding: 10px 18px;
       border: none;
@@ -118,6 +119,7 @@
       }
     </style>
 
+    <!-- Ayuda contextual para Pedidos -->
   <section id="ayuda">
     <div class="h2title"> 
       <h2>📦 Módulo Pedidos</h2>
@@ -145,6 +147,7 @@
   <button id="cerrarAyuda">Cerrar Ayuda</button>
   </section>
 
+     <!-- Mini menú lateral con botón de flechita -->
 <div id="miniMenuLateral" class="expandido">
   <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
   <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
@@ -175,6 +178,7 @@
   <script src="js/pedidos.js"></script>
   <script src="js/nav-highlighter.js" defer></script>
   <script src="js/chatbot-ayuda.js" defer></script>
+  <script src="js/connection-status.js"></script>
 
     <script>
       function toggleMenu() {
@@ -182,6 +186,7 @@
     }
     </script>
 
+    <!--SCRIPT PARA EL BOTÓN FLOTANTE DE AYUDA-->
 <script>
   function mostrarAyuda() {
     const ayuda = document.getElementById("ayuda");
