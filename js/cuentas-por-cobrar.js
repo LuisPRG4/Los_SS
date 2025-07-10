@@ -405,11 +405,11 @@ function crearCardVentaCredito(venta) {
     // 📱 Botón WhatsApp si el cliente tiene teléfono
     const clienteDatos = clientes.find(c => c.nombre === nombreCliente);
     if (clienteDatos?.telefono) {
-        const numero = clienteDatos.telefono.replace(/\D/g, '');
+        const localNum = clienteDatos.telefono.replace(/\\D/g, '');
+        const numeroIntl = `52${localNum}`; // Asumimos México
         const mensaje = encodeURIComponent(`Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
 
-        const esMovil = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
-        const enlace = generarEnlaceWhatsApp(numero, `Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
+        const enlace = generarEnlaceWhatsApp(numeroIntl, `Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
 
         const botonWhatsapp = document.createElement("a");
         botonWhatsapp.href = enlace;
@@ -1439,8 +1439,10 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
                     <div class="detalle-item">
                         <strong>Cliente:</strong> ${venta.cliente}
                         ${clienteData.telefono ? (() => {
-                            const linkWA = generarEnlaceWhatsApp(clienteData.telefono, `Hola ${clienteData.nombre || ''}, tienes una cuenta pendiente con nosotros.`);
-                            return `<a href="${linkWA}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
+                            const localNum = clienteData.telefono.replace(/\\D/g, '');
+                            const numeroIntl = `52${localNum}`; // Asumimos México
+                            const enlace = generarEnlaceWhatsApp(numeroIntl, `Hola ${clienteData.nombre || ''}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
+                            return `<a href="${enlace}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
                         })() : ''}
                     </div>
                     <div class="detalle-item">
@@ -1673,11 +1675,11 @@ function initSortCxC(){
 
 // === Utilidad para generar enlaces de WhatsApp ===
 function generarEnlaceWhatsApp(numeroRaw, mensajeRaw = '') {
-  const numero = String(numeroRaw).replace(/\D/g, ''); // Solo dígitos
+  const numero = String(numeroRaw).replace(/\\D/g, ''); // Solo dígitos con código país incluido
   const mensaje = mensajeRaw ? encodeURIComponent(mensajeRaw) : '';
   const isMobile = /android|iphone|ipad|mobile/i.test(navigator.userAgent);
   if (isMobile) {
-    return `whatsapp://send?phone=52${numero}${mensaje ? `&text=${mensaje}` : ''}`;
+    return `https://wa.me/${numero}${mensaje ? `?text=${mensaje}` : ''}`;
   }
-  return `https://web.whatsapp.com/send?phone=52${numero}${mensaje ? `&text=${mensaje}` : ''}`;
+  return `https://web.whatsapp.com/send?phone=${numero}${mensaje ? `&text=${mensaje}` : ''}`;
 }
