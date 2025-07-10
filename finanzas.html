@@ -10,11 +10,12 @@
   <link rel="stylesheet" href="css/navigation.css">
   <link rel="stylesheet" href="css/ayuda.css" />
   <link rel="stylesheet" href="css/chatbot-ayuda.css" />
-  <link rel="stylesheet" href="css/form-decoration.css"> 
-  <link rel="stylesheet" href="css/financial-cards.css">
+  <link rel="stylesheet" href="css/form-decoration.css"> <!-- ¡NUEVA LÍNEA CLAVE! -->
+  <link rel="stylesheet" href="css/financial-cards.css"> <!-- Nuevo CSS para las tarjetas financieras -->
+  <link rel="stylesheet" href="css/fontawesome web/css/all.min.css"> <!-- Íconos FontAwesome -->
 
   <style>
-
+    /* Estilos nuevos para el gráfico */
     .grafico-container {
       width: 400px;
       height: 400px;
@@ -32,6 +33,7 @@
       display: block;
     }
 
+    /* Toast */
     .toast-container {
       position: fixed;
       top: 1rem;
@@ -82,6 +84,7 @@
       <h1 class="titulo-header">💰 Finanzas</h1>
       <p class="descripcion-header">Visualiza y administra tus ingresos y gastos. Mantén un control financiero claro, con balances y reportes actualizados al instante.</p>
     </div>
+    <span class="connection-icon online" title="En línea">●</span>
   </div>
 </header>
 
@@ -91,7 +94,7 @@
       <li><a href="index.html">🏠 Inicio</a></li>
       <li><a href="inventario.html">🧃 Inventario</a></li>
       <li><a href="mermas.html">📉 Mermas</a></li>
-      <li><a href="ventas.html">🛒 Ventas</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
       <li><a href="clientes.html">👥 Clientes</a></li>
       <li><a href="proveedores.html">🚚 Proveedores</a></li>
       <li class="active"> <a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
@@ -168,7 +171,8 @@
     </section>
 
     <button onclick="exportarExcel()">📤 Exportar a Excel</button>
-    
+
+    <!-- Ayuda contextual para Finanzas -->
     <section id="ayuda">
       <div class="h2title"> 
         <h2>💰 Módulo Finanzas</h2> 
@@ -197,6 +201,7 @@
       <button id="cerrarAyuda">Cerrar Ayuda</button>
     </section>
 
+    <!-- Mini menú lateral con botón de flechita -->
     <div id="miniMenuLateral" class="expandido">
         <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
         <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
@@ -228,6 +233,7 @@
   <script src="js/finanzas.js"></script>
   <script src="js/nav-highlighter.js" defer></script>
   <script src="js/chatbot-ayuda.js" defer></script>
+  <script src="js/connection-status.js"></script>
 
   <script>
     function toggleMenu() {
