@@ -460,14 +460,21 @@ async function toggleHistorialPagos(event) {
             historialDiv.innerHTML = '<p>No hay abonos registrados para esta venta.</p>';
         } else {
             // Crear listado bonito de abonos
-            historialDiv.innerHTML = abonos.map(abono => `
-                <div class="abono-item">
-                    <p><strong>Fecha:</strong> ${abono.fechaAbono}</p>
-                    <p><strong>Monto Abonado:</strong> $${abono.montoAbonado.toFixed(2)}</p>
-                    ${abono.metodoPago ? `<p><strong>Método de Pago:</strong> ${abono.metodoPago}</p>` : ''}
-                </div>
-                <hr>
-            `).join('');
+            historialDiv.innerHTML = abonos.map(abono => {
+                // Formatear método de pago legible
+                let metodo = abono.formaPago || abono.metodoPago || '';
+                if (metodo === 'pago_movil') metodo = 'Pago Móvil';
+                else if (metodo) metodo = metodo.charAt(0).toUpperCase() + metodo.slice(1);
+
+                return `
+                    <div class="abono-item">
+                        <p><strong>Fecha y Hora:</strong> ${abono.fechaAbono}</p>
+                        <p><strong>Monto Abonado:</strong> $${abono.montoAbonado.toFixed(2)}</p>
+                        ${metodo ? `<p><strong>Método de Pago:</strong> ${metodo}</p>` : ''}
+                    </div>
+                    <hr>
+                `;
+            }).join('');
         }
         historialDiv.style.display = 'block';
     } catch (error) {
@@ -648,7 +655,7 @@ async function registrarAbono() {
 
         const nuevoAbono = {
             pedidoId: currentVentaIdAbono,
-            fechaAbono: getTodayDateFormattedLocal(),
+            fechaAbono: getNowDateTimeFormattedLocal(),
             montoAbonado: montoAbono,
             formaPago: formaPago // Añadir la forma de pago al objeto
         };
@@ -1094,6 +1101,21 @@ function getTodayDateFormattedLocal() {
     const month = (today.getMonth() + 1).toString().padStart(2, '0'); // getMonth() es de 0-11
     const day = today.getDate().toString().padStart(2, '0'); // getDate() es el día del mes
     return `${year}-${month}-${day}`;
+}
+
+// === Nueva utilidad: fecha y hora local (YYYY-MM-DD HH:MM) ===
+function getNowDateTimeFormattedLocal() {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, '0');
+  const d = String(now.getDate()).padStart(2, '0');
+  let hours = now.getHours();
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours ? hours : 12; // 0 -> 12
+  const hh12 = String(hours).padStart(2, '0');
+  return `${y}-${m}-${d} ${hh12}:${minutes} ${ampm}`;
 }
 
 // --- INICIO: FUNCIÓN PARA ELIMINAR HISTORIAL DE VENTAS PAGADAS ---
