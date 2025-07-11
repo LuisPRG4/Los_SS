@@ -1,7 +1,5 @@
-// Archivo: service-worker.js
-// Incrementamos la versión y agregamos timestamp para forzar actualización
-const CACHE_NAME = "los-ss-cache-v15";
-const APP_VERSION = "1.0.5"; // Incrementa esto cuando hagas cambios importantes
+const CACHE_NAME = "los-ss-cache-v16";
+const APP_VERSION = "1.0.6"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
 function getRepoPrefix() {
@@ -34,6 +32,8 @@ const urlsToCache = [
   `${REPO_PREFIX}proveedores.html`,
   `${REPO_PREFIX}reportesGraficos.html`,
   `${REPO_PREFIX}ventas.html`,
+  `${REPO_PREFIX}dashboard-analitico.html`,
+  `${REPO_PREFIX}datos.html`,
 
   // CSS:
   `${REPO_PREFIX}css/fontawesome web/css/all.min.css`,
@@ -43,6 +43,7 @@ const urlsToCache = [
   `${REPO_PREFIX}css/chatbot-ayuda.css`,
   `${REPO_PREFIX}css/exportData.css`,
   `${REPO_PREFIX}css/form-decoration.css`,
+  `${REPO_PREFIX}css/financial-cards.css`,
   `${REPO_PREFIX}css/index.css`,
   `${REPO_PREFIX}css/inventario.css`,
   `${REPO_PREFIX}css/login.css`,
@@ -58,17 +59,26 @@ const urlsToCache = [
   `${REPO_PREFIX}css/whatsapp.css`,
   `${REPO_PREFIX}css/update-button.css`,
   `${REPO_PREFIX}css/recibo-venta.css`,
+  `${REPO_PREFIX}css/reportes.css`,
+  `${REPO_PREFIX}css/ventas-pagadas.css`,
+  `${REPO_PREFIX}css/whatsapp.css`,
+  `${REPO_PREFIX}css/dashboard-analitico.css`,
 
   // JS:
   `${REPO_PREFIX}js/calendar.js`,
   `${REPO_PREFIX}js/chart.js`,
   `${REPO_PREFIX}js/chatbot-ayuda.js`,
   `${REPO_PREFIX}js/clientes.js`,
+  `${REPO_PREFIX}js/connection-status.js`,
+  `${REPO_PREFIX}js/dasboard.js`,
+  `${REPO_PREFIX}js/dashboard-analitico.js`,
   `${REPO_PREFIX}js/cuentas-por-cobrar.js`,
+  `${REPO_PREFIX}js/datos.js`,
   `${REPO_PREFIX}js/db.js`,
-  `${REPO_PREFIX}js/exportAll.js`,
+  `${REPO_PREFIX}js/exportAll.txt`,
   `${REPO_PREFIX}js/finanzas.js`,
   `${REPO_PREFIX}js/inventario.js`,
+  `${REPO_PREFIX}js/kpi-config.js`,
   `${REPO_PREFIX}js/login.js`,
   `${REPO_PREFIX}js/mermas.js`,
   `${REPO_PREFIX}js/nav-highlighter.js`,
@@ -79,8 +89,8 @@ const urlsToCache = [
   `${REPO_PREFIX}js/reportes.js`,
   `${REPO_PREFIX}js/script.js`,
   `${REPO_PREFIX}js/ventas.js`,
-  `${REPO_PREFIX}js/sw-register.js`, 
   `${REPO_PREFIX}js/connection-status.js`,
+  `${REPO_PREFIX}js/sw-register.js`,
 
   // Archivos externos (siempre y cuando GitHub Pages pueda acceder a ellos)
   `https://unpkg.com/xlsx/dist/xlsx.full.min.js`,
@@ -97,7 +107,6 @@ const urlsToCache = [
   `${REPO_PREFIX}fonts/Handlee-Regular.ttf`,
   `${REPO_PREFIX}fonts/Montserrat-Italic.ttf`,
   `${REPO_PREFIX}fonts/Nabla-Regular-VariableFont_EDPT,EHLT.ttf`,
-  `${REPO_PREFIX}fonts/Playfair.ttf`,
 
   // Icons:
   `${REPO_PREFIX}icons/1.EXCEL.png`,
