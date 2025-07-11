@@ -407,25 +407,28 @@ function crearCardVentaCredito(venta) {
     if (clienteDatos?.telefono) {
         const localNum = clienteDatos.telefono.replace(/\\D/g, '');
         const numeroIntl = `58${localNum}`; // Asumimos Venezuela
-        const mensaje = encodeURIComponent(`Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
+        const mensajeWhatsApp = `🥛 Buen día, estimado/a ${clienteDatos.nombre}: 🌟\n\n`+
+          `Esperamos que estés disfrutando de nuestros yogures cremosos y llenos de cariño 😊. Solo queremos compartirte un recordatorio amable:\n\n`+
+          `💳 Monto pendiente: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS, Tasa del día: [Tasa Actual])\n\n`+
+          `🍶 Pedido #: ${venta.id}\n\n`+
+          `📌 Opciones de pago (fáciles y seguras):\n`+
+          `1️⃣ Transferencia Bancaria: [Nombre del Banco] / Cuenta [Número de cuenta]\n`+
+          `2️⃣ Pago Móvil: [Número de teléfono] / C.I. [Cédula] / [Banco]\n`+
+          `3️⃣ Efectivo: Disponible al momento de entrega\n\n`+
+          `⌚ Si necesitas más tiempo o tienes alguna consulta, no dudes en contactarnos. Estamos para ayudarte a seguir disfrutando sin preocupaciones 🧘.\n\n`+
+          `Con especial atención,\n`+
+          `El equipo de [Nombre de tu empresa] 🍓\n`+
+          `📞 [Teléfono de contacto]`;
 
-        const enlace = generarEnlaceWhatsApp(numeroIntl, `Hola ${clienteDatos.nombre}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
+        const enlace = generarEnlaceWhatsApp(numeroIntl, mensajeWhatsApp);
 
-        const botonWhatsapp = document.createElement("a");
-        botonWhatsapp.href = enlace;
-        botonWhatsapp.target = "_blank";
+        const botonWhatsapp = document.createElement("button");
+        botonWhatsapp.type = "button";
         botonWhatsapp.className = "btn-whatsapp";
         botonWhatsapp.innerHTML = "📱 Contactar por WhatsApp";
-
         botonWhatsapp.addEventListener("click", () => {
-            botonWhatsapp.innerHTML = "✔️ Enviado por WhatsApp";
-            botonWhatsapp.classList.add("enviado");
-            setTimeout(() => {
-                botonWhatsapp.innerHTML = "📱 Contactar por WhatsApp";
-                botonWhatsapp.classList.remove("enviado");
-            }, 5000);
+            abrirModalWhatsApp(venta, clienteDatos, numeroIntl);
         });
-
         card.querySelector(".card-actions").appendChild(botonWhatsapp);
     }
 
@@ -1463,7 +1466,20 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
                         ${clienteData.telefono ? (() => {
                             const localNum = clienteData.telefono.replace(/\\D/g, '');
                             const numeroIntl = `58${localNum}`; // Asumimos Venezuela
-                            const enlace = generarEnlaceWhatsApp(numeroIntl, `Hola ${clienteData.nombre || ''}, tienes una cuenta pendiente con nosotros. ¿Podemos ayudarte a regularizarla?`);
+                            const mensajeWhatsApp = `🥛 Hola, ${clienteData.nombre}! 🌟\n\n`+
+                              `Esperamos que estés disfrutando de nuestros yogures cremosos 😊. Solo un recordativo amable:\n\n`+
+                              `💲 *Monto pendiente:* **$${venta.montoPendiente.toFixed(2)} USD** (≈ **[Monto en BS]** BS, Tasa **[Tasa]**).\n\n`+
+                              `🍶 *Pedido #:* **${venta.id}**\n\n`+
+                              `📌 ¿Cómo pagar? (Fácil y rápido):\n`+
+                              `1️⃣ Transferencia: [Banco] [Cuenta]\n`+
+                              `2️⃣ Pago Móvil: [Número] [Cédula] [Banco]\n`+
+                              `3️⃣ Efectivo\n\n`+
+                              `⌚ ¿Necesitas más tiempo? ¡Avísanos! Queremos que sigas disfrutando sin preocupaciones.\n\n`+
+                              `Atentamente,\n`+
+                              `El equipo de [Tu Empresa de Yogures] 🍓\n`+
+                              `📞 [Teléfono]`;
+
+                            const enlace = generarEnlaceWhatsApp(numeroIntl, mensajeWhatsApp);
                             return `<a href="${enlace}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
                         })() : ''}
                     </div>
@@ -1705,3 +1721,203 @@ function generarEnlaceWhatsApp(numeroRaw, mensajeRaw = '') {
   }
   return `https://web.whatsapp.com/send?phone=${numero}${mensaje ? `&text=${mensaje}` : ''}`;
 }
+
+// === MODAL PARA WHATSAPP ===
+// Función global para abrir el modal de edición y envío de WhatsApp
+window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl){
+  // Crear modal si aún no existe
+  let modal = document.getElementById('modalWhatsApp');
+  if(!modal){
+    modal = document.createElement('div');
+    modal.id = 'modalWhatsApp';
+    modal.className = 'modal-overlay';
+    // === Inyectar CSS responsivo (solo una vez) ===
+    if(!document.getElementById('whModalStyles')){
+      const styleTag = document.createElement('style');
+      styleTag.id = 'whModalStyles';
+      styleTag.textContent = `
+        #modalWhatsApp .modal-content{max-width:95%;width:95%;}
+        #modalWhatsApp canvas{max-width:100%;height:auto;}
+        #modalWhatsApp .wh-tabs button{flex:1;padding:6px 8px;border:none;background:#ddd;border-radius:4px;cursor:pointer;}
+        #modalWhatsApp .wh-tabs .tab-active{background:#caa43b;color:#fff;}
+      `;
+      document.head.appendChild(styleTag);
+    }
+    modal.innerHTML = `
+      <div class="modal-content whatsapp-modal">
+        <div class="modal-header">
+          <h2>Edición de WhatsApp</h2>
+          <span id="cerrarModalWhatsApp" class="close-button">&times;</span>
+        </div>
+
+        <div class="wh-tabs" style="display:flex; gap:6px; margin-bottom:10px;">
+          <button id="tabTexto" class="tab-active">Mensaje</button>
+          <button id="tabSticker">Sticker</button>
+        </div>
+
+        <div class="modal-body" id="whTextoSection">
+          <label style="display:block; margin-bottom:8px;">Tasa BCV (Bs/USD):
+            <input type="number" id="whTasaInput" step="0.0001" style="width:120px; margin-left:6px;" />
+          </label>
+          <textarea id="whMessageText" rows="10" style="width:100%; resize:vertical;"></textarea>
+        </div>
+
+        <div class="modal-body" id="whStickerSection" style="display:none; text-align:center;">
+          <canvas id="whStickerCanvas" width="512" height="512" style="border:1px solid #ccc; background:#fff;"></canvas>
+          <div style="margin-top:10px;">
+            <button id="btnDescargarSticker" class="btn-secondary">📥 Descargar Sticker</button>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button id="btnEnviarWhatsApp" class="btn-success">Enviar por WhatsApp</button>
+        </div>
+      </div>`;
+    document.body.appendChild(modal);
+
+    // Cerrar modal al hacer clic en X o fuera del contenido
+    modal.addEventListener('click', (e)=>{
+      if(e.target.id==='cerrarModalWhatsApp'|| e.target===modal){
+        modal.style.display='none';
+      }
+    });
+  }
+
+  // Preparar mensaje
+  const tasaInput = modal.querySelector('#whTasaInput');
+  const txtArea   = modal.querySelector('#whMessageText');
+  const btnEnviar = modal.querySelector('#btnEnviarWhatsApp');
+  const tabTexto  = modal.querySelector('#tabTexto');
+  const tabSticker= modal.querySelector('#tabSticker');
+  const textoSection = modal.querySelector('#whTextoSection');
+  const stickerSection = modal.querySelector('#whStickerSection');
+  const canvasSticker = modal.querySelector('#whStickerCanvas');
+  const btnDescargarSticker = modal.querySelector('#btnDescargarSticker');
+
+  // Obtener tasa guardada o valor por defecto
+  const storedTasa = parseFloat(localStorage.getItem('tasaBCV')) || 0;
+  const tasaInicial = storedTasa>0? storedTasa : 0;
+  tasaInput.value = tasaInicial;
+
+  const construirMensaje = (tasaValor)=>{
+    const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
+    return `🥛 Buen día, estimado/a ${clienteDatos.nombre}: 🌟\n\n`+
+    `Esperamos que estés disfrutando de nuestros yogures cremosos y llenos de cariño 😊. Solo queremos compartirte un recordatorio amable:\n\n`+
+    `💳 Monto pendiente: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS, Tasa del día: ${tasaValor})\n\n`+
+    `🍶 Pedido #: ${venta.id}\n\n`+
+    `📌 Opciones de pago (fáciles y seguras):\n`+
+    `1️⃣ Transferencia Bancaria: [Nombre del Banco] / Cuenta [Número de cuenta]\n`+
+    `2️⃣ Pago Móvil: [Número de teléfono] / C.I. [Cédula] / [Banco]\n`+
+    `3️⃣ Efectivo: Disponible al momento de entrega\n\n`+
+    `⌚ Si necesitas más tiempo o tienes alguna consulta, no dudes en contactarnos. Estamos para ayudarte a seguir disfrutando sin preocupaciones 🧘.\n\n`+
+    `Con especial atención,\n`+
+    `El equipo de [Nombre de tu empresa] 🍓\n`+
+    `📞 [Teléfono de contacto]`;
+  };
+
+  // Rellenar mensaje inicial
+  txtArea.value = construirMensaje(tasaInicial);
+
+  // === FUNCIONES PARA STICKER ===
+  const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
+    const words = text.split(' ');
+    let line = '';
+    for (let n = 0; n < words.length; n++) {
+      const testLine = line + words[n] + ' ';
+      const metrics = context.measureText(testLine);
+      const testWidth = metrics.width;
+      if (testWidth > maxWidth && n > 0) {
+        context.fillText(line, x, y);
+        line = words[n] + ' ';
+        y += lineHeight;
+      } else {
+        line = testLine;
+      }
+    }
+    context.fillText(line, x, y);
+  };
+
+  const renderSticker = () => {
+    const ctx = canvasSticker.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0,0,512,512);
+    ctx.fillStyle = '#000000';
+    ctx.font = '22px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    const margin = 20;
+    wrapText(ctx, txtArea.value, 256, margin, 472, 28);
+  };
+
+  // Dibujar inicialmente
+  renderSticker();
+
+  // Actualizar sticker al cambiar mensaje o tasa
+  const updateAll = ()=>{
+    const nuevaTasa = parseFloat(tasaInput.value)||0;
+    txtArea.value = construirMensaje(nuevaTasa);
+    renderSticker();
+  };
+  tasaInput.oninput = updateAll;
+  txtArea.oninput = renderSticker;
+
+  // Tabs
+  const activateTab = (isTexto)=>{
+    if(isTexto){
+      tabTexto.classList.add('tab-active');
+      tabSticker.classList.remove('tab-active');
+      textoSection.style.display='block';
+      stickerSection.style.display='none';
+    }else{
+      tabSticker.classList.add('tab-active');
+      tabTexto.classList.remove('tab-active');
+      textoSection.style.display='none';
+      stickerSection.style.display='block';
+      renderSticker();
+    }
+  };
+  tabTexto.onclick = ()=>activateTab(true);
+  tabSticker.onclick = ()=>activateTab(false);
+
+  // Descargar sticker
+  btnDescargarSticker.onclick = ()=>{
+    canvasSticker.toBlob(blob=>{
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `sticker_pedido_${venta.id}.png`;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+  };
+
+  // Acción enviar
+  btnEnviar.onclick = ()=>{
+    const tasaUsada = parseFloat(tasaInput.value)||0;
+    // guardar tasa en localStorage para próximos usos
+    if(tasaUsada>0){
+      localStorage.setItem('tasaBCV', tasaUsada.toString());
+    }
+    const mensajeFinal = txtArea.value;
+    const enlaceEnvio = generarEnlaceWhatsApp(numeroIntl, mensajeFinal);
+    window.open(enlaceEnvio, '_blank');
+    modal.style.display = 'none';
+  };
+
+  // Mostrar modal
+  modal.style.display='flex';
+};
+
+// Delegación global para enlaces de WhatsApp dentro de modales/detalles
+document.body.addEventListener('click', (e)=>{
+  const link = e.target.closest('.btn-link-whatsapp');
+  if(link){
+    e.preventDefault();
+    const ventaId = Number(link.dataset.ventaId);
+    const numeroIntl = link.dataset.numeroIntl;
+    const venta = ventas.find(v=>v.id===ventaId);
+    if(!venta) return;
+    const clienteDatos = clientes.find(c=>c.nombre===venta.cliente) || {nombre: venta.cliente};
+    abrirModalWhatsApp(venta, clienteDatos, numeroIntl);
+  }
+}, false);
