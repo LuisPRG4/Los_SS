@@ -1,9 +1,9 @@
-let ventasCredito = [];
+let ventasCredito = []; // Solo las ventas a crédito
 let clientes = [];
-let abonos = [];
-let ventas = [];
+let abonos = []; // Para los abonos
+let ventas = []; // <--- ASEGÚRATE DE QUE ESTA LÍNEA EXISTA
 
-let currentVentaIdAbono = null;
+let currentVentaIdAbono = null; // Para el modal de abonos
 let abonoEnProceso = false;
 
 let currentPageCuentas = 1;
@@ -19,15 +19,18 @@ let sortAscCxC = true;
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        await abrirDB();
+        await abrirDB(); // Abre la base de datos
 
+        // Cargar todos los datos necesarios al inicio
         ventas = await obtenerTodasLasVentas();
         clientes = await obtenerTodosLosClientes();
         llenarDatalistClientes();
         abonos = await obtenerTodosLosAbonos();
 
+        // NUEVO: Verificar y normalizar las fechas de vencimiento
         await verificarFormatosFechasVencimiento();
 
+        // Inicializar la sección de ventas pagadas
         const seccionVentasPagadas = document.getElementById("seccionVentasPagadas");
         if (seccionVentasPagadas) {
             seccionVentasPagadas.style.display = "none";
@@ -36,23 +39,28 @@ document.addEventListener("DOMContentLoaded", async () => {
         // --- *** NUEVA LÍNEA CLAVE *** ---
         const btnEliminarHistorialPagadas = document.getElementById("btnEliminarHistorialPagadas");
         if (btnEliminarHistorialPagadas) {
-            btnEliminarHistorialPagadas.style.display = "none"; 
+            btnEliminarHistorialPagadas.style.display = "none"; // Esta línea lo oculta al inicio
         }
+        // --- FIN: NUEVA LÍNEA CLAVE ---
 
+        // --- AQUÍ ESTÁ LA LÍNEA PARA OCULTAR EL BOTÓN DE EXPORTAR AL INICIO ---
         const btnExportarHistorialPagadasPDF = document.getElementById("btnExportarHistorialPagadasPDF");
         if (btnExportarHistorialPagadasPDF) {
-            btnExportarHistorialPagadasPDF.style.display = "none";
+            btnExportarHistorialPagadasPDF.style.display = "none"; // <--- Esta es la línea
         }
+        // --- FIN DE LA LÍNEA ---
 
         initSortCxC();
 
         await cargarYMostrarCuentasPorCobrar();
 
+        // Forzar una carga inmediata
         await cargarYMostrarCuentasPorCobrar();
 
         if (typeof renderCalendar === 'function') {
             renderCalendar();
-
+            // Forzar una segunda renderización después de un pequeño retraso
+            // para asegurar que todos los datos estén disponibles
             setTimeout(() => {
                 console.log("🔄 Forzando actualización del calendario...");
                 renderCalendar();
@@ -90,12 +98,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (storedEditVentaId) {
             localStorage.removeItem('editVentaId');
         }
-      
+        
+        // Este event listener para eliminar historial ya lo tienes, y está bien ubicado
         const btnEliminarHistorialPagadas_listener = document.getElementById("btnEliminarHistorialPagadas");
         if (btnEliminarHistorialPagadas_listener) {
             btnEliminarHistorialPagadas_listener.addEventListener("click", eliminarHistorialVentasPagadas);
         }
 
+        // Añadir el event listener para el botón de exportar a PDF
         const btnExportarPDF = document.getElementById("btnExportarHistorialPagadasPDF");
         if (btnExportarPDF) {
             btnExportarPDF.addEventListener("click", exportarVentasPagadasPDF);
@@ -109,10 +119,12 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function llenarDatalistClientes() {
     const datalist = document.getElementById("clientesLista");
-    datalist.innerHTML = "";
+    datalist.innerHTML = ""; // Limpiar por si ya había algo
 
+    // Crear una lista de nombres únicos, limpios
     const nombresUnicos = [...new Set(clientes.map(c => c.nombre.trim()).filter(n => n))];
 
+    // Insertar cada nombre como una opción en el datalist
     nombresUnicos.forEach(nombre => {
         const option = document.createElement("option");
         option.value = nombre;
@@ -122,21 +134,24 @@ function llenarDatalistClientes() {
 
 async function cargarYMostrarCuentasPorCobrar() {
     try {
-  
+        // Limpiar el contenedor de cuentas
         const listaCuentas = document.getElementById("listaCuentasPorCobrar");
         if (listaCuentas) {
             listaCuentas.innerHTML = "";
         }
 
+        // Obtener todas las ventas y filtrar solo las de crédito
         const allVentas = await obtenerTodasLasVentas();
         ventasCredito = allVentas.filter(venta => venta.tipoPago === 'credito');
-        abonos = await obtenerTodosLosAbonos();
+        abonos = await obtenerTodosLosAbonos(); // Asegurar que los abonos estén actualizados
 
+        // Recalcular montos pendientes y estados para cada venta a crédito
         for (const venta of ventasCredito) {
             const abonosDeVenta = abonos.filter(abono => abono.pedidoId === venta.id);
             const totalAbonado = abonosDeVenta.reduce((sum, abono) => sum + abono.montoAbonado, 0);
-            venta.montoPendiente = Math.max(0, venta.ingreso - totalAbonado);
+            venta.montoPendiente = Math.max(0, venta.ingreso - totalAbonado); // Evitar negativos
 
+            // Asignar estado de pago basado en el monto pendiente
             if (venta.montoPendiente === 0) {
                 venta.estadoPago = 'Pagado Total';
             } else if (totalAbonado > 0 && totalAbonado < venta.ingreso) {
@@ -144,20 +159,24 @@ async function cargarYMostrarCuentasPorCobrar() {
             } else {
                 venta.estadoPago = 'Pendiente';
             }
-
+            // Persistir el estado actualizado en la DB
             await actualizarVenta(venta.id, venta);
         }
 
+        // Filtrar solo las ventas que aún tienen un monto pendiente por defecto
         const pendientesFiltradas = ventasCredito.filter(v => v.montoPendiente > 0);
 
+        // Forzar una actualización completa de la UI
         mostrarCuentasEnUI(pendientesFiltradas);
         await actualizarEstadisticas(pendientesFiltradas);
 
         verificarRecordatorios(pendientesFiltradas);
         mostrarRankingMorosos(pendientesFiltradas);
 
+        // Forzar un refresco de los eventos después de actualizar la UI
         agregarEventosHistorial();
 
+        // Aplicar paginación después de renderizar las tarjetas
         setTimeout(() => {
             if (window.PaginacionUtils?.paginarDOM) {
                 PaginacionUtils.paginarDOM('#listaCuentasPorCobrar', '.venta-credito-card', currentPageCuentas, rowsPerPageCuentas, 'paginacionCuentas', (nuevaPag) => {
@@ -173,7 +192,7 @@ async function cargarYMostrarCuentasPorCobrar() {
 }
 
 function mostrarCuentasEnUI(cuentasParaMostrar) {
-
+    // Ordenar segun sortKeyCxC antes de filtros adicionales
     cuentasParaMostrar.sort((a,b)=>{
       let valA,valB;
       switch(sortKeyCxC){
@@ -201,13 +220,14 @@ function mostrarCuentasEnUI(cuentasParaMostrar) {
         listaCuentas.appendChild(card);
     });
 
-    agregarEventosHistorial(); 
+    agregarEventosHistorial(); // ¡Agrega los eventos a los botones!
 }
 
+//FUNCIÓN RECORDARTORIOS 25 DE JUNIO 2025
 function verificarRecordatorios(pedidos) {
-
+    // Verificar si ya se mostró el recordatorio en esta sesión
     if (sessionStorage.getItem("recordatorioMostrado") === "true") {
-        return;
+        return; // Si ya se mostró, no hacer nada
     }
     
     const hoy = new Date();
@@ -222,22 +242,25 @@ function verificarRecordatorios(pedidos) {
 
     if (proximosAVencer.length > 0) {
         mostrarToast(`⚠️ Tienes ${proximosAVencer.length} cliente(s) por vencer en menos de 3 días.`, "warning", 5000);
-
+        // Marcar que ya se mostró el recordatorio en esta sesión
         sessionStorage.setItem("recordatorioMostrado", "true");
     }
 }
 
+//NUEVA A LA 1 AM (actualizada para ventas pagadas)
 function agregarEventosHistorial() {
-
+    // Para los botones de "Ventas a Crédito Pendientes"
     document.querySelectorAll('.btn-ver-historial').forEach(btn => {
         btn.removeEventListener('click', toggleHistorialPagos); // Eliminar por si ya existía
         btn.addEventListener('click', toggleHistorialPagos);
     });
 
+    // --- NUEVA SECCIÓN: Para los botones de "Historial de Ventas Pagadas" ---
     document.querySelectorAll('.btn-ver-historial-pagada').forEach(btn => {
         btn.removeEventListener('click', toggleHistorialPagos); // Eliminar por si ya existía
         btn.addEventListener('click', toggleHistorialPagos);
     });
+    // --- FIN NUEVA SECCIÓN ---
 }
 
 function crearCardVentaCredito(venta) {
@@ -251,6 +274,7 @@ function crearCardVentaCredito(venta) {
         detallePago: venta.detallePago
     });
 
+    // Formatear fecha y hora de registro
     let fechaRegistro;
     try {
         const fechaObj = new Date(venta.fecha);
@@ -275,9 +299,10 @@ function crearCardVentaCredito(venta) {
     const vencimientoDate = new Date(fechaVencimiento);
     const vencimientoOnlyDate = new Date(vencimientoDate.getFullYear(), vencimientoDate.getMonth(), vencimientoDate.getDate());
 
+    // Texto de días de mora o por vencer
     let textoDias = '';
     if (fechaVencimiento !== "Sin fecha") {
-    
+        // Crear fecha de vencimiento correctamente
         const fechaVencimientoSinHora = new Date(fechaVencimiento + 'T00:00:00');
         const fechaHoySinHora = new Date();
         fechaHoySinHora.setHours(0, 0, 0, 0);
@@ -287,7 +312,8 @@ function crearCardVentaCredito(venta) {
             fechaHoy: fechaHoySinHora.toISOString(),
             fechaVencimientoOriginal: fechaVencimiento
         });
-
+        
+        // Calcular la diferencia en días
         const diff = fechaVencimientoSinHora.getTime() - fechaHoySinHora.getTime();
         const diasTotales = Math.ceil(diff / (1000 * 60 * 60 * 24));
         
@@ -1833,7 +1859,7 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
     return `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
     `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
     `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS) Tasa de cambio aplicada: ${tasaValor}\n\n`+
-    `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [0414-0872624] / C.I. [19.317.877] / [Venezuela] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
+    `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [0414-0872621] / C.I. [19.317.877] / [Venezuela] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
     `Saludos cordiales.`;
   };
 
