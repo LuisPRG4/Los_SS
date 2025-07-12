@@ -231,3 +231,150 @@
     color: #666;
     padding: 20px;
 }
+
+/* Estilos para el modal de detalle de venta */
+.modal-detalle-venta {
+    width: 90%;
+    max-width: 800px;
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.detalle-venta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.detalle-venta-seccion {
+    background: #f8fafc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.detalle-venta-seccion h3 {
+    margin-top: 0;
+    color: #334155;
+    border-bottom: 1px solid #e2e8f0;
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.detalle-item {
+    margin-bottom: 8px;
+    padding: 5px 0;
+}
+
+.detalle-item strong {
+    color: #475569;
+}
+
+.estado-pago .badge {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.badge-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.badge-info {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.badge-success {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.monto-total, .monto-abonado, .monto-pendiente {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.monto-total {
+    color: #1e40af; /* azul oscuro */
+}
+
+.monto-abonado {
+    color: #15803d; /* verde */
+}
+
+.monto-pendiente {
+    color: #b91c1c; /* rojo */
+}
+
+.btn-link-whatsapp {
+    display: inline-block;
+    background: #25D366;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    margin-left: 10px;
+}
+
+.btn-link-whatsapp:hover {
+    background: #128C7E;
+}
+
+/* Tablas en modal de detalle */
+.tabla-productos-detalle, .tabla-abonos-detalle {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+.tabla-productos-detalle th, .tabla-abonos-detalle th {
+    background: #f1f5f9;
+    color: #334155;
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.tabla-productos-detalle td, .tabla-abonos-detalle td {
+    padding: 10px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.tabla-productos-detalle tr:hover, .tabla-abonos-detalle tr:hover {
+    background-color: #f8fafc;
+}
+
+.text-center {
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .detalle-venta-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .tabla-productos-detalle, .tabla-abonos-detalle {
+        font-size: 0.9rem;
+    }
+
+    .btn-link-whatsapp {
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+        text-align: center;
+    }
+}
