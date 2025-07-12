@@ -1,9 +1,9 @@
-let ventasCredito = []; // Solo las ventas a crédito
+let ventasCredito = [];
 let clientes = [];
-let abonos = []; // Para los abonos
-let ventas = []; // <--- ASEGÚRATE DE QUE ESTA LÍNEA EXISTA
+let abonos = [];
+let ventas = [];
 
-let currentVentaIdAbono = null; // Para el modal de abonos
+let currentVentaIdAbono = null;
 let abonoEnProceso = false;
 
 let currentPageCuentas = 1;
@@ -19,18 +19,15 @@ let sortAscCxC = true;
 
 document.addEventListener("DOMContentLoaded", async () => {
     try {
-        await abrirDB(); // Abre la base de datos
+        await abrirDB();
 
-        // Cargar todos los datos necesarios al inicio
         ventas = await obtenerTodasLasVentas();
         clientes = await obtenerTodosLosClientes();
         llenarDatalistClientes();
         abonos = await obtenerTodosLosAbonos();
 
-        // NUEVO: Verificar y normalizar las fechas de vencimiento
         await verificarFormatosFechasVencimiento();
 
-        // Inicializar la sección de ventas pagadas
         const seccionVentasPagadas = document.getElementById("seccionVentasPagadas");
         if (seccionVentasPagadas) {
             seccionVentasPagadas.style.display = "none";
@@ -39,28 +36,23 @@ document.addEventListener("DOMContentLoaded", async () => {
         // --- *** NUEVA LÍNEA CLAVE *** ---
         const btnEliminarHistorialPagadas = document.getElementById("btnEliminarHistorialPagadas");
         if (btnEliminarHistorialPagadas) {
-            btnEliminarHistorialPagadas.style.display = "none"; // Esta línea lo oculta al inicio
+            btnEliminarHistorialPagadas.style.display = "none"; 
         }
-        // --- FIN: NUEVA LÍNEA CLAVE ---
 
-        // --- AQUÍ ESTÁ LA LÍNEA PARA OCULTAR EL BOTÓN DE EXPORTAR AL INICIO ---
         const btnExportarHistorialPagadasPDF = document.getElementById("btnExportarHistorialPagadasPDF");
         if (btnExportarHistorialPagadasPDF) {
-            btnExportarHistorialPagadasPDF.style.display = "none"; // <--- Esta es la línea
+            btnExportarHistorialPagadasPDF.style.display = "none";
         }
-        // --- FIN DE LA LÍNEA ---
 
         initSortCxC();
 
         await cargarYMostrarCuentasPorCobrar();
 
-        // Forzar una carga inmediata
         await cargarYMostrarCuentasPorCobrar();
 
         if (typeof renderCalendar === 'function') {
             renderCalendar();
-            // Forzar una segunda renderización después de un pequeño retraso
-            // para asegurar que todos los datos estén disponibles
+
             setTimeout(() => {
                 console.log("🔄 Forzando actualización del calendario...");
                 renderCalendar();
@@ -98,14 +90,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (storedEditVentaId) {
             localStorage.removeItem('editVentaId');
         }
-        
-        // Este event listener para eliminar historial ya lo tienes, y está bien ubicado
+      
         const btnEliminarHistorialPagadas_listener = document.getElementById("btnEliminarHistorialPagadas");
         if (btnEliminarHistorialPagadas_listener) {
             btnEliminarHistorialPagadas_listener.addEventListener("click", eliminarHistorialVentasPagadas);
         }
 
-        // Añadir el event listener para el botón de exportar a PDF
         const btnExportarPDF = document.getElementById("btnExportarHistorialPagadasPDF");
         if (btnExportarPDF) {
             btnExportarPDF.addEventListener("click", exportarVentasPagadasPDF);
@@ -119,12 +109,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
 function llenarDatalistClientes() {
     const datalist = document.getElementById("clientesLista");
-    datalist.innerHTML = ""; // Limpiar por si ya había algo
+    datalist.innerHTML = "";
 
-    // Crear una lista de nombres únicos, limpios
     const nombresUnicos = [...new Set(clientes.map(c => c.nombre.trim()).filter(n => n))];
 
-    // Insertar cada nombre como una opción en el datalist
     nombresUnicos.forEach(nombre => {
         const option = document.createElement("option");
         option.value = nombre;
@@ -134,24 +122,21 @@ function llenarDatalistClientes() {
 
 async function cargarYMostrarCuentasPorCobrar() {
     try {
-        // Limpiar el contenedor de cuentas
+  
         const listaCuentas = document.getElementById("listaCuentasPorCobrar");
         if (listaCuentas) {
             listaCuentas.innerHTML = "";
         }
 
-        // Obtener todas las ventas y filtrar solo las de crédito
         const allVentas = await obtenerTodasLasVentas();
         ventasCredito = allVentas.filter(venta => venta.tipoPago === 'credito');
-        abonos = await obtenerTodosLosAbonos(); // Asegurar que los abonos estén actualizados
+        abonos = await obtenerTodosLosAbonos();
 
-        // Recalcular montos pendientes y estados para cada venta a crédito
         for (const venta of ventasCredito) {
             const abonosDeVenta = abonos.filter(abono => abono.pedidoId === venta.id);
             const totalAbonado = abonosDeVenta.reduce((sum, abono) => sum + abono.montoAbonado, 0);
-            venta.montoPendiente = Math.max(0, venta.ingreso - totalAbonado); // Evitar negativos
+            venta.montoPendiente = Math.max(0, venta.ingreso - totalAbonado);
 
-            // Asignar estado de pago basado en el monto pendiente
             if (venta.montoPendiente === 0) {
                 venta.estadoPago = 'Pagado Total';
             } else if (totalAbonado > 0 && totalAbonado < venta.ingreso) {
@@ -159,24 +144,20 @@ async function cargarYMostrarCuentasPorCobrar() {
             } else {
                 venta.estadoPago = 'Pendiente';
             }
-            // Persistir el estado actualizado en la DB
+
             await actualizarVenta(venta.id, venta);
         }
 
-        // Filtrar solo las ventas que aún tienen un monto pendiente por defecto
         const pendientesFiltradas = ventasCredito.filter(v => v.montoPendiente > 0);
 
-        // Forzar una actualización completa de la UI
         mostrarCuentasEnUI(pendientesFiltradas);
         await actualizarEstadisticas(pendientesFiltradas);
 
         verificarRecordatorios(pendientesFiltradas);
         mostrarRankingMorosos(pendientesFiltradas);
 
-        // Forzar un refresco de los eventos después de actualizar la UI
         agregarEventosHistorial();
 
-        // Aplicar paginación después de renderizar las tarjetas
         setTimeout(() => {
             if (window.PaginacionUtils?.paginarDOM) {
                 PaginacionUtils.paginarDOM('#listaCuentasPorCobrar', '.venta-credito-card', currentPageCuentas, rowsPerPageCuentas, 'paginacionCuentas', (nuevaPag) => {
@@ -192,7 +173,7 @@ async function cargarYMostrarCuentasPorCobrar() {
 }
 
 function mostrarCuentasEnUI(cuentasParaMostrar) {
-    // Ordenar segun sortKeyCxC antes de filtros adicionales
+
     cuentasParaMostrar.sort((a,b)=>{
       let valA,valB;
       switch(sortKeyCxC){
@@ -220,14 +201,13 @@ function mostrarCuentasEnUI(cuentasParaMostrar) {
         listaCuentas.appendChild(card);
     });
 
-    agregarEventosHistorial(); // ¡Agrega los eventos a los botones!
+    agregarEventosHistorial(); 
 }
 
-//FUNCIÓN RECORDARTORIOS 25 DE JUNIO 2025
 function verificarRecordatorios(pedidos) {
-    // Verificar si ya se mostró el recordatorio en esta sesión
+
     if (sessionStorage.getItem("recordatorioMostrado") === "true") {
-        return; // Si ya se mostró, no hacer nada
+        return;
     }
     
     const hoy = new Date();
@@ -242,25 +222,22 @@ function verificarRecordatorios(pedidos) {
 
     if (proximosAVencer.length > 0) {
         mostrarToast(`⚠️ Tienes ${proximosAVencer.length} cliente(s) por vencer en menos de 3 días.`, "warning", 5000);
-        // Marcar que ya se mostró el recordatorio en esta sesión
+
         sessionStorage.setItem("recordatorioMostrado", "true");
     }
 }
 
-//NUEVA A LA 1 AM (actualizada para ventas pagadas)
 function agregarEventosHistorial() {
-    // Para los botones de "Ventas a Crédito Pendientes"
+
     document.querySelectorAll('.btn-ver-historial').forEach(btn => {
         btn.removeEventListener('click', toggleHistorialPagos); // Eliminar por si ya existía
         btn.addEventListener('click', toggleHistorialPagos);
     });
 
-    // --- NUEVA SECCIÓN: Para los botones de "Historial de Ventas Pagadas" ---
     document.querySelectorAll('.btn-ver-historial-pagada').forEach(btn => {
         btn.removeEventListener('click', toggleHistorialPagos); // Eliminar por si ya existía
         btn.addEventListener('click', toggleHistorialPagos);
     });
-    // --- FIN NUEVA SECCIÓN ---
 }
 
 function crearCardVentaCredito(venta) {
@@ -274,7 +251,6 @@ function crearCardVentaCredito(venta) {
         detallePago: venta.detallePago
     });
 
-    // Formatear fecha y hora de registro
     let fechaRegistro;
     try {
         const fechaObj = new Date(venta.fecha);
@@ -299,10 +275,9 @@ function crearCardVentaCredito(venta) {
     const vencimientoDate = new Date(fechaVencimiento);
     const vencimientoOnlyDate = new Date(vencimientoDate.getFullYear(), vencimientoDate.getMonth(), vencimientoDate.getDate());
 
-    // Texto de días de mora o por vencer
     let textoDias = '';
     if (fechaVencimiento !== "Sin fecha") {
-        // Crear fecha de vencimiento correctamente
+    
         const fechaVencimientoSinHora = new Date(fechaVencimiento + 'T00:00:00');
         const fechaHoySinHora = new Date();
         fechaHoySinHora.setHours(0, 0, 0, 0);
@@ -312,8 +287,7 @@ function crearCardVentaCredito(venta) {
             fechaHoy: fechaHoySinHora.toISOString(),
             fechaVencimientoOriginal: fechaVencimiento
         });
-        
-        // Calcular la diferencia en días
+
         const diff = fechaVencimientoSinHora.getTime() - fechaHoySinHora.getTime();
         const diasTotales = Math.ceil(diff / (1000 * 60 * 60 * 24));
         
@@ -405,31 +379,86 @@ function crearCardVentaCredito(venta) {
     // 📱 Botón WhatsApp si el cliente tiene teléfono
     const clienteDatos = clientes.find(c => c.nombre === nombreCliente);
     if (clienteDatos?.telefono) {
-        const localNum = clienteDatos.telefono.replace(/\\D/g, '');
+        const localNum = clienteDatos.telefono.replace(/\D/g, '');
         const numeroIntl = `58${localNum}`; // Asumimos Venezuela
-        const mensajeWhatsApp = `🥛 Buen día, estimado/a ${clienteDatos.nombre}: 🌟\n\n`+
-          `Esperamos que estés disfrutando de nuestros yogures cremosos y llenos de cariño 😊. Solo queremos compartirte un recordatorio amable:\n\n`+
-          `💳 Monto pendiente: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS, Tasa del día: [Tasa Actual])\n\n`+
-          `🍶 Pedido #: ${venta.id}\n\n`+
-          `📌 Opciones de pago (fáciles y seguras):\n`+
-          `1️⃣ Transferencia Bancaria: [Nombre del Banco] / Cuenta [Número de cuenta]\n`+
-          `2️⃣ Pago Móvil: [Número de teléfono] / C.I. [Cédula] / [Banco]\n`+
-          `3️⃣ Efectivo: Disponible al momento de entrega\n\n`+
-          `⌚ Si necesitas más tiempo o tienes alguna consulta, no dudes en contactarnos. Estamos para ayudarte a seguir disfrutando sin preocupaciones 🧘.\n\n`+
-          `Con especial atención,\n`+
-          `El equipo de [Nombre de tu empresa] 🍓\n`+
-          `📞 [Teléfono de contacto]`;
+        // Mensaje principal
+        const mensajeWhatsApp = `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
+          `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
+          `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS) Tasa de cambio aplicada: [Tasa Actual]\n\n`+
+          `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [Teléfono] / C.I. [Cédula] / [Banco] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
+          `Saludos cordiales.`;
+          
+        // Mensaje alternativo (idéntico por ahora)
+        //* const mensajeWhatsAppAlt = `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
+        //* `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
+        //*  `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS) Tasa de cambio aplicada: [Tasa Actual]\n\n`+
+        //*  `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [Teléfono] / C.I. [Cédula] / [Banco] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
+        //*  `Saludos cordiales.`;
 
-        const enlace = generarEnlaceWhatsApp(numeroIntl, mensajeWhatsApp);
+        // Contenedor para el botón y el menú
+        const contenedorWhatsapp = document.createElement("div");
+        contenedorWhatsapp.className = "whatsapp-dropdown-container";
+        contenedorWhatsapp.style.position = "relative";
 
-        const botonWhatsapp = document.createElement("button");
-        botonWhatsapp.type = "button";
-        botonWhatsapp.className = "btn-whatsapp";
-        botonWhatsapp.innerHTML = "📱 Contactar por WhatsApp";
-        botonWhatsapp.addEventListener("click", () => {
-            abrirModalWhatsApp(venta, clienteDatos, numeroIntl);
+        // Botón principal
+        const botonDropdown = document.createElement("button");
+        botonDropdown.type = "button";
+        botonDropdown.className = "btn-whatsapp-dropdown";
+        botonDropdown.innerHTML = "Opciones de Contacto ▼";
+        contenedorWhatsapp.appendChild(botonDropdown);
+
+        // Menú desplegable
+        const menu = document.createElement("div");
+        menu.className = "whatsapp-dropdown-menu";
+        menu.style.display = "none";
+        menu.style.position = "absolute";
+        menu.style.top = "110%";
+        menu.style.left = "0";
+        menu.style.background = "#fff";
+        menu.style.boxShadow = "0 2px 8px rgba(0,0,0,0.15)";
+        menu.style.borderRadius = "6px";
+        menu.style.zIndex = "1000";
+        menu.style.minWidth = "220px";
+        menu.style.padding = "6px 0";
+
+        // Opción 1
+        const opcion1 = document.createElement("button");
+        opcion1.type = "button";
+        opcion1.className = "whatsapp-dropdown-option";
+        opcion1.innerHTML = " Contactar por WhatsApp";
+        opcion1.onclick = (e) => {
+            e.stopPropagation();
+            menu.style.display = "none";
+            abrirModalWhatsApp(venta, clienteDatos, numeroIntl, mensajeWhatsApp);
+        };
+        menu.appendChild(opcion1);
+
+        // Opción 2
+        const opcion2 = document.createElement("button");
+        opcion2.type = "button";
+        opcion2.className = "whatsapp-dropdown-option";
+        opcion2.innerHTML = "Alternativo (¡Aún no es funcional!)";
+        opcion2.onclick = (e) => {
+            e.stopPropagation();
+            menu.style.display = "none";
+            abrirModalWhatsApp(venta, clienteDatos, numeroIntl, mensajeWhatsAppAlt, true);
+        };
+        menu.appendChild(opcion2);
+
+        contenedorWhatsapp.appendChild(menu);
+        card.querySelector(".card-actions").appendChild(contenedorWhatsapp);
+
+        // Mostrar/ocultar menú
+        botonDropdown.onclick = (e) => {
+            e.stopPropagation();
+            menu.style.display = menu.style.display === "none" ? "block" : "none";
+        };
+        // Cerrar menú al hacer clic fuera
+        document.addEventListener("click", function cerrarMenuWhatsapp(e) {
+            if (!contenedorWhatsapp.contains(e.target)) {
+                menu.style.display = "none";
+            }
         });
-        card.querySelector(".card-actions").appendChild(botonWhatsapp);
     }
 
     return card;
@@ -1467,17 +1496,17 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
                             const localNum = clienteData.telefono.replace(/\\D/g, '');
                             const numeroIntl = `58${localNum}`; // Asumimos Venezuela
                             const mensajeWhatsApp = `🥛 Hola, ${clienteData.nombre}! 🌟\n\n`+
-                              `Esperamos que estés disfrutando de nuestros yogures cremosos 😊. Solo un recordativo amable:\n\n`+
-                              `💲 *Monto pendiente:* **$${venta.montoPendiente.toFixed(2)} USD** (≈ **[Monto en BS]** BS, Tasa **[Tasa]**).\n\n`+
-                              `🍶 *Pedido #:* **${venta.id}**\n\n`+
-                              `📌 ¿Cómo pagar? (Fácil y rápido):\n`+
-                              `1️⃣ Transferencia: [Banco] [Cuenta]\n`+
-                              `2️⃣ Pago Móvil: [Número] [Cédula] [Banco]\n`+
-                              `3️⃣ Efectivo\n\n`+
-                              `⌚ ¿Necesitas más tiempo? ¡Avísanos! Queremos que sigas disfrutando sin preocupaciones.\n\n`+
-                              `Atentamente,\n`+
-                              `El equipo de [Tu Empresa de Yogures] 🍓\n`+
-                              `📞 [Teléfono]`;
+                              `Esperamos que estés disfrutando de nuestros yogures cremosos y llenos de cariño 😊. Solo queremos compartirte un recordatorio amable:\n\n`+
+                              `💳 Monto pendiente: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS, Tasa del día: [Tasa Actual])\n\n`+
+                              `🍶 Pedido #: ${venta.id}\n\n`+
+                              `📌 Opciones de pago (fáciles y seguras):\n`+
+                              `1️⃣ Transferencia Bancaria: [Nombre del Banco] / Cuenta [Número de cuenta]\n`+
+                              `2️⃣ Pago Móvil: [Número de teléfono] / C.I. [Cédula] / [Banco]\n`+
+                              `3️⃣ Efectivo: Disponible al momento de entrega\n\n`+
+                              `⌚ Si necesitas más tiempo o tienes alguna consulta, no dudes en contactarnos. Estamos para ayudarte a seguir disfrutando sin preocupaciones 🧘.\n\n`+
+                              `Con especial atención,\n`+
+                              `El equipo de [Nombre de tu empresa] 🍓\n`+
+                              `📞 [Teléfono de contacto]`;
 
                             const enlace = generarEnlaceWhatsApp(numeroIntl, mensajeWhatsApp);
                             return `<a href="${enlace}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
@@ -1724,7 +1753,7 @@ function generarEnlaceWhatsApp(numeroRaw, mensajeRaw = '') {
 
 // === MODAL PARA WHATSAPP ===
 // Función global para abrir el modal de edición y envío de WhatsApp
-window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl){
+window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePrincipal, esAlternativo = false){
   // Crear modal si aún no existe
   let modal = document.getElementById('modalWhatsApp');
   if(!modal){
@@ -1801,18 +1830,11 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl){
 
   const construirMensaje = (tasaValor)=>{
     const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
-    return `🥛 Buen día, estimado/a ${clienteDatos.nombre}: 🌟\n\n`+
-    `Esperamos que estés disfrutando de nuestros yogures cremosos y llenos de cariño 😊. Solo queremos compartirte un recordatorio amable:\n\n`+
-    `💳 Monto pendiente: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS, Tasa del día: ${tasaValor})\n\n`+
-    `🍶 Pedido #: ${venta.id}\n\n`+
-    `📌 Opciones de pago (fáciles y seguras):\n`+
-    `1️⃣ Transferencia Bancaria: [Nombre del Banco] / Cuenta [Número de cuenta]\n`+
-    `2️⃣ Pago Móvil: [Número de teléfono] / C.I. [Cédula] / [Banco]\n`+
-    `3️⃣ Efectivo: Disponible al momento de entrega\n\n`+
-    `⌚ Si necesitas más tiempo o tienes alguna consulta, no dudes en contactarnos. Estamos para ayudarte a seguir disfrutando sin preocupaciones 🧘.\n\n`+
-    `Con especial atención,\n`+
-    `El equipo de [Nombre de tu empresa] 🍓\n`+
-    `📞 [Teléfono de contacto]`;
+    return `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
+    `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
+    `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS) Tasa de cambio aplicada: ${tasaValor}\n\n`+
+    `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [0414-0872624] / C.I. [19.317.877] / [Venezuela] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
+    `Saludos cordiales.`;
   };
 
   // Rellenar mensaje inicial
