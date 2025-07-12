@@ -18,3 +18,80 @@
     color: white;
     transition: background-color 0.3s ease;
 }
+
+/* --- WhatsApp Dropdown Moderno --- */
+.whatsapp-dropdown-container {
+    display: inline-block;
+    position: relative;
+}
+
+.btn-whatsapp-dropdown {
+    background: linear-gradient(90deg, #25d366 60%, #128c7e 100%);
+    color: #fff;
+    border: none;
+    padding: 10px 22px 10px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(37,211,102,0.10);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background 0.2s, box-shadow 0.2s;
+    position: relative;
+}
+.btn-whatsapp-dropdown::before {
+    content: '📔';
+    font-size: 18px;
+    margin-right: 6px;
+}
+.btn-whatsapp-dropdown:hover {
+    background: linear-gradient(90deg, #128c7e 60%, #25d366 100%);
+    box-shadow: 0 4px 16px rgba(37,211,102,0.18);
+}
+
+.whatsapp-dropdown-menu {
+    min-width: 230px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(37,211,102,0.13);
+    position: absolute;
+    top: 110%;
+    left: 0;
+    z-index: 1000;
+    padding: 8px 0;
+    display: none;
+    border: 1.5px solid #25d36633;
+    animation: fadeInWhatsappMenu 0.18s;
+}
+@keyframes fadeInWhatsappMenu {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.whatsapp-dropdown-option {
+    width: 100%;
+    background: none;
+    border: none;
+    color: #128c7e;
+    text-align: left;
+    padding: 12px 22px;
+    font-size: 15.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    border-radius: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.whatsapp-dropdown-option::before {
+    content: '💬';
+    font-size: 17px;
+    margin-right: 6px;
+}
+.whatsapp-dropdown-option:hover {
+    background: #e9fef3;
+    color: #075e54;
+}
