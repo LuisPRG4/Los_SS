@@ -1,10 +1,3 @@
-// js/modal-productos.js
-
-// Asegúrate de que obtenerTodosLosProductos() está definido y accesible globalmente
-// (por ejemplo, en db.js, y que ese script se carga antes que este).
-
-// Esta función es llamada una vez cuando el DOM está listo para configurar
-// los event listeners del modal (cierre y cambio de vista).
 function inicializarModalProductos() {
     const modalReporteProductos = document.getElementById('modalReporteProductos');
     const cerrarModalBtn = modalReporteProductos ? modalReporteProductos.querySelector('.cerrar-modal') : null;
@@ -61,38 +54,44 @@ function inicializarModalProductos() {
 // tanto en formato de tarjeta como de tabla. Luego hace el modal visible.
 async function mostrarReporteProductos() {
     const modalReporteProductos = document.getElementById('modalReporteProductos');
-    const listaReporteProductos = document.getElementById('listaReporteProductos'); // Contenedor de vista de tarjeta
-    const tablaReporteProductosDiv = document.getElementById('tablaReporteProductos'); // Contenedor de vista de tabla
-    const tablaBody = tablaReporteProductosDiv ? tablaReporteProductosDiv.querySelector('tbody') : null; // Body de la tabla
+    const listaReporteProductos = document.getElementById('listaReporteProductos');
+    const tablaReporteProductosDiv = document.getElementById('tablaReporteProductos');
+    const tablaBody = tablaReporteProductosDiv ? tablaReporteProductosDiv.querySelector('tbody') : null;
 
     if (!modalReporteProductos || !listaReporteProductos || !tablaReporteProductosDiv || !tablaBody) {
-        console.error('Elementos esenciales del modal (modalReporteProductos, listaReporteProductos, tablaReporteProductos o tbody) no encontrados al mostrar el reporte.');
-        return; // Salir si los elementos no están disponibles
+        console.error('Elementos esenciales del modal no encontrados al mostrar el reporte.');
+        return;
     }
 
-    // Mostrar mensajes de carga iniciales
     listaReporteProductos.innerHTML = '<p>Cargando productos...</p>';
-    tablaBody.innerHTML = '<tr><td colspan="5">Cargando productos...</td></tr>'; // Ajusta colspan si tienes más/menos columnas
+    tablaBody.innerHTML = '<tr><td colspan="5">Cargando productos...</td></tr>';
 
-    // Asegurar que la vista por defecto sea la de tarjeta al abrir el modal
-    listaReporteProductos.style.display = 'grid'; // O el display original de tus tarjetas
+    listaReporteProductos.style.display = 'grid';
     tablaReporteProductosDiv.style.display = 'none';
     const btnCambiarVista = document.getElementById('btnCambiarVista');
     if(btnCambiarVista) {
-        btnCambiarVista.textContent = "Cambiar a Vista de Tabla"; // Resetear texto del botón
+        btnCambiarVista.textContent = "Cambiar a Vista de Tabla";
     }
 
-
     try {
-        const productos = await obtenerTodosLosProductos();
+        const todosLosProductos = await obtenerTodosLosProductos();
 
-        if (productos && productos.length > 0) {
-            // Limpiar contenedores antes de agregar nuevos elementos
+        // ****** INICIO DE LA MODIFICACIÓN CLAVE ******
+        // Filtrar productos: solo mostrar aquellos con stock mayor a 0
+        const productosConExistencia = todosLosProductos.filter(producto => {
+            // Asegurarse de que 'stock' es un número y es mayor que 0
+            // Si 'stock' es undefined o null, se considera 0 para el filtro
+            return (producto.stock !== undefined && producto.stock !== null && producto.stock > 0);
+        });
+        // ****** FIN DE LA MODIFICACIÓN CLAVE ******
+
+
+        if (productosConExistencia && productosConExistencia.length > 0) { // Usamos los productos filtrados aquí
             listaReporteProductos.innerHTML = '';
             tablaBody.innerHTML = '';
 
             // 1. Poblar la vista de tarjetas (tarjeta-card-reporte)
-            productos.forEach(producto => {
+            productosConExistencia.forEach(producto => { // Usamos productos filtrados
                 const productoCard = document.createElement('div');
                 productoCard.classList.add('producto-card-reporte');
 
@@ -124,9 +123,8 @@ async function mostrarReporteProductos() {
             });
 
             // 2. Poblar la vista de tabla
-            productos.forEach(producto => {
+            productosConExistencia.forEach(producto => { // Usamos productos filtrados
                 const row = tablaBody.insertRow();
-                // Puedes personalizar qué columnas quieres mostrar en la tabla aquí
                 row.innerHTML = `
                     <td>${producto.nombre || 'N/A'}</td>
                     <td>${producto.categoria || 'N/A'}</td>
@@ -137,19 +135,18 @@ async function mostrarReporteProductos() {
             });
 
         } else {
-            listaReporteProductos.innerHTML = '<p>No hay productos registrados en el inventario.</p>';
-            tablaBody.innerHTML = '<tr><td colspan="5">No hay productos registrados en el inventario.</td></tr>';
+            listaReporteProductos.innerHTML = '<p>No hay productos con existencias en el inventario.</p>';
+            tablaBody.innerHTML = '<tr><td colspan="5">No hay productos con existencias en el inventario.</td></tr>';
         }
 
-        // Una vez que el contenido está cargado, hacemos visible el modal
-        modalReporteProductos.style.display = 'flex'; // Vuelve a 'flex' para centrar
-        modalReporteProductos.classList.add('mostrar'); // Añade la clase 'mostrar' para la animación
+        modalReporteProductos.style.display = 'flex';
+        modalReporteProductos.classList.add('mostrar');
         console.log('Modal de productos mostrado con éxito.');
 
     } catch (error) {
         console.error('Error al cargar los productos para el reporte:', error);
         listaReporteProductos.innerHTML = '<p>Error al cargar los productos. Por favor, intente de nuevo.</p>';
-        tablaBody.innerHTML = '<tr><td colspan="5">Error al cargar los productos.</td></tr>'; // Mostrar error en la tabla también
+        tablaBody.innerHTML = '<tr><td colspan="5">Error al cargar los productos.</td></tr>';
     }
 }
 
@@ -202,6 +199,3 @@ document.addEventListener('DOMContentLoaded', () => {
     // Esto se hace siempre al cargar la página, sin hacer el modal visible.
     inicializarModalProductos();
 });
-
-// Nota: La función 'obtenerTodosLosProductos()' se espera que esté definida en 'js/db.js'
-// o en un script que se cargue ANTES de 'modal-productos.js'.
