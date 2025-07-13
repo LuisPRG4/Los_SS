@@ -3,6 +3,16 @@ let clientes = [];
 let abonos = []; // Para los abonos
 let ventas = []; // <--- ASEGÚRATE DE QUE ESTA LÍNEA EXISTA
 
+// Números de pago
+const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821'; // Cambia por el tuyo
+
+// Datos fijos que aparecerán en los mensajes
+const CEDULA_VENDEDOR = 'V-19.317.877';
+const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663';
+const BANCO_VENDEDOR  = 'Banco de Venezuela';
+const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco de Venezuela';
+
 let currentVentaIdAbono = null; // Para el modal de abonos
 let abonoEnProceso = false;
 
@@ -415,11 +425,11 @@ function crearCardVentaCredito(venta) {
           `Saludos cordiales.`;
           
         // Mensaje alternativo (idéntico por ahora)
-        //* const mensajeWhatsAppAlt = `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
-        //* `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
-        //*  `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS) Tasa de cambio aplicada: [Tasa Actual]\n\n`+
-        //*  `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [Teléfono] / C.I. [Cédula] / [Banco] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
-        //*  `Saludos cordiales.`;
+        const mensajeWhatsAppAlt = `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
+        `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
+        `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS) Tasa de cambio aplicada: [Tasa Actual]\n\n`+
+        `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [Teléfono] / C.I. [Cédula] / [Banco] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
+        `Saludos cordiales.`;
 
         // Contenedor para el botón y el menú
         const contenedorWhatsapp = document.createElement("div");
@@ -463,7 +473,7 @@ function crearCardVentaCredito(venta) {
         const opcion2 = document.createElement("button");
         opcion2.type = "button";
         opcion2.className = "whatsapp-dropdown-option";
-        opcion2.innerHTML = "Alternativo (¡Aún no es funcional!)";
+        opcion2.innerHTML = "Btn. José Luis";
         opcion2.onclick = (e) => {
             e.stopPropagation();
             menu.style.display = "none";
@@ -1854,17 +1864,10 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
   const tasaInicial = storedTasa>0? storedTasa : 0;
   tasaInput.value = tasaInicial;
 
-  const construirMensaje = (tasaValor)=>{
-    const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
-    return `Buen día, estimado/a ${clienteDatos.nombre}:\n\n`+
-    `Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:\n\n`+
-    `💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS) Tasa de cambio aplicada: ${tasaValor}\n\n`+
-    `📌 Formas de pago disponibles: 1️⃣ Pago móvil: [0414-0872621] / C.I. [19.317.877] / [Venezuela] 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad\n\n`+
-    `Saludos cordiales.`;
-  };
+  const mensajeFunc = esAlternativo ? construirMensajeAlternativo : construirMensajePrincipal;
 
   // Rellenar mensaje inicial
-  txtArea.value = construirMensaje(tasaInicial);
+  txtArea.value = mensajeFunc(venta, clienteDatos, tasaInicial);
 
   // === FUNCIONES PARA STICKER ===
   const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
@@ -1901,11 +1904,12 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
   renderSticker();
 
   // Actualizar sticker al cambiar mensaje o tasa
-  const updateAll = ()=>{
+    const updateAll = ()=>{
     const nuevaTasa = parseFloat(tasaInput.value)||0;
-    txtArea.value = construirMensaje(nuevaTasa);
+    txtArea.value = mensajeFunc(venta, clienteDatos, nuevaTasa); // ✅ Ahora usa la función correcta
     renderSticker();
   };
+  
   tasaInput.oninput = updateAll;
   txtArea.oninput = renderSticker;
 
@@ -1969,3 +1973,35 @@ document.body.addEventListener('click', (e)=>{
     abrirModalWhatsApp(venta, clienteDatos, numeroIntl);
   }
 }, false);
+
+function construirMensajePrincipal(venta, clienteDatos, tasaValor) {
+    const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
+    return `Buen día, estimado/a ${clienteDatos.nombre}:
+
+Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:
+
+💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS) Tasa de cambio aplicada: ${tasaValor}
+
+📌 Formas de pago disponibles: 
+1️⃣ Pago móvil: ${NUMERO_VENDEDOR_PRINCIPAL} / C.I. ${CEDULA_VENDEDOR} / ${BANCO_VENDEDOR} 
+2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad
+
+Saludos cordiales.`;
+}
+
+function construirMensajeAlternativo(venta, clienteDatos, tasaValor) {
+    const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
+    return `Buen día, estimado/a ${clienteDatos.nombre}:
+
+Confío en que el producto entregado haya sido de su agrado. Le escribo para recordarle el saldo pendiente correspondiente al acuerdo de crédito.
+
+💳 Monto adeudado: $${venta.montoPendiente.toFixed(2)} USD (≈ ${montoBs} BS) Tasa referencial aplicada: ${tasaValor}
+
+📌 Medios de pago disponibles: 
+1️⃣ Pago móvil: ${NUMERO_VENDEDOR_ALTERNATIVO} / C.I. ${CEDULA_VENDEDOR_ALTERNATIVO} / ${BANCO_VENDEDOR_ALTERNATIVO}
+2️⃣ Divisas o bolívares: Aceptados según disponibilidad, al momento de la cancelación
+
+Agradezco su atención a este mensaje y quedo atento/a para asistirle en lo que necesite.
+
+Saludos cordiales.`;
+}
