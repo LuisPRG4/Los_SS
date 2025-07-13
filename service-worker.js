@@ -1,5 +1,5 @@
-const CACHE_NAME = "los-ss-cache-v16";
-const APP_VERSION = "1.0.6"; // Incrementa esto cuando hagas cambios importantes
+const CACHE_NAME = "los-ss-cache-v17";
+const APP_VERSION = "1.0.7"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
 function getRepoPrefix() {
@@ -34,6 +34,7 @@ const urlsToCache = [
   `${REPO_PREFIX}ventas.html`,
   `${REPO_PREFIX}dashboard-analitico.html`,
   `${REPO_PREFIX}datos.html`,
+  `${REPO_PREFIX}modal-productos.html`,
 
   // CSS:
   `${REPO_PREFIX}css/fontawesome web/css/all.min.css`,
@@ -63,6 +64,7 @@ const urlsToCache = [
   `${REPO_PREFIX}css/ventas-pagadas.css`,
   `${REPO_PREFIX}css/whatsapp.css`,
   `${REPO_PREFIX}css/dashboard-analitico.css`,
+  `${REPO_PREFIX}css/modal-productos.css`,
 
   // JS:
   `${REPO_PREFIX}js/calendar.js`,
@@ -91,6 +93,7 @@ const urlsToCache = [
   `${REPO_PREFIX}js/ventas.js`,
   `${REPO_PREFIX}js/connection-status.js`,
   `${REPO_PREFIX}js/sw-register.js`,
+  `${REPO_PREFIX}js/modal-productos.js`,
 
   // Archivos externos (siempre y cuando GitHub Pages pueda acceder a ellos)
   `https://unpkg.com/xlsx/dist/xlsx.full.min.js`,
