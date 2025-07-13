@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="css/ayuda.css" />
     <link rel="stylesheet" href="css/calendar.css" />
     <link rel="stylesheet" href="css/whatsapp.css" />
+    <link rel="stylesheet" href="css/modal-productos.css" />
     <link rel="stylesheet" href="css/chatbot-ayuda.css" />
     <link rel="stylesheet" href="css/ventas-pagadas.css">
     <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
@@ -169,6 +170,7 @@
     <div id="miniMenuLateral" class="expandido">
         <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
         <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
+        <button id="btnReporteProductos" class="miniBoton dorado" title="Ver Reporte de Productos">📋</button>
         <button id="toggleMiniMenu" class="miniBoton dorado toggleArrow" title="Ocultar menú">➡️</button>
     </div>
 
@@ -237,6 +239,7 @@
     <script src="js/cuentas-por-cobrar.js"></script>
     <script src="js/nav-highlighter.js" defer></script>
     <script src="js/chatbot-ayuda.js" defer></script>
+    <script src="js/modal-productos.js"></script>
     <script src="js/connection-status.js"></script>
 
     <script>
@@ -258,5 +261,35 @@
         }
         */
     </script>
+
+     <!--Script para el modal de inventario en todos los módulos-->
+   <div id="modalReporteProductos" class="modal">
+    <div class="modal-contenido">
+        <span class="cerrar-modal">&times;</span>
+        <h2>📋 Reporte de Productos</h2>
+        <div id="reporteVistasContainer">
+            <div id="listaReporteProductos" class="reporte-lista">
+                </div>
+            <div id="tablaReporteProductos" class="reporte-tabla" style="display: none;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Categoría</th>
+                            <th>Stock</th>
+                            <th>Precio Venta</th>
+                            <th>Proveedor</th>
+                            </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
+        </div>
+
+        <button id="btnCambiarVista" class="btn-cambiar-vista">Cambiar a Vista de Tabla</button>
+    </div>
+</div>
+
 </body>
 </html>
