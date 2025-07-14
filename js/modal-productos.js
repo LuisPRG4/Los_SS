@@ -1,3 +1,10 @@
+// js/modal-productos.js
+
+// Asegúrate de que obtenerTodosLosProductos() está definido y accesible globalmente
+// (por ejemplo, en db.js, y que ese script se carga antes que este).
+
+// Esta función es llamada una vez cuando el DOM está listo para configurar
+// los event listeners del modal (cierre y cambio de vista).
 function inicializarModalProductos() {
     const modalReporteProductos = document.getElementById('modalReporteProductos');
     const cerrarModalBtn = modalReporteProductos ? modalReporteProductos.querySelector('.cerrar-modal') : null;
@@ -172,30 +179,27 @@ function alternarVistaProductos(esTabla) {
 
 
 // Este listener espera a que todo el DOM esté cargado antes de ejecutar el script.
+// Este listener espera a que todo el DOM esté cargado antes de ejecutar el script.
 document.addEventListener('DOMContentLoaded', () => {
-    // Busca el botón principal para abrir el modal (en el miniMenuLateral)
+    // Busca el botón principal para abrir el modal.
+    // Ahora, ambos botones (en index.html y finanzas.html) tendrán este mismo ID: 'btnReporteProductos'
     const btnReporteProductos = document.getElementById('btnReporteProductos');
-    // Busca el nuevo botón de acceso rápido en index.html (NUEVO ID)
-    const btnReporteProductosIndex = document.getElementById('btnReporteProductosIndex'); // <--- Esta línea es la que faltaba!
+
+    // Ya no necesitamos buscar 'btnReporteProductosIndex' porque lo hemos unificado.
 
     if (btnReporteProductos) {
-        // Adjunta el event listener al botón para llamar a mostrarReporteProductos
         btnReporteProductos.addEventListener('click', mostrarReporteProductos);
         console.log('Botón btnReporteProductos (para abrir el modal) encontrado y listener adjuntado.');
     } else {
-        console.warn('Botón "btnReporteProductos" no encontrado en el DOM.');
+        // Esta advertencia solo se mostrará si, por alguna razón,
+        // el botón con ID 'btnReporteProductos' no se encuentra en la página actual.
+        console.warn('Botón "btnReporteProductos" no encontrado en el DOM actual.');
     }
-
-    // Si el botón del index existe, también le añadimos el listener
-    if (btnReporteProductosIndex) { // <--- Y este if es el que lo usa
-        btnReporteProductosIndex.addEventListener('click', mostrarReporteProductos);
-        console.log('Botón btnReporteProductosIndex (en index.html) encontrado y listener adjuntado.');
-    } else {
-        console.warn('Botón "btnReporteProductosIndex" no encontrado en el DOM actual.');
-    }
-
 
     // Inicializa los listeners de cierre y el botón de cambio de vista del modal.
     // Esto se hace siempre al cargar la página, sin hacer el modal visible.
     inicializarModalProductos();
 });
+
+// Nota: La función 'obtenerTodosLosProductos()' se espera que esté definida en 'js/db.js'
+// o en un script que se cargue ANTES de 'modal-productos.js'.
