@@ -147,8 +147,8 @@
       <label for="descripcion">Descripción:</label>
       <input type="text" id="descripcion" placeholder="Descripción" />
 
-      <button onclick="agregarMovimiento()">Guardar Movimiento</button>
-      <button id="btnReiniciarFinanzas" onclick="reiniciarMovimientos()" style="background:#e53e3e; color:white; margin-left:auto;">Reiniciar todo</button>
+      <button id="btnAgregarMovimiento">Guardar Movimiento</button>
+      <button id="btnReiniciarFinanzas" style="background:#e53e3e; color:white; margin-left:auto;">Reiniciar todo</button>
     </section>
 
     <section>
@@ -182,8 +182,8 @@
       <h2>📅 Filtrar por Fecha</h2>
       <label>Desde: <input type="date" id="fechaDesde"></label>
       <label>Hasta: <input type="date" id="fechaHasta"></label>
-      <button onclick="filtrarPorFecha()">Aplicar Filtro</button>
-      <button id="btnLimpiarFiltroFecha" onclick="limpiarFiltroFecha()">Limpiar</button> </section>
+      <button id="btnAplicarFiltroFecha">Aplicar Filtro</button>
+      <button id="btnLimpiarFiltroFecha">Limpiar</button> </section>
     </section>
 
     <section>
@@ -196,7 +196,7 @@
       <ul id="listaMovimientos"></ul>
     </section>
 
-    <button onclick="exportarExcel()">📤 Exportar a Excel</button>
+    <button id="btnExportarFinanzas">📤 Exportar a Excel</button>
 
     <!-- Ayuda contextual para Finanzas -->
     <section id="ayuda">
