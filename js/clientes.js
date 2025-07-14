@@ -395,10 +395,6 @@ async function descargarPlantillaClientesJSON() {
 
 
 // Las siguientes funciones son del HTML y no necesitan ir en el JS principal si ya están en un script en el HTML o en otro archivo
-function toggleMenu() {
-    document.getElementById("navMenu").classList.toggle("open");
-}
-
 function mostrarAyuda() {
     const ayuda = document.getElementById("ayuda");
     ayuda.classList.add("visible");
