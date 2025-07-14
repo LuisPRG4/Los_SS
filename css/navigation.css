@@ -1,92 +1,208 @@
-/* ===== Navegación principal (extraído de style.css) ===== */
+/* --- Estilos Generales para Navegación (Base) --- */
 
-nav {
-  background-color: #fffaf0;
-  padding: 10px;
-  margin-bottom: 20px;
-  border-radius: 30px;
-  text-align: center;
-  border: 1px solid #d4af37;
+/* Por defecto, ocultar la barra superior móvil y el menú lateral en pantallas grandes */
+.top-nav-bar-mobile,
+.sidebar {
+    display: none; /* Ocultos por defecto */
 }
 
-nav ul {
-  list-style: none;
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin: 0;
-  padding: 0;
-}
-
-nav a {
-  text-decoration: none;
-  font-weight: bold;
-  padding: 8px 15px;
-  border-radius: 8px;
-  background-color: #ffffff;
-  border: 1px solid #d5bfff;
-  transition: background-color 0.3s, border-color 0.3s, color 0.3s;
-  color: #4b3500; /* Color sólido, sin degradado */
-  /* Se elimina el degradado y la animación shimmer */
-  background-image: none !important;
-  -webkit-text-fill-color: #4b3500 !important;
-  animation: none !important;
-}
-
-nav a:hover {
-  background-color: #a58b36;
-  color: #ffffff;
-}
-
-nav a.active {
-  background-color: #a58b36;
-  border-color: #d4af37;
-  color: #ffffff;
-}
-
-nav a.active:hover {
-  background-color: #a58b36;
-  color: #ffffff;
-}
-
-/* ===== Botón Menú Hamburguesa ===== */
-.menu-toggle {
-  display: none; /* Oculto por defecto en escritorio */
-  font-size: 1.5rem;
-  cursor: pointer;
-  background: linear-gradient(145deg, #f7e1b8, #c6a663);
-  color: white;
-  padding: 10px 15px;
-  border-radius: 90px;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-/* ===== Navegación Responsive ===== */
-@media (max-width: 768px) {
-  nav ul {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  nav a {
-    width: 100%;
-    text-align: center;
-  }
-
-  /* Menú hamburguesa */
-  .menu-toggle {
+/* El menú de escritorio será visible por defecto en PC */
+.desktop-nav {
     display: block;
-    margin-bottom: auto;
-  }
+    background-color: #fffaf0; /* Color de fondo de tu nav original */
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 30px;
+    text-align: center;
+    border: 1px solid #d4af37;
+}
 
-  nav ul {
-    display: none; /* Oculto por defecto */
-    margin-top: 10px;
-  }
+.desktop-nav ul {
+    list-style: none;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0;
+}
 
-  nav ul.open {
-    display: flex; /* Se muestra al activar la hamburguesa */
-  }
-} 
+.desktop-nav a {
+    text-decoration: none;
+    font-weight: bold;
+    padding: 8px 15px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    border: 1px solid #d5bfff;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+    color: #4b3500;
+    background-image: none !important;
+    -webkit-text-fill-color: #4b3500 !important;
+    animation: none !important;
+}
+
+.desktop-nav a:hover {
+    background-color: #a58b36;
+    color: #ffffff;
+}
+
+.desktop-nav a.active {
+    background-color: #a58b36;
+    border-color: #d4af37;
+    color: #ffffff;
+}
+
+.desktop-nav a.active:hover {
+    background-color: #a58b36;
+    color: #ffffff;
+}
+
+/* Contenido principal de la página */
+.main-content {
+    transition: margin-left .5s; /* Para el efecto de "empuje" si se decide usarlo */
+    padding: 16px; /* Padding general para el main content */
+    padding-top: 0; /* Lo reiniciamos aquí y lo ajustamos en media queries */
+}
+
+
+/* --- Media Query para Vista de Teléfono (max-width: 768px) --- */
+@media screen and (max-width: 768px) {
+    /* Ocultar el menú de escritorio */
+    .desktop-nav {
+        display: none;
+    }
+
+    /* Mostrar la barra superior móvil */
+    .top-nav-bar-mobile {
+       display: flex; /* Hacer visible la barra superior */
+       background-color: #f8f8dc; /* Usar el mismo color de fondo del sidebar */
+       color: #8b4513; /* Un color más elegante para el texto */
+       padding: 10px 20px;
+       align-items: center;
+       position: fixed; /* Fija la barra en la parte superior */
+       width: 100%;
+       top: 0;
+       left: 0;
+       z-index: 999;
+       box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+   }
+
+    .menu-toggle-mobile {
+       display: block; /* Muestra el botón de hamburguesa en móvil */
+       font-size: 24px; /* Tamaño más pequeño para el ícono */
+       cursor: pointer;
+       margin-right: 15px;
+       color: #a58b36; /* Color dorado más elegante */
+       background: none;
+       padding: 0;
+       border-radius: 0;
+   }
+
+    .nav-title-mobile {
+       font-size: 1.4rem; /* Tamaño de fuente más pequeño para el título */
+       font-weight: bold;
+       color: #8b4513;
+   }
+
+    /* Mostrar el sidebar (se controlará la visibilidad con JS) */
+    .sidebar {
+       display: flex; /* Permite que el sidebar sea controlado por JS */
+       height: 100%;
+       width: 250px; /* Ancho fijo para que se vea el cambio al instante */
+       position: fixed;
+       z-index: 1000;
+       top: 0;
+       left: -250px; /* Oculto por defecto, se desliza desde la izquierda */
+       background-color: #f8f8dc; /* Un color más claro y elegante */
+       overflow-x: hidden;
+       transition: left 0.3s ease; /* Transición para la propiedad 'left' */
+       padding-top: 60px; /* Espacio para el botón de cerrar */
+       box-shadow: 2px 0 10px rgba(0, 0, 0, 0.2);
+       flex-direction: column;
+       align-items: center;
+       color: #333; /* Color de texto más oscuro */
+   }
+
+    .sidebar.open {
+       left: 0; /* Se desliza hacia adentro */
+   }
+
+   .sidebar .close-btn {
+       position: absolute;
+       top: 10px; /* Ajustar posición del botón de cerrar */
+       right: 15px; /* Ajustar posición del botón de cerrar */
+       font-size: 24px; /* Tamaño más pequeño para el botón de cerrar */
+       margin-left: 0;
+       color: #8b4513; /* Color más acorde */
+       text-decoration: none;
+       cursor: pointer;
+       line-height: 1; /* Ajustar line-height */
+       opacity: 0.7;
+       transition: opacity 0.2s ease;
+   }
+
+    .sidebar .close-btn:hover {
+       opacity: 1;
+   }
+
+   .sidebar-nav-list {
+       list-style-type: none;
+       padding: 10px 0; /* Reducir padding superior */
+       margin-top: 0; /* Eliminar margen superior */
+       width: 100%;
+   }
+
+   .sidebar-nav-list li {
+       width: 100%;
+       text-align: left; /* Alinear texto a la izquierda */
+       padding: 0 10px; /* Añadir padding horizontal */
+   }
+
+   .sidebar-nav-list li a {
+       padding: 10px 20px; /* Reducir el padding vertical y ajustar el horizontal */
+       text-decoration: none;
+       font-size: 1rem; /* Tamaño de fuente más pequeño */
+       color: #555;
+       display: block;
+       transition: background-color 0.3s ease; /* Transición solo para el fondo */
+       font-weight: normal; /* Peso de fuente normal */
+       border-radius: 5px; /* Añadir un pequeño borde redondeado */
+       margin-bottom: 5px; /* Espacio entre botones */
+   }
+
+   .sidebar-nav-list li a:hover,
+   .sidebar-nav-list li.active a {
+       color: #fff;
+       background-color: #a58b36; /* Un color dorado más elegante */
+       border-left: none; /* Quitar la línea izquierda */
+       padding-left: 25px; /* Compensar la falta de borde con padding */
+   }
+
+    /* Ajuste del padding para el body cuando el sidebar NO está abierto */
+   body {
+       padding-top: 60px; /* Altura de la top-nav-bar-mobile */
+       padding-left: 0; /* Asegurar que no haya padding izquierdo por defecto */
+       transition: padding-left 0.3s ease; /* Transición suave para el padding */
+   }
+
+   body.sidebar-open {
+       padding-left: 250px; /* Ancho del sidebar */
+   }
+
+    /* Asegurarse de que el main-content no tenga margin-left en móvil */
+    .main-content.pushed {
+        margin-left: 0;
+    }
+}
+
+/* --- Media Query para Vista de Escritorio (min-width: 769px) --- */
+@media screen and (min-width: 769px) {
+    /* Asegurarse de que no haya padding extra en el body para PC */
+    body {
+        padding-top: 0;
+    }
+    /* Asegurarse de que el main-content no tenga margin-left en PC */
+    .main-content {
+        margin-left: 0;
+    }
+}
