@@ -610,11 +610,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 });
 
-// Función para el menú móvil (ya la tenías en el HTML)
-function toggleMenu() {
-    document.getElementById("navMenu").classList.toggle("open");
-}
-
 // Script para el botón flotante de ayuda (ya lo tenías en el HTML)
 function mostrarAyuda() {
     const ayuda = document.getElementById("ayuda");
