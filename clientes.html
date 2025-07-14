@@ -1,267 +1,245 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Los SS - Clientes</title>
-  <link rel="icon" type="image/png" href="fav/SALAZAR.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Los SS - Clientes</title>
+    <link rel="icon" type="image/png" href="fav/SALAZAR.png">
 
-  <link rel="stylesheet" href="css/style.css">
-  <link rel="stylesheet" href="css/navigation.css">
-  <link rel="stylesheet" href="css/ayuda.css">
-  <link rel="stylesheet" href="css/note.css">
-  <link rel="stylesheet" href="css/chatbot-ayuda.css">
-  <link rel="stylesheet" href="css/modal-productos.css" />
-  <link rel="stylesheet" href="css/form-decoration.css"> <!-- ¡NUEVA LÍNEA CLAVE! -->
-  <link rel="stylesheet" href="css/cards-general.css"> <!-- ¡NUEVA LÍNEA CLAVE! -->
-  <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
-
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/navigation.css">
+    <link rel="stylesheet" href="css/ayuda.css">
+    <link rel="stylesheet" href="css/note.css">
+    <link rel="stylesheet" href="css/chatbot-ayuda.css">
+    <link rel="stylesheet" href="css/modal-productos.css" />
+    <link rel="stylesheet" href="css/form-decoration.css">
+    <link rel="stylesheet" href="css/cards-general.css">
+    <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
 </head>
 <body>
-  <div id="toastContainer" class="toast-container"></div>
+    <div id="toastContainer" class="toast-container"></div>
 
-  <header class="header-elegante">
-  <div class="header-container">
-    <img src="logo/BIOMÉTRICA.png" alt="Logo" class="logo-libre" />
-    <div class="texto-header">
-      <h1 class="titulo-header">👥 Clientes</h1>
-      <p class="descripcion-header">Lleva un registro detallado de tus clientes para mejorar tu atención y crear relaciones más duraderas y confiables.</p>
+    <header class="header-elegante">
+        <div class="header-container">
+            <img src="logo/BIOMÉTRICA.png" alt="Logo" class="logo-libre" />
+            <div class="texto-header">
+                <h1 class="titulo-header">👥 Clientes</h1>
+                <p class="descripcion-header">Lleva un registro detallado de tus clientes para mejorar tu atención y crear relaciones más duraderas y confiables.</p>
+            </div>
+            <span class="connection-icon online" title="En línea">●</span>
+        </div>
+    </header>
+
+    <div id="sidebar-menu" class="sidebar">
+        <div class="close-btn" onclick="toggleMenu()">×</div>
+        <ul class="sidebar-nav-list">
+            <li><a href="index.html">🏠 Inicio</a></li>
+            <li><a href="inventario.html">🧃 Inventario</a></li>
+            <li><a href="dashboard-analitico.html">📊📈 Dashboard Analítico</a></li>
+            <li><a href="mermas.html">📉 Mermas</a></li>
+            <li><a href="ventas.html">🧾 Ventas</a></li>
+            <li><a href="clientes.html">👥 Clientes</a></li>
+            <li><a href="proveedores.html">🚚 Proveedores</a></li>
+            <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
+            <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+            <li><a href="finanzas.html">💰 Finanzas</a></li>
+            <li><a href="novedades.html">🐶 Novedades</a></li>
+            <li><a href="pedidos.html">📦 Pedidos</a></li>
+            <li><a href="datos.html">💾 Datos</a></li>
+        </ul>
     </div>
-    <span class="connection-icon online" title="En línea">●</span>
-  </div>
-</header>
 
-<nav>
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <ul id="navMenu">
-      <li><a href="index.html">🏠 Inicio</a></li>
-      <li><a href="inventario.html">🧃 Inventario</a></li>
-      <li><a href="dashboard-analitico.html">📊📈 Dashboard Analítico</a></li>
-      <li><a href="mermas.html">📉 Mermas</a></li>
-      <li><a href="ventas.html">🧾 Ventas</a></li>
-      <li><a href="clientes.html">👥 Clientes</a></li>
-      <li><a href="proveedores.html">🚚 Proveedores</a></li>
-      <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
-      <li><a href="reportesGraficos.html">📊 Reportes</a></li>
-      <li><a href="finanzas.html">💰 Finanzas</a></li>
-      <li><a href="novedades.html">🐶 Novedades</a></li>
-      <li><a href="pedidos.html">📦 Pedidos</a></li>
-      <li><a href="datos.html">💾 Datos</a></li>
-    </ul>
-  </nav>
+    <div id="main-content-wrapper" class="main-content">
+        <nav class="top-nav-bar-mobile">
+            <div class="menu-toggle-mobile" onclick="toggleMenu()">☰</div>
+            <div class="nav-title-mobile">Los SS</div>
+        </nav>
 
-  <main>
-    <section class="golden-decorated-form"> <!-- ¡NUEVA CLASE AÑADIDA AQUÍ! -->
-      <h2>➕ Agregar Cliente</h2>
-        <label>Ingresa el nombre del cliente:</label>
-      <input type="text" id="nombreCliente" placeholder="Nombre completo" />
-        <label>Ingresa la dirección del cliente:</label>
-      <input type="text" id="direccion" placeholder="Dirección" />
-        <label>Número de contacto del cliente:</label>
-      <input type="number" id="telefono" placeholder="Teléfono" />
-        <label>Correo electrónico del cliente:</label>
-      <input type="email" id="email" placeholder="Correo electrónico" />
+        <nav class="desktop-nav">
+            <ul>
+                <li><a href="index.html">🏠 Inicio</a></li>
+                <li><a href="inventario.html">🧃 Inventario</a></li>
+                <li><a href="dashboard-analitico.html">📊📈 Dashboard Analítico</a></li>
+                <li><a href="mermas.html">📉 Mermas</a></li>
+                <li><a href="ventas.html">🧾 Ventas</a></li>
+                <li><a href="clientes.html">👥 Clientes</a></li>
+                <li><a href="proveedores.html">🚚 Proveedores</a></li>
+                <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
+                <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+                <li><a href="finanzas.html">💰 Finanzas</a></li>
+                <li><a href="novedades.html">🐶 Novedades</a></li>
+                <li><a href="pedidos.html">📦 Pedidos</a></li>
+                <li><a href="datos.html">💾 Datos</a></li>
+            </ul>
+        </nav>
 
-      <label>Nota sobre el cliente (opcional):</label>
-      <textarea id="notaCliente" placeholder="Escribe una nota especial, comportamiento de pago, referencias, etc." rows="3"></textarea>
+        <main>
+            <section class="golden-decorated-form">
+                <h2>➕ Agregar Cliente</h2>
+                <label>Ingresa el nombre del cliente:</label>
+                <input type="text" id="nombreCliente" placeholder="Nombre completo" />
+                <label>Ingresa la dirección del cliente:</label>
+                <input type="text" id="direccion" placeholder="Dirección" />
+                <label>Número de contacto del cliente:</label>
+                <input type="number" id="telefono" placeholder="Teléfono" />
+                <label>Correo electrónico del cliente:</label>
+                <input type="email" id="email" placeholder="Correo electrónico" />
 
-      <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-        <button id="btnGuardarCliente" class="btn-primario">Guardar Cliente</button>
-        <button onclick="cancelarEdicionCliente()" id="btnCancelarEdicionCliente" class="btn-cancelar" style="display:none;">Cancelar</button>
-      </div>
+                <label>Nota sobre el cliente (opcional):</label>
+                <textarea id="notaCliente" placeholder="Escribe una nota especial, comportamiento de pago, referencias, etc." rows="3"></textarea>
 
-    </section>
-
-    <section class="inventory-utilities">
-    <h2>Herramientas de Clientes</h2>
-    <div class="utility-buttons">
-        <button id="exportarClientesBtn" class="btn btn-utility">
-            <i class="fas fa-file-export"></i> Exportar Clientes
-        </button>
-        <label for="importarClientesInput" class="btn btn-utility file-upload-label">
-            <i class="fas fa-file-import"></i> Importar Clientes
-            <input type="file" id="importarClientesInput" accept=".json" style="display: none;">
-        </label>
-        <button id="descargarPlantillaClientesBtn" class="btn btn-utility">
-            <i class="fas fa-download"></i> Descargar Plantilla
-        </button>
-    </div>
-</section>
-
-    <section>
-  <h2>📋 Lista de Clientes</h2>
-
-  <!-- Campo de búsqueda -->
-  <input type="text" id="buscadorClientes" placeholder="Buscar clientes..." oninput="filtrarClientes()" />
-
-  <!-- Botón para agregar cliente si no existe -->
-  <div id="contenedorBotonAgregar" style="display: none; margin-top: 10px;">
-    <button id="btnAgregarDesdeBusqueda" onclick="agregarDesdeBusqueda()" style="
-      background-color: #d4af37;
-      color: white;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background-color 0.3s ease;">
-      ➕ Agregar nuevo cliente
-    </button>
-  </div>
-
-  <!-- Lista de clientes -->
-  <!-- Cambiado de <ul> a <div> y añadida clase para layout de cuadrícula -->
-  <div id="listaClientes" class="clientes-grid"></div>
-</section>
-
-<!-- Sección de historial de compras del cliente seleccionado -->
-<section id="historialComprasSection" class="golden-decorated-form" style="display:none; margin-top: 30px;">
-  <h2>🧾 Historial de Compras de <span id="nombreClienteHistorial"></span></h2>
-  <table id="tablaHistorialCompras" class="styled-table">
-    <thead>
-      <tr>
-        <th>Fecha</th>
-        <th>Productos</th>
-        <th>Total</th>
-        <th>Tipo de Pago</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Aquí se llenarán las compras del cliente -->
-    </tbody>
-  </table>
-</section>
-
-    <!-- Ayuda contextual para Clientes -->
-  <section id="ayuda">
-    <div class="h2title"> 
-      <h2>👥 Módulo Clientes</h2> 
-    </div> 
-      <h3>📝 ¿Cómo usar este módulo?</h3>
-    <div class="parrafito">
-      <p>
-        Aquí puedes registrar a cada uno de tus clientes agregando su nombre, dirección, contacto y correo.
-        Esto te ayudará a tener control sobre tus ventas y darles seguimiento personalizado. Puedes buscar, editar
-        o eliminar clientes cuando lo necesites.
-      </p>
-    </div>
-    <ul>
-      <li>🔹 Completa el formulario y guarda para registrar un cliente nuevo.</li>
-      <li>🔹 Usa el botón ✏️ para editar un cliente existente.</li>
-      <li>🔹 El botón 🗑️ elimina al cliente seleccionado.</li>
-      <li>🔹 Usa el buscador para filtrar por nombre, dirección o contacto.</li>
-    </ul>
-    <button id="cerrarAyuda">Cerrar Ayuda</button>
-  </section>
-
-  <!-- Mini menú lateral con botón de flechita -->
-<div id="miniMenuLateral" class="expandido">
-  <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
-  <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
-  <button id="btnReporteProductos" class="miniBoton dorado" title="Ver Reporte de Productos">📋</button>
-  <button id="toggleMiniMenu" class="miniBoton dorado toggleArrow" title="Ocultar menú">➡️</button>
-</div>
-
-
-  <div id="panelChatbot">
-  <button class="cerrarBtn" id="cerrarChatbot">×</button>
-  <h3>Chatbot - Clientes</h3>
-  <div id="chatbotContenido">
-    <button onclick="mostrarRespuesta('variosTelefonos')">¿Puedo registrar varios números de contacto?</button>
-    <button onclick="mostrarRespuesta('agregarRapido')">¿Cómo agregar un cliente rápido desde búsqueda?</button>
-    <button onclick="mostrarRespuesta('editarEliminar')">¿Cómo editar o eliminar un cliente?</button>
-    <button onclick="mostrarRespuesta('busquedaCorreo')">¿Puedo buscar cliente por correo?</button>
-    <button onclick="mostrarRespuesta('formatoTelefono')">¿Qué formato usar para el teléfono?</button>
-    <button onclick="mostrarRespuesta('correoObligatorio')">¿Es obligatorio el correo electrónico?</button>
-    <button onclick="mostrarRespuesta('clientesDuplicados')">¿Cómo evitar clientes duplicados?</button>
-    <button onclick="mostrarRespuesta('corregirNombre')">¿Cómo corregir nombre o datos de un cliente?</button>
-    <button onclick="mostrarRespuesta('exportarClientes')">¿Puedo exportar o imprimir la lista de clientes?</button>
-    <button onclick="mostrarRespuesta('eliminarError')">¿Qué pasa si elimino un cliente por error?</button>
-  </div>
-  <div id="respuestaChatbot" style="margin-top: 10px;"></div>
-</div>
-
-</main>
-
-  <script src="js/db.js"></script>
-  <script src="js/clientes.js"></script>
-  <script src="js/nav-highlighter.js" defer></script>
-  <script src="js/chatbot-ayuda.js" defer></script>
-  <script src="js/modal-productos.js"></script>
-  <script src="js/connection-status.js"></script>
-
-    <script>
-      function toggleMenu() {
-      document.getElementById("navMenu").classList.toggle("open");
-    }
-    </script>
-
-    <script>
-  if (sessionStorage.getItem("sesionIniciada") !== "true") {
-    window.location.href = "login.html";
-  }
-</script>
-
-<!--SCRIPT PARA EL BOTÓN FLOTANTE DE AYUDA-->
-<script>
-  function mostrarAyuda() {
-    const ayuda = document.getElementById("ayuda");
-    ayuda.classList.add("visible");
-    ayuda.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
-
-  document.getElementById("cerrarAyuda").addEventListener("click", () => {
-    document.getElementById("ayuda").classList.remove("visible");
-  });
-</script>
-
- <!--Script para el modal de inventario en todos los módulos-->
-    <script>
-        fetch('modals/modal-productos.html') // Ruta correcta a tu modal HTML
-            .then(response => response.text())
-            .then(html => {
-                document.body.insertAdjacentHTML('beforeend', html);
-                // Llama a la función de inicialización del modal DESPUÉS de que se haya cargado el HTML
-                inicializarModalProductos();
-            })
-            .catch(error => console.error('Error al cargar el modal de productos:', error));
-    </script>
-    <script src="js/modal-productos.js"></script>
-
-    <script>
-        function toggleMenu() {
-            document.getElementById("navMenu").classList.toggle("open");
-        }
-    </script>
-
-     <!--Script para el modal de inventario en todos los módulos-->
-   <div id="modalReporteProductos" class="modal">
-    <div class="modal-contenido">
-        <span class="cerrar-modal">&times;</span>
-        <h2>📋 Reporte de Productos</h2>
-        <div id="reporteVistasContainer">
-            <div id="listaReporteProductos" class="reporte-lista">
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
+                    <button id="btnGuardarCliente" class="btn-primario">Guardar Cliente</button>
+                    <button onclick="cancelarEdicionCliente()" id="btnCancelarEdicionCliente" class="btn-cancelar" style="display:none;">Cancelar</button>
                 </div>
-            <div id="tablaReporteProductos" class="reporte-tabla" style="display: none;">
-                <table>
+            </section>
+
+            <section class="inventory-utilities">
+                <h2>Herramientas de Clientes</h2>
+                <div class="utility-buttons">
+                    <button id="exportarClientesBtn" class="btn btn-utility">
+                        <i class="fas fa-file-export"></i> Exportar Clientes
+                    </button>
+                    <label for="importarClientesInput" class="btn btn-utility file-upload-label">
+                        <i class="fas fa-file-import"></i> Importar Clientes
+                        <input type="file" id="importarClientesInput" accept=".json" style="display: none;">
+                    </label>
+                    <button id="descargarPlantillaClientesBtn" class="btn btn-utility">
+                        <i class="fas fa-download"></i> Descargar Plantilla
+                    </button>
+                </div>
+            </section>
+
+            <section>
+                <h2>📋 Lista de Clientes</h2>
+                <input type="text" id="buscadorClientes" placeholder="Buscar clientes..." oninput="filtrarClientes()" />
+                <div id="contenedorBotonAgregar" style="display: none; margin-top: 10px;">
+                    <button id="btnAgregarDesdeBusqueda" onclick="agregarDesdeBusqueda()" style="
+                        background-color: #d4af37;
+                        color: white;
+                        padding: 10px 15px;
+                        border: none;
+                        border-radius: 10px;
+                        font-size: 1rem;
+                        cursor: pointer;
+                        transition: background-color 0.3s ease;">
+                        ➕ Agregar nuevo cliente
+                    </button>
+                </div>
+                <div id="listaClientes" class="clientes-grid"></div>
+            </section>
+
+            <section id="historialComprasSection" class="golden-decorated-form" style="display:none; margin-top: 30px;">
+                <h2>🧾 Historial de Compras de <span id="nombreClienteHistorial"></span></h2>
+                <table id="tablaHistorialCompras" class="styled-table">
                     <thead>
                         <tr>
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Stock</th>
-                            <th>Precio Venta</th>
-                            <th>Proveedor</th>
-                            </tr>
+                            <th>Fecha</th>
+                            <th>Productos</th>
+                            <th>Total</th>
+                            <th>Tipo de Pago</th>
+                        </tr>
                     </thead>
                     <tbody>
                         </tbody>
                 </table>
-            </div>
-        </div>
+            </section>
 
-        <button id="btnCambiarVista" class="btn-cambiar-vista">Cambiar a Vista de Tabla</button>
+            <section id="ayuda">
+                <div class="h2title">
+                    <h2>👥 Módulo Clientes</h2>
+                </div>
+                <h3>📝 ¿Cómo usar este módulo?</h3>
+                <div class="parrafito">
+                    <p>
+                        Aquí puedes registrar a cada uno de tus clientes agregando su nombre, dirección, contacto y correo.
+                        Esto te ayudará a tener control sobre tus ventas y darles seguimiento personalizado. Puedes buscar, editar
+                        o eliminar clientes cuando lo necesites.
+                    </p>
+                </div>
+                <ul>
+                    <li>🔹 Completa el formulario y guarda para registrar un cliente nuevo.</li>
+                    <li>🔹 Usa el botón ✏️ para editar un cliente existente.</li>
+                    <li>🔹 El botón 🗑️ elimina al cliente seleccionado.</li>
+                    <li>🔹 Usa el buscador para filtrar por nombre, dirección o contacto.</li>
+                </ul>
+                <button id="cerrarAyuda">Cerrar Ayuda</button>
+            </section>
+
+            <div id="miniMenuLateral" class="expandido">
+                <button id="btnAyudaFlotante" class="miniBoton dorado" title="Ayuda">❔</button>
+                <button id="btnChatbot" class="miniBoton dorado" title="Chatbot">💬</button>
+                <button id="btnReporteProductos" class="miniBoton dorado" title="Ver Reporte de Productos">📋</button>
+                <button id="toggleMiniMenu" class="miniBoton dorado toggleArrow" title="Ocultar menú">➡️</button>
+            </div>
+
+            <div id="panelChatbot">
+                <button class="cerrarBtn" id="cerrarChatbot">×</button>
+                <h3>Chatbot - Clientes</h3>
+                <div id="chatbotContenido">
+                    <button onclick="mostrarRespuesta('variosTelefonos')">¿Puedo registrar varios números de contacto?</button>
+                    <button onclick="mostrarRespuesta('agregarRapido')">¿Cómo agregar un cliente rápido desde búsqueda?</button>
+                    <button onclick="mostrarRespuesta('editarEliminar')">¿Cómo editar o eliminar un cliente?</button>
+                    <button onclick="mostrarRespuesta('busquedaCorreo')">¿Puedo buscar cliente por correo?</button>
+                    <button onclick="mostrarRespuesta('formatoTelefono')">¿Qué formato usar para el teléfono?</button>
+                    <button onclick="mostrarRespuesta('correoObligatorio')">¿Es obligatorio el correo electrónico?</button>
+                    <button onclick="mostrarRespuesta('clientesDuplicados')">¿Cómo evitar clientes duplicados?</button>
+                    <button onclick="mostrarRespuesta('corregirNombre')">¿Cómo corregir nombre o datos de un cliente?</button>
+                    <button onclick="mostrarRespuesta('exportarClientes')">¿Puedo exportar o imprimir la lista de clientes?</button>
+                    <button onclick="mostrarRespuesta('eliminarError')">¿Qué pasa si elimino un cliente por error?</button>
+                </div>
+                <div id="respuestaChatbot" style="margin-top: 10px;"></div>
+            </div>
+        </main>
+    </div> <div id="modalReporteProductos" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar-modal">&times;</span>
+            <h2>📋 Reporte de Productos</h2>
+            <div id="reporteVistasContainer">
+                <div id="listaReporteProductos" class="reporte-lista"></div>
+                <div id="tablaReporteProductos" class="reporte-tabla" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Stock</th>
+                                <th>Precio Venta</th>
+                                <th>Proveedor</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+            <button id="btnCambiarVista" class="btn-cambiar-vista">Cambiar a Vista de Tabla</button>
+        </div>
     </div>
-</div>
+
+    <script src="js/db.js"></script>
+    <script src="js/script.js"></script> 
+    <script src="js/clientes.js"></script>
+    <script src="js/nav-highlighter.js" defer></script>
+    <script src="js/chatbot-ayuda.js" defer></script>
+    <script src="js/modal-productos.js"></script> <script src="js/connection-status.js"></script>
+
+    <script>
+        if (sessionStorage.getItem("sesionIniciada") !== "true") {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <script>
+        function mostrarAyuda() {
+            const ayuda = document.getElementById("ayuda");
+            ayuda.classList.add("visible");
+            ayuda.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+
+        document.getElementById("cerrarAyuda").addEventListener("click", () => {
+            document.getElementById("ayuda").classList.remove("visible");
+        });
+    </script>
 
 </body>
 </html>
