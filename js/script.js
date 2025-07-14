@@ -311,14 +311,17 @@ async function restaurarStockProductos() {
 function toggleMenu() {
     const sidebar = document.getElementById("sidebar-menu");
     const mainContentWrapper = document.getElementById("main-content-wrapper");
-    const body = document.body; // Obtenemos el body
+    const body = document.body;
+    const navOverlay = document.getElementById("nav-overlay"); // <-- Ahora obtenemos el nav-overlay
 
-    if (sidebar && mainContentWrapper && body) { // Asegúrate de que todos los elementos existan
-        sidebar.classList.toggle('open');
-        body.classList.toggle('sidebar-open'); // Añadir/quitar clase al body
-        // mainContentWrapper.classList.toggle('shifted'); // No estoy seguro si sigues usando 'shifted', pero si es así, debería estar aquí. Si no, ignora o elimina esta línea.
+    if (sidebar && mainContentWrapper && body && navOverlay) { // <-- Asegúrate de que navOverlay exista
+        sidebar.classList.toggle('open'); // Abre/cierra el sidebar
+        body.classList.toggle('sidebar-open'); // Ajusta el padding del body si lo usas
+        // mainContentWrapper.classList.toggle('pushed'); // Si estás usando esto para empujar el contenido, déjalo.
+                                                        // Si no, puedes eliminarlo, ya que body.sidebar-open puede bastar.
+        navOverlay.classList.toggle('open'); // <-- ¡Esto activa/desactiva el overlay!
     } else {
-        console.error("Error: Elementos del menú lateral o del contenido principal no encontrados para toggleMenu.");
+        console.error("Error: Elementos del menú lateral, contenido principal o overlay no encontrados para toggleMenu.");
     }
 }
 
