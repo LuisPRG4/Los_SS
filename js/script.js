@@ -309,7 +309,17 @@ async function restaurarStockProductos() {
 
 // Función para alternar el menú de navegación (movida aquí para ser global)
 function toggleMenu() {
-    document.getElementById("navMenu").classList.toggle("open");
+    const sidebar = document.getElementById("sidebar-menu");
+    const mainContentWrapper = document.getElementById("main-content-wrapper");
+    const body = document.body; // Obtenemos el body
+
+    if (sidebar && mainContentWrapper && body) { // Asegúrate de que todos los elementos existan
+        sidebar.classList.toggle('open');
+        body.classList.toggle('sidebar-open'); // Añadir/quitar clase al body
+        // mainContentWrapper.classList.toggle('shifted'); // No estoy seguro si sigues usando 'shifted', pero si es así, debería estar aquí. Si no, ignora o elimina esta línea.
+    } else {
+        console.error("Error: Elementos del menú lateral o del contenido principal no encontrados para toggleMenu.");
+    }
 }
 
 // Estos dos listeners aseguran que `cargarDashboard` se ejecute cuando la página esté lista
