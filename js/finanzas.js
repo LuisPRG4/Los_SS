@@ -20,13 +20,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById("btnAgregarMovimiento")?.addEventListener("click", agregarMovimiento);
     document.getElementById("btnLimpiarFormulario")?.addEventListener("click", limpiarFormulario);
 
-    document.getElementById("fechaDesde").addEventListener("change", filtrarPorFecha);
-    document.getElementById("fechaHasta").addEventListener("change", filtrarPorFecha);
-    document.getElementById("btnLimpiarFiltroFecha").addEventListener("click", limpiarFiltroFecha);
-    document.getElementById("buscadorMovimientos").addEventListener("input", buscarMovimientos);
+    document.getElementById("fechaDesde")?.addEventListener("change", filtrarPorFecha);
+    document.getElementById("fechaHasta")?.addEventListener("change", filtrarPorFecha);
+    document.getElementById("btnLimpiarFiltroFecha")?.addEventListener("click", limpiarFiltroFecha);
+    document.getElementById("buscadorMovimientos")?.addEventListener("input", buscarMovimientos);
 
-    document.getElementById("btnReiniciarFinanzas").addEventListener("click", reiniciarMovimientos);
-    document.getElementById("btnExportarFinanzas").addEventListener("click", exportarExcel);
+    document.getElementById("btnReiniciarFinanzas")?.addEventListener("click", reiniciarMovimientos);
+    document.getElementById("btnExportarFinanzas")?.addEventListener("click", exportarExcel);
 
     // Mostrar inicial
     mostrarMovimientos();
@@ -108,22 +108,41 @@ function limpiarFormulario() {
 
 // Modificación clave en mostrarMovimientos
 async function mostrarMovimientos() { // Hacemos esta función async
-    listaMovimientos.innerHTML = "";
+    const listaMovimientos = document.getElementById("listaMovimientos"); 
+    if (!listaMovimientos) {
+        console.error("Elemento 'listaMovimientos' no encontrado en el DOM.");
+        return;
+    }
+
+    listaMovimientos.innerHTML = ""; // Limpiar la lista al inicio
 
     // **Paso clave: Recargar movimientos desde la DB antes de filtrar**
-    movimientos = await obtenerTodosLosMovimientos(); 
+    let todosLosMovimientos = await obtenerTodosLosMovimientos(); // Obtener todos los movimientos
+    let movimientosParaMostrar = [...todosLosMovimientos]; // Usamos una copia para manipularla
 
-    let filtrados = movimientos.filter(mov => {
+
+    // Asegúrate de que filtroFechaDesde, filtroFechaHasta y busquedaTexto estén definidos globalmente
+    // Si no lo están, podrías definirlos al inicio de este script o pasarlos como parámetros.
+    // Por ahora, asumiré que son globales.
+    let filtrados = movimientosParaMostrar.filter(mov => { 
         let cumpleFecha = true;
         // Asegúrate de que las fechas sean comparables como cadenas YYYY-MM-DD
-        if (filtroFechaDesde) cumpleFecha = cumpleFecha && (mov.fecha >= filtroFechaDesde);
-        if (filtroFechaHasta) cumpleFecha = cumpleFecha && (mov.fecha <= filtroFechaHasta);
+        // Aquí se asume que las variables globales filtroFechaDesde y filtroFechaHasta existen
+        if (typeof filtroFechaDesde !== 'undefined' && filtroFechaDesde) {
+            cumpleFecha = cumpleFecha && (mov.fecha >= filtroFechaDesde);
+        }
+        if (typeof filtroFechaHasta !== 'undefined' && filtroFechaHasta) {
+            cumpleFecha = cumpleFecha && (mov.fecha <= filtroFechaHasta);
+        }
 
-        const texto = busquedaTexto.toLowerCase();
+        // Aquí se asume que la variable global busquedaTexto existe
+        const texto = (typeof busquedaTexto !== 'undefined' ? busquedaTexto : "").toLowerCase();
         const descripcionLower = (mov.descripcion || "").toLowerCase();
         const tipoLower = (mov.tipo || "").toLowerCase();
 
-        const cumpleTexto = descripcionLower.includes(texto) || tipoLower.includes(texto) || String(mov.monto).includes(texto); // Incluir búsqueda por monto
+        // Asegurarse de que mov.monto sea un número o una cadena para la búsqueda
+        const montoString = String(mov.monto || ''); // Convertir a cadena, usando '' si es null/undefined
+        const cumpleTexto = descripcionLower.includes(texto) || tipoLower.includes(texto) || montoString.includes(texto);
 
         return cumpleFecha && cumpleTexto;
     });
@@ -138,38 +157,43 @@ async function mostrarMovimientos() { // Hacemos esta función async
     // Nuevo código con las clases de estilo modernas
     filtrados.forEach(mov => {
         const li = document.createElement("li");
-        
+
         // Aplicamos la clase base de tarjeta de movimiento
         li.className = "movimiento-card";
-        
+
         // Aplicamos clase específica según el tipo
-        const tipoLower = mov.tipo.toLowerCase();
+        const tipoLower = (mov.tipo || "").toLowerCase(); 
         if (tipoLower === "ingreso") {
             li.classList.add("ingreso");
         } else if (tipoLower === "gasto") {
             li.classList.add("gasto");
         }
-        
+
         // Añadir clase para animación de nuevos elementos
-        if (mov.id > Date.now() - 5000) {
+        if (mov.id && (mov.id > Date.now() - 5000)) { 
             li.classList.add("nuevo");
         }
-        
+
         // Formatear la fecha correctamente
         let fechaFormateada = mov.fecha;
-        if (fechaFormateada === "undefined" || !fechaFormateada) {
+        if (!fechaFormateada || String(fechaFormateada).toLowerCase() === "undefined") { 
             fechaFormateada = `<span class="fecha-undefined">Fecha no definida</span>`;
         }
-        
+
+        // *** ESTA ES LA LÍNEA CLAVE QUE CAMBIAMOS PARA EVITAR EL ERROR ***
+        // Asegúrate de que mov.monto sea un número antes de usar toFixed.
+        // Si no es un número (null, undefined, NaN), se usará 0.
+        const montoSeguro = parseFloat(mov.monto) || 0; 
+
         li.innerHTML = `
             <div class="movimiento-tipo ${tipoLower}">
-                ${tipoLower === "ingreso" ? "💰" : "💸"} ${mov.tipo}
+                ${tipoLower === "ingreso" ? "💰" : "💸"} ${(mov.tipo || "N/A")}
             </div>
             <div class="movimiento-monto">
-                $${mov.monto.toFixed(2)}
+                $${montoSeguro.toFixed(2)}
             </div>
             <div class="movimiento-descripcion">
-                ${mov.descripcion}
+                ${mov.descripcion || "Sin descripción"}
             </div>
             <div class="movimiento-fecha">
                 📅 ${fechaFormateada}
