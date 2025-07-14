@@ -34,10 +34,9 @@
     </div>
   </header>
 
-  <nav>
-    <div class="menu-toggle" onclick="toggleMenu()">☰</div>
-    <ul id="navMenu">
-      <li><a href="index.html">🏠 Inicio</a></li>
+  <div id="sidebar-menu" class="sidebar">
+    <div class="close-btn" onclick="toggleMenu()">×</div>
+    <ul class="sidebar-nav-list"> <li><a href="index.html">🏠 Inicio</a></li>
       <li><a href="inventario.html">🧃 Inventario</a></li>
       <li><a href="dashboard-analitico.html">📊📈 Dashboard Analítico</a></li>
       <li><a href="mermas.html">📉 Mermas</a></li>
@@ -48,10 +47,33 @@
       <li><a href="reportesGraficos.html">📊 Reportes</a></li>
       <li><a href="finanzas.html">💰 Finanzas</a></li>
       <li><a href="novedades.html">🐶 Novedades</a></li>
-       <li><a href="pedidos.html">📦 Pedidos</a></li>
-       <li><a href="datos.html">💾 Datos</a></li>
+      <li><a href="pedidos.html">📦 Pedidos</a></li>
+      <li><a href="datos.html">💾 Datos</a></li>
     </ul>
-  </nav>
+  </div>
+
+  <div id="main-content-wrapper" class="main-content">
+    <nav class="top-nav-bar-mobile">
+        <div class="menu-toggle-mobile" onclick="toggleMenu()">☰</div> <div class="nav-title-mobile">Los SS</div>
+    </nav>
+
+  <nav class="desktop-nav">
+      <ul>
+        <li><a href="index.html">🏠 Inicio</a></li>
+        <li><a href="inventario.html">🧃 Inventario</a></li>
+        <li><a href="dashboard-analitico.html">📊📈 Dashboard Analítico</a></li>
+        <li><a href="mermas.html">📉 Mermas</a></li>
+        <li><a href="ventas.html">🧾 Ventas</a></li>
+        <li><a href="clientes.html">👥 Clientes</a></li>
+        <li><a href="proveedores.html">🚚 Proveedores</a></li>
+        <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
+        <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+        <li><a href="finanzas.html">💰 Finanzas</a></li>
+        <li><a href="novedades.html">🐶 Novedades</a></li>
+        <li><a href="pedidos.html">📦 Pedidos</a></li>
+        <li><a href="datos.html">💾 Datos</a></li>
+      </ul>
+    </nav>
 
   <main>
     <!-- Tipo de gráfico sin onchange inline -->
@@ -228,6 +250,7 @@
   </main>
 
   <script src="js/db.js"></script>
+  <script src="js/script.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
   <script src="js/reportes.js"></script>
   <script src="js/nav-highlighter.js" defer></script>
@@ -237,13 +260,7 @@
   <script src="js/connection-status.js"></script>
 
   <script>
-    // Función para abrir y cerrar menú
-    function toggleMenu() {
-        document.getElementById("navMenu").classList.toggle("open");
-        // Asegúrate de que este toggle también controle la clase 'menu-open' en el body
-        document.body.classList.toggle("menu-open", document.getElementById("navMenu").classList.contains("open"));
-    }
-
+    
     // Verificar sesión (igual que antes)
     if (sessionStorage.getItem("sesionIniciada") !== "true") {
       window.location.href = "login.html";
