@@ -110,6 +110,10 @@ const urlsToCache = [
   `${REPO_PREFIX}fonts/Handlee-Regular.ttf`,
   `${REPO_PREFIX}fonts/Montserrat-Italic.ttf`,
   `${REPO_PREFIX}fonts/Nabla-Regular-VariableFont_EDPT,EHLT.ttf`,
+  `${REPO_PREFIX}fonts/Menú/Courgette-Regular.ttf`,
+  `${REPO_PREFIX}fonts/Menú/KaushanScript-Regular.ttf`,
+  `${REPO_PREFIX}fonts/Menú/Niconne-Regular.ttf`,
+  `${REPO_PREFIX}fonts/Menú/EduVICWANTHand-VariableFont_wght.ttf`,
 
   // Icons:
   `${REPO_PREFIX}icons/1.EXCEL.png`,
