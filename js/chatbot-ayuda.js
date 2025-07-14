@@ -419,7 +419,7 @@ novedades: {
   // y generación automática de botones + buscador
   // ──────────────────────────────────────────────
 
-  const JSON_PATH = "resources/chatbot-respuestas.json";
+  const JSON_PATH = "../resources/chatbot-respuestas.json";
 
   // IIFE asíncrona para cargar base de conocimiento una vez iniciado el DOM
   (async function cargarBaseConocimiento() {
