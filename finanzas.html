@@ -181,7 +181,7 @@
       <label>Desde: <input type="date" id="fechaDesde"></label>
       <label>Hasta: <input type="date" id="fechaHasta"></label>
       <button onclick="filtrarPorFecha()">Aplicar Filtro</button>
-      <button onclick="limpiarFiltroFecha()">Limpiar</button>
+      <button id="btnLimpiarFiltroFecha" onclick="limpiarFiltroFecha()">Limpiar</button> </section>
     </section>
 
     <section>
@@ -280,19 +280,6 @@
       document.getElementById("ayuda").classList.remove("visible");
     });
   </script>
-
-   <!--Script para el modal de inventario en todos los módulos-->
-    <script>
-        fetch('modals/modal-productos.html') // Ruta correcta a tu modal HTML
-            .then(response => response.text())
-            .then(html => {
-                document.body.insertAdjacentHTML('beforeend', html);
-                // Llama a la función de inicialización del modal DESPUÉS de que se haya cargado el HTML
-                inicializarModalProductos();
-            })
-            .catch(error => console.error('Error al cargar el modal de productos:', error));
-    </script>
-    <script src="js/modal-productos.js"></script>
 
      <!--Script para el modal de inventario en todos los módulos-->
    <div id="modalReporteProductos" class="modal">
