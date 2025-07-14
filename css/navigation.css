@@ -1,5 +1,33 @@
 /* --- Estilos Generales para Navegación (Base) --- */
 
+@font-face {
+    font-family: 'Niconne';
+    src: url('../fonts/Menú/Niconne-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'KaushanScript';
+    src: url('../fonts/Menú/KaushanScript-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'KaushanScript';
+    src: url('../fonts/Menú/Courgette-Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'EduVICWANTHand';
+    src: url('../fonts/Menú/EduVICWANTHand-VariableFont_wght.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 /* Por defecto, ocultar la barra superior móvil y el menú lateral en pantallas grandes */
 .top-nav-bar-mobile,
 .sidebar {
@@ -97,9 +125,10 @@
 }
 
     .nav-title-mobile {
-       font-size: 1.4rem; /* Tamaño de fuente más pequeño para el título */
+       font-size: 1.5rem; /* Tamaño de fuente más pequeño para el título */
        font-weight: bold;
-       color: #c2a919;
+       color: #b3ac91;
+       font-family: "EduVICWANTHand", cursive;
    }
 
     /* Mostrar el sidebar (se controlará la visibilidad con JS) */
