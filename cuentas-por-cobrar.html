@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/navigation.css">
     <link rel="stylesheet" href="css/pagination.css">
+    <link rel="stylesheet" href="css/morosos.css">
     <link rel="stylesheet" href="css/ayuda.css" />
     <link rel="stylesheet" href="css/calendar.css" />
     <link rel="stylesheet" href="css/whatsapp.css" />
@@ -22,7 +23,8 @@
     <link rel="stylesheet" href="css/chatbot-ayuda.css" />
     <link rel="stylesheet" href="css/ventas-pagadas.css">
     <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
-
+    <link rel="stylesheet" href="css/dashboard-cpc.css">
+    
 </head>
 <body>
     <div id="toastContainer" class="toast-container"> </div>
@@ -56,7 +58,7 @@
     </ul>
   </div>
 
-    <div id="nav-overlay" class="nav-overlay" onclick="toggleMenu()"></div>
+  <div id="nav-overlay" class="nav-overlay" onclick="toggleMenu()"></div>
 
   <div id="main-content-wrapper" class="main-content">
     <nav class="top-nav-bar-mobile">
@@ -121,19 +123,41 @@
         </section>
 
         <section id="rankingMorosos" style="margin-top: 20px;">
-            <h2>🔝 Clientes más morosos</h2>
+            <h2>🚨 Clientes con Vencimientos Urgentes</h2>
             <ul id="listaRankingMorosos"></ul>
         </section>
 
 
-        <section class="kpi-box">
+        <section class="dashboard-cxc-nueva">
+        <h2>📊 Resumen Financiero Pendiente</h2>
+        <div class="dashboard-cards-container">
+            <div class="dashboard-card-nueva">
+                <h3>Total Pendiente</h3>
+                <p id="totalPendienteDashboard">$0.00</p>
+            </div>
+            <div class="dashboard-card-nueva">
+                <h3>Cuentas Pendientes</h3>
+                <p id="ventasPendientesDashboard">0</p>
+            </div>
+            <div class="dashboard-card-nueva">
+                <h3>Vencidas</h3>
+                <p id="ventasVencidasDashboard">$0.00</p>
+            </div>
+            <div class="dashboard-card-nueva">
+                <h3>Por Vencer (7 días)</h3>
+                <p id="porVencerDashboard">$0.00</p>
+            </div>
+        </div>
+    </section>
+
+        <section class="kpi-box" id="kpiBoxAntiguo">
             <h2>📈 Resumen de Cuentas</h2>
             <div class="kpis">
                 <div class="kpi"><strong>Total Crédito Activo:</strong> $<span id="totalCredito">0.00</span></div>
                 <div class="kpi"><strong>Monto Pendiente Total:</strong> $<span id="montoPendienteGlobal">0.00</span></div>
                 <div class="kpi"><strong>Vencidas / Próximas:</strong> <span id="ventasVencidasProximas">0 / 0</span></div>
             </div>
-        </section>
+        </section> 
 
         <section class="listado-seccion">
             <h2>📜 Ventas a Crédito Pendientes</h2>
@@ -251,13 +275,15 @@
             </div>
             <div class="modal-footer">
                 <button id="btnRegistrarAbono" class="btn-primary">Confirmar Abono</button>
-                <button type="button" onclick="cerrarModalAbono()" class="btn-secondary">Cancelar</button>
+                <button id="btnCancelarEdicionAbono" class="btn btn-secondary" style="display: none;">Cancelar Edición</button>
+                <button type="button" onclick="cerrarModalAbono()" class="btn-secondary">Cerrar</button>
             </div>
         </div>
     </div>
 
     <script src="js/db.js"></script>
     <script src="js/script.js"></script>
+    <script src="js/sweetalert2@11.js"></script>
     <script src="js/calendar.js"></script>
     
     <script src="js/pagination.js" defer></script>
