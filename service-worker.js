@@ -1,4 +1,4 @@
-const CACHE_NAME = "los-ss-cache-v18";
+const CACHE_NAME = "los-ss-cache-v19";
 const APP_VERSION = "1.0.9"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
@@ -96,6 +96,7 @@ const urlsToCache = [
   `${REPO_PREFIX}js/connection-status.js`,
   `${REPO_PREFIX}js/sw-register.js`,
   `${REPO_PREFIX}js/modal-productos.js`,
+  `${REPO_PREFIX}js/sweetalert2@11.js`,
 
   // Archivos externos (siempre y cuando GitHub Pages pueda acceder a ellos)
   `https://unpkg.com/xlsx/dist/xlsx.full.min.js`,
