@@ -10,45 +10,51 @@ const btnCancelarEdicionAbono = document.getElementById("btnCancelarEdicionAbono
 
 // Función para actualizar las métricas del nuevo dashboard de Cuentas por Cobrar
 async function actualizarDashboardCxC() {
-    let totalPendiente = 0;
-    let cuentasPendientesConSaldo = 0;
-    let ventasVencidasMonto = 0;
-    let porVencerMonto = 0;
+    // --- Declaración de variables: Aquí creamos las "cajas" que vamos a usar ---
+    let totalCuentasPorCobrar = 0; // Esta "caja" guardará el total pendiente de dinero
+    let ventasVencidasMonto = 0; // Esta "caja" guardará el monto de ventas que ya pasaron su fecha
+    let ventasPorVencerMonto = 0; // Esta "caja" guardará el monto de ventas que vencen en los próximos 7 días (como dice tu dashboard)
+    // La variable 'ventasCasiVencidasMonto' ya no la necesitamos por separado, porque 'ventasPorVencerMonto'
+    // ahora va a incluir todo lo que vence en 7 días.
 
     const hoy = new Date();
     hoy.setHours(0, 0, 0, 0); // Establecer la hora a 00:00:00 para comparar solo la fecha
 
-    const unaSemanaDespues = new Date();
+    console.log("Hoy (normalizado para cálculo):", hoy.toISOString()); // Esto te ayudará a verificar la fecha de hoy
+
+    const unaSemanaDespues = new Date(hoy); // Creamos la fecha para 7 días desde hoy
     unaSemanaDespues.setDate(hoy.getDate() + 7);
-    unaSemanaDespues.setHours(23, 59, 59, 999); // Establecer la hora al final del 7º día
+    unaSemanaDespues.setHours(23, 59, 59, 999); // Establecer al final del 7º día
 
     // Asumimos que 'ventasCredito' es el array global que contiene todas las ventas a crédito
-    // y que ya está cargado y actualizado por 'cargarYMostrarCuentasPorCobrar'.
+    // y que ya está cargado por 'cargarYMostrarCuentasPorCobrar'.
     for (const venta of ventasCredito) {
         if (venta.montoPendiente > 0) { // Solo consideramos ventas con saldo pendiente
-            totalPendiente += venta.montoPendiente;
-            cuentasPendientesConSaldo++;
+            totalCuentasPorCobrar += venta.montoPendiente; // Sumamos al total pendiente
 
             if (venta.fechaVencimiento) {
                 const fechaVencimiento = new Date(venta.fechaVencimiento);
-                fechaVencimiento.setHours(0, 0, 0, 0); // Establecer la hora a 00:00:00 para comparar solo la fecha
+                fechaVencimiento.setHours(0, 0, 0, 0); // Normalizar también la fecha de vencimiento
+
+                console.log(`DEBUG Venta ID ${venta.id} - Fecha Vencimiento (normalizada):`, fechaVencimiento.toISOString());
+                console.log(`DEBUG Venta ID ${venta.id} - Comparación: ¿${fechaVencimiento.toISOString()} < ${hoy.toISOString()}? Resultado: ${fechaVencimiento < hoy}`);
 
                 if (fechaVencimiento < hoy) {
-                    // La venta ya está vencida
+                    // Si la fecha de vencimiento es anterior a hoy, está vencida
                     ventasVencidasMonto += venta.montoPendiente;
                 } else if (fechaVencimiento >= hoy && fechaVencimiento <= unaSemanaDespues) {
-                    // La venta vence hoy o en los próximos 7 días
-                    porVencerMonto += venta.montoPendiente;
+                    // Si la fecha de vencimiento es hoy o en los próximos 7 días, es "por vencer"
+                    ventasPorVencerMonto += venta.montoPendiente;
                 }
             }
         }
     }
 
-    // Actualizar los elementos HTML del dashboard con los valores calculados
-    document.getElementById("totalPendienteDashboard").textContent = `$${totalPendiente.toFixed(2)}`;
-    document.getElementById("ventasPendientesDashboard").textContent = cuentasPendientesConSaldo;
+    // --- ACTUALIZACIONES PARA TU DASHBOARD NUEVO (EL QUE IMPORTA) ---
+    document.getElementById("totalPendienteDashboard").textContent = `$${totalCuentasPorCobrar.toFixed(2)}`;
+    document.getElementById("ventasPendientesDashboard").textContent = ventasCredito.length.toString(); // Muestra la cantidad de ventas a crédito
     document.getElementById("ventasVencidasDashboard").textContent = `$${ventasVencidasMonto.toFixed(2)}`;
-    document.getElementById("porVencerDashboard").textContent = `$${porVencerMonto.toFixed(2)}`;
+    document.getElementById("porVencerDashboard").textContent = `$${ventasPorVencerMonto.toFixed(2)}`; // Muestra el monto de ventas por vencer en 7 días
 }
 
 // Números de pago
@@ -200,7 +206,7 @@ async function cargarYMostrarCuentasPorCobrar() {
 
         // Obtener todas las ventas y filtrar solo las de crédito
         const allVentas = await obtenerTodasLasVentas();
-        ventasCredito = allVentas.filter(venta => venta.tipoPago === 'credito');
+        ventasCredito = ventas.filter(venta => venta.tipoPago === 'credito' && venta.estadoPago !== 'Pagado Total');
         abonos = await obtenerTodosLosAbonos(); // Asegurar que los abonos estén actualizados
 
         // Recalcular montos pendientes y estados para cada venta a crédito
