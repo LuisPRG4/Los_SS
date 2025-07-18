@@ -530,7 +530,7 @@ function crearCardVenta(venta, id) {
 
     const card = document.createElement("div");
     card.classList.add("venta-card");
-    if (estadoClase) card.classList.add(estadoClase);
+    if (estadoClase) card.classList.add(...estadoClase.split(' '));
 
     // Aseguramos que detallePago exista
     if (!venta.detallePago) {
