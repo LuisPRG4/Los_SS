@@ -3,6 +3,54 @@ let clientes = [];
 let abonos = []; // Para los abonos
 let ventas = []; // <--- ASEGÚRATE DE QUE ESTA LÍNEA EXISTA
 
+let currentAbonoIdEditar = null; // Para guardar el ID del abono que estamos editando en el modal
+let ventaIdParaAbonoAccion = null; // Para guardar el ID de la venta a la que pertenece el abono que se está editando/revirtiendo
+
+const btnCancelarEdicionAbono = document.getElementById("btnCancelarEdicionAbono");
+
+// Función para actualizar las métricas del nuevo dashboard de Cuentas por Cobrar
+async function actualizarDashboardCxC() {
+    let totalPendiente = 0;
+    let cuentasPendientesConSaldo = 0;
+    let ventasVencidasMonto = 0;
+    let porVencerMonto = 0;
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Establecer la hora a 00:00:00 para comparar solo la fecha
+
+    const unaSemanaDespues = new Date();
+    unaSemanaDespues.setDate(hoy.getDate() + 7);
+    unaSemanaDespues.setHours(23, 59, 59, 999); // Establecer la hora al final del 7º día
+
+    // Asumimos que 'ventasCredito' es el array global que contiene todas las ventas a crédito
+    // y que ya está cargado y actualizado por 'cargarYMostrarCuentasPorCobrar'.
+    for (const venta of ventasCredito) {
+        if (venta.montoPendiente > 0) { // Solo consideramos ventas con saldo pendiente
+            totalPendiente += venta.montoPendiente;
+            cuentasPendientesConSaldo++;
+
+            if (venta.fechaVencimiento) {
+                const fechaVencimiento = new Date(venta.fechaVencimiento);
+                fechaVencimiento.setHours(0, 0, 0, 0); // Establecer la hora a 00:00:00 para comparar solo la fecha
+
+                if (fechaVencimiento < hoy) {
+                    // La venta ya está vencida
+                    ventasVencidasMonto += venta.montoPendiente;
+                } else if (fechaVencimiento >= hoy && fechaVencimiento <= unaSemanaDespues) {
+                    // La venta vence hoy o en los próximos 7 días
+                    porVencerMonto += venta.montoPendiente;
+                }
+            }
+        }
+    }
+
+    // Actualizar los elementos HTML del dashboard con los valores calculados
+    document.getElementById("totalPendienteDashboard").textContent = `$${totalPendiente.toFixed(2)}`;
+    document.getElementById("ventasPendientesDashboard").textContent = cuentasPendientesConSaldo;
+    document.getElementById("ventasVencidasDashboard").textContent = `$${ventasVencidasMonto.toFixed(2)}`;
+    document.getElementById("porVencerDashboard").textContent = `$${porVencerMonto.toFixed(2)}`;
+}
+
 // Números de pago
 const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621'; // Cambia por el tuyo
 const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821'; // Cambia por el tuyo
@@ -199,6 +247,12 @@ async function cargarYMostrarCuentasPorCobrar() {
         console.error("Error al cargar y mostrar cuentas por cobrar:", error);
         mostrarToast("Error al cargar cuentas por cobrar ❌", 'error');
     }
+
+    // >>>>> AÑADE ESTA LÍNEA AQUÍ AL FINAL DE LA FUNCIÓN <<<<<
+    await actualizarDashboardCxC(); // Actualiza el nuevo dashboard después de cargar los datos
+    document.getElementById("kpiBoxAntiguo").style.display = "none";
+    //ACTUALIZAR LISTA DE CLIENTES MOROSOS
+    await actualizarRankingClientesUrgentes(); // ¡AÑADE ESTA LÍNEA AQUÍ!
 }
 
 function mostrarCuentasEnUI(cuentasParaMostrar) {
@@ -664,8 +718,23 @@ window.abrirModalAbono = async function(ventaId) {
 
 function cerrarModalAbono() {
     document.getElementById("modalAbono").style.display = "none";
-    document.getElementById("montoAbono").value = "";
-    currentVentaIdAbono = null;
+    document.getElementById("montoAbono").value = ''; // Limpiar el campo de monto
+    document.getElementById("formaPagoAbono").value = ''; // Limpiar el campo de forma de pago
+    document.getElementById("detalleVentaModal").innerHTML = ''; // Limpiar el detalle de la venta/abono
+
+    // ESTAS SON LAS LÍNEAS CLAVE QUE FALTABAN PARA RESTABLECER EL MODAL:
+    const btnRegistrarAbono = document.getElementById("btnRegistrarAbono");
+    btnRegistrarAbono.textContent = "Confirmar Abono"; // Vuelve el texto del botón a "Confirmar Abono"
+    btnRegistrarAbono.onclick = registrarAbono; // Asigna de nuevo la función original para registrar abonos
+
+    document.getElementById("listaAbonosModal").style.display = "block"; // Vuelve a mostrar la lista de abonos previos
+    // Si tienes un título específico para el formulario del abono (como un <h2> con id="abonoFormTitle"), descomenta y restablece también:
+    // document.getElementById("abonoFormTitle").textContent = "Registrar Abono";
+
+    currentVentaIdAbono = null; // Limpiar el ID de la venta actual
+    currentAbonoIdEditar = null; // Asegurarse de que no quede ningún abono en modo edición
+    ventaIdParaAbonoAccion = null; // Limpiar el ID de la venta para la acción de abono/reversión
+    
     cargarYMostrarCuentasPorCobrar(); // Recargar la lista de cuentas para que refleje los cambios
 }
 
@@ -736,6 +805,11 @@ async function registrarAbono() {
         
         await agregarAbonoDB(nuevoAbono);
         mostrarToast("Abono registrado con éxito ✅", 'success');
+
+        await actualizarDashboardCxC();
+
+        //ACTUALIZAR LISTA DE CLIENTES MOROSOS
+        await actualizarRankingClientesUrgentes();
 
         // Actualizar el monto pendiente y estado de pago de la venta en el modelo
         venta.montoPendiente -= montoAbono;
@@ -832,12 +906,18 @@ async function mostrarAbonosPrevios(ventaId) {
         else if (metodoPago) metodoPago = metodoPago.charAt(0).toUpperCase() + metodoPago.slice(1);
         
         li.innerHTML = `
-            <strong>Fecha:</strong> ${abono.fechaAbono}, 
-            <strong>Monto:</strong> $${abono.montoAbonado.toFixed(2)}
-            ${metodoPago !== "No especificado" ? `, <strong>Método:</strong> ${metodoPago}` : ''}
-        `;
-        li.className = 'abono-item'; // Nueva clase para cada ítem de abono
-        ul.appendChild(li);
+        <div class="abono-info">
+            <p><strong>Fecha:</strong> ${abono.fechaAbono}</p>
+            <p><strong>Monto:</strong> $${abono.montoAbonado.toFixed(2)}</p>
+            ${metodoPago !== "No especificado" ? `<p><strong>Método:</strong> ${metodoPago}</p>` : ''}
+        </div>
+        <div class="abono-actions">
+            <button onclick="abrirModalEditarAbono(${abono.id})" class="btn-sm btn-warning">Editar</button>
+            <button onclick="confirmarRevertirAbono(${abono.id})" class="btn-sm btn-danger">Revertir</button>
+        </div>
+    `;
+    li.className = 'abono-item'; // Asegúrate de que esta línea exista para el estilo
+    ul.appendChild(li);
     });
     listaAbonos.appendChild(ul);
 }
@@ -1974,6 +2054,379 @@ document.body.addEventListener('click', (e)=>{
   }
 }, false);
 
+
+//FUNCIONES PARA EDITAR Y REVERTIR ABONOS
+// Función para abrir el modal en modo edición
+window.abrirModalEditarAbono = async function(abonoId) {
+    console.log(`🔄 Abriendo modal para editar abono #${abonoId}`);
+    currentAbonoIdEditar = abonoId; // Guardamos el ID del abono que vamos a editar
+
+    // Obtenemos los datos del abono desde la base de datos
+    const abono = await obtenerAbonoPorId(abonoId); 
+    if (!abono) {
+        mostrarToast("Abono no encontrado para editar. 🚫", 'error');
+        return;
+    }
+
+    // Guardamos el ID de la venta a la que pertenece este abono
+    ventaIdParaAbonoAccion = abono.pedidoId; 
+
+    // Rellenamos la información de detalle de la venta en el modal para que el usuario sepa qué está editando
+    document.getElementById("detalleVentaModal").innerHTML = `
+        <p><strong>Editando Abono ID:</strong> ${abono.id}</p>
+        <p><strong>Fecha de Abono Original:</strong> ${abono.fechaAbono}</p>
+        <p><strong>Venta Asociada ID:</strong> ${abono.pedidoId}</p>
+    `;
+
+    // Rellenamos los campos de monto y forma de pago con los datos del abono
+    document.getElementById("montoAbono").value = abono.montoAbonado.toFixed(2);
+    document.getElementById("formaPagoAbono").value = abono.formaPago || ''; 
+
+    // Cambiamos el texto del botón principal del modal para que diga "Guardar Edición"
+    const btnRegistrarAbono = document.getElementById("btnRegistrarAbono");
+    btnRegistrarAbono.textContent = "Guardar Edición de Abono";
+    btnRegistrarAbono.onclick = guardarEdicionAbono; // Y le asignamos la función para guardar la edición
+
+    // >>>>> AQUÍ ESTÁN LAS NUEVAS LÍNEAS QUE DEBES AÑADIR/MODIFICAR <<<<<
+
+    // Mostrar el nuevo botón de "Cancelar Edición" y asignarle su función
+    const btnCancelarEdicionAbono = document.getElementById("btnCancelarEdicionAbono"); // Asegúrate de haber añadido este id al botón en el HTML
+    if (btnCancelarEdicionAbono) { // Asegurarse de que el botón existe en el HTML
+        btnCancelarEdicionAbono.style.display = "inline-block"; // Lo hacemos visible
+        btnCancelarEdicionAbono.onclick = cancelarEdicionAbono; // Le asignamos la nueva función de cancelar
+    }
+
+    // >>>>> FIN DE LAS NUEVAS LÍNEAS <<<<<
+
+    // Mostramos el modal y ocultamos la lista de abonos previos (porque estamos editando uno)
+    document.getElementById("modalAbono").style.display = "flex"; 
+    document.getElementById("listaAbonosModal").style.display = "none"; 
+    // Si tienes un título específico para el formulario del abono (por ejemplo, <h2 id="abonoFormTitle">), cámbialo aquí también:
+    // document.getElementById("abonoFormTitle").textContent = "Editar Abono"; 
+};
+
+//FUNCIÓN CANCELAR EDICIÓN ABONO
+async function cancelarEdicionAbono() {
+    console.log("🚫 Cancelando edición de abono. Volviendo a modo de registro.");
+
+    // 1. Restaurar el botón principal a su estado original
+    const btnRegistrarAbono = document.getElementById("btnRegistrarAbono");
+    btnRegistrarAbono.textContent = "Confirmar Abono";
+    btnRegistrarAbono.onclick = registrarAbono; 
+
+    // 2. Ocultar el botón "Cancelar Edición"
+    if (btnCancelarEdicionAbono) {
+        btnCancelarEdicionAbono.style.display = "none";
+        btnCancelarEdicionAbono.onclick = null; // Limpiar el event listener
+    }
+
+    // 3. Limpiar los campos del formulario de abono
+    document.getElementById("montoAbono").value = '';
+    document.getElementById("formaPagoAbono").value = '';
+    document.getElementById("detalleVentaModal").innerHTML = ''; // Limpiar el detalle
+
+    // 4. Resetear las variables de estado de edición
+    currentAbonoIdEditar = null; 
+    // ventaIdParaAbonoAccion NO se resetea aquí, porque la necesitamos para reabrir el modal correctamente
+
+    // 5. Volver a mostrar la lista de abonos previos
+    document.getElementById("listaAbonosModal").style.display = "block"; 
+
+    // 6. ¡Lo más importante! Reabrir el modal con la función original de abono
+    // Esto recargará los abonos previos y restaurará la estructura normal
+    if (ventaIdParaAbonoAccion) {
+        await abrirModalAbono(ventaIdParaAbonoAccion); 
+    } else {
+        // Si por alguna razón no tenemos ventaIdParaAbonoAccion, cerramos el modal
+        // Esto es un caso de seguridad, no debería ocurrir si el flujo es correcto.
+        cerrarModalAbono();
+    }
+}
+
+// Función para guardar la edición de un abono
+async function guardarEdicionAbono() {
+    if (abonoEnProceso) {
+        console.log("Ya hay una edición en proceso, evitando duplicación");
+        return;
+    }
+    abonoEnProceso = true; // Evita que se haga doble clic o se ejecute dos veces
+
+    try {
+        if (currentAbonoIdEditar === null) {
+            mostrarToast("No hay un abono seleccionado para editar. 🚫", 'error');
+            abonoEnProceso = false;
+            return;
+        }
+
+        const nuevoMontoAbono = parseFloat(document.getElementById("montoAbono").value);
+        const nuevaFormaPago = document.getElementById("formaPagoAbono").value;
+
+        if (isNaN(nuevoMontoAbono) || nuevoMontoAbono <= 0) {
+            mostrarToast("Ingresa un monto de abono válido. 🚫", 'warning');
+            abonoEnProceso = false;
+            return;
+        }
+
+        const abonoOriginal = await obtenerAbonoPorId(currentAbonoIdEditar);
+        if (!abonoOriginal) {
+            mostrarToast("Abono original no encontrado. 🚫", 'error');
+            abonoEnProceso = false;
+            return;
+        }
+
+        const venta = await obtenerVentaPorId(abonoOriginal.pedidoId);
+        if (!venta) {
+            mostrarToast("Venta asociada no encontrada. 🚫", 'error');
+            abonoEnProceso = false;
+            return;
+        }
+
+        // Calculamos la diferencia entre el nuevo monto y el monto original del abono
+        const diferenciaMonto = nuevoMontoAbono - abonoOriginal.montoAbonado;
+
+        // Validar que el nuevo monto total abonado no exceda el ingreso total de la venta
+        if ((venta.ingreso - venta.montoPendiente + diferenciaMonto) > venta.ingreso) {
+            mostrarToast("El monto total abonado no puede exceder el total de la venta. 🚫", 'warning');
+            abonoEnProceso = false;
+            return;
+        }
+
+        // Actualizamos los datos del abono original
+        abonoOriginal.montoAbonado = nuevoMontoAbono;
+        abonoOriginal.formaPago = nuevaFormaPago;
+        // Opcional: podrías actualizar la fecha del abono a la fecha actual de edición si quieres
+        // abonoOriginal.fechaAbono = getNowDateTimeFormattedLocal(); 
+        await actualizarAbonoDB(abonoOriginal); // Guardamos el abono actualizado en la DB
+
+        // Actualizamos el monto pendiente de la venta (sumamos/restamos la diferencia)
+        venta.montoPendiente -= diferenciaMonto;
+        venta.montoPendiente = Math.max(0, venta.montoPendiente); // Aseguramos que no sea negativo
+
+        // Actualizamos el estado de pago de la venta
+        if (venta.montoPendiente <= 0.01) { // Usamos 0.01 para evitar problemas con números flotantes
+            venta.montoPendiente = 0;
+            venta.estadoPago = 'Pagado Total';
+        } else if (venta.montoPendiente > 0 && venta.montoPendiente < venta.ingreso) {
+            venta.estadoPago = 'Pagado Parcial';
+        } else {
+            venta.estadoPago = 'Pendiente';
+        }
+        await actualizarVenta(venta.id, venta); // Guardamos la venta actualizada en la DB
+
+        // Opcional: Registramos un movimiento financiero para reflejar el cambio en el abono
+        const descripcionMovimiento = `Edición de abono a venta a crédito de ${venta.cliente} (ID Venta: ${venta.id}, Abono ID: ${abonoOriginal.id})`;
+        await agregarMovimientoDB({ tipo: "ingreso", monto: diferenciaMonto, fecha: getNowDateTimeFormattedLocal(), descripcion: descripcionMovimiento });
+
+
+        mostrarToast("Abono editado con éxito ✅", 'success');
+
+        await actualizarDashboardCxC();
+
+        //ACTUALIZAR LISTA DE CLIENTES MOROSOS
+        await actualizarRankingClientesUrgentes();
+
+        // >>>>> AÑADE ESTAS DOS LÍNEAS AQUÍ <<<<<
+        if (btnCancelarEdicionAbono) { // Asegúrate de que el botón existe
+            btnCancelarEdicionAbono.style.display = "none"; // Ocultar el botón "Cancelar Edición"
+            btnCancelarEdicionAbono.onclick = null; // Limpiar el event listener
+        }
+        // >>>>> FIN DE LAS LÍNEAS A AÑADIR <<<<<
+
+        // Restauramos el modal a su estado original para registrar nuevos abonos
+        const btnRegistrarAbono = document.getElementById("btnRegistrarAbono");
+        btnRegistrarAbono.textContent = "Confirmar Abono"; // Vuelve a su texto original
+        btnRegistrarAbono.onclick = registrarAbono; // Vuelve a la función original de registrar
+
+
+        document.getElementById("listaAbonosModal").style.display = "block"; // Mostramos de nuevo la lista de abonos previos
+        // Si tienes un título de formulario, restablece también:
+        // document.getElementById("abonoFormTitle").textContent = "Registrar Abono"; 
+
+        // Recargamos la lista de abonos en el modal y la vista principal de cuentas por cobrar
+        if (ventaIdParaAbonoAccion) {
+            await mostrarAbonosPrevios(ventaIdParaAbonoAccion);
+            // Reabrimos el modal de abono para la misma venta para que se vea el historial actualizado
+            await abrirModalAbono(ventaIdParaAbonoAccion); 
+        } else {
+            cerrarModalAbono(); 
+        }
+        cargarYMostrarCuentasPorCobrar(); // Recargamos la tabla principal
+    } catch (error) {
+        console.error("Error al guardar edición de abono:", error);
+        mostrarToast("Error al editar abono. 😔", 'error');
+    } finally {
+        abonoEnProceso = false; // Liberamos el proceso
+        currentAbonoIdEditar = null; // Limpiamos el ID del abono en edición
+        ventaIdParaAbonoAccion = null;
+    }
+}
+
+//REVERTIR ABONOS
+// Función de confirmación para revertir abono (usa SweetAlert2)
+window.confirmarRevertirAbono = async function(abonoId) {
+    // Verificamos si SweetAlert2 está cargado
+    if (typeof Swal === 'undefined') {
+        console.error("SweetAlert2 no está cargado. No se puede mostrar la confirmación.");
+        mostrarToast("Error: No se puede confirmar. Faltan librerías (SweetAlert2).", 'error');
+        return;
+    }
+
+    const result = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "¡Esta acción eliminará el abono y ajustará el monto pendiente de la venta!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6', // Azul
+        cancelButtonColor: '#d33',    // Rojo
+        confirmButtonText: 'Sí, revertir abono',
+        cancelButtonText: 'Cancelar'
+    });
+
+    if (result.isConfirmed) { // Si el usuario confirma
+        await revertirAbono(abonoId);
+    }
+};
+
+// Función principal para revertir el abono
+async function revertirAbono(abonoId) {
+    if (abonoEnProceso) {
+        console.log("Ya hay un proceso en marcha, evitando duplicación");
+        return;
+    }
+    abonoEnProceso = true;
+
+    try {
+        const abono = await obtenerAbonoPorId(abonoId); // Obtenemos el abono a revertir
+        if (!abono) {
+            mostrarToast("Abono no encontrado para revertir. 🚫", 'error');
+            abonoEnProceso = false;
+            return;
+        }
+
+        const venta = await obtenerVentaPorId(abono.pedidoId); // Obtenemos la venta asociada
+        if (!venta) {
+            mostrarToast("Venta asociada no encontrada. 🚫", 'error');
+            abonoEnProceso = false;
+            return;
+        }
+
+        ventaIdParaAbonoAccion = venta.id; // Guardamos el ID de la venta
+
+        // Revertimos el monto abonado: lo sumamos de nuevo al monto pendiente de la venta
+        venta.montoPendiente += abono.montoAbonado;
+
+        // Ajustamos el estado de pago de la venta
+        if (venta.montoPendiente >= venta.ingreso) {
+            venta.montoPendiente = venta.ingreso; // Aseguramos que no exceda el total de la venta
+            venta.estadoPago = 'Pendiente'; // Si el monto pendiente vuelve a ser el total, es "Pendiente"
+        } else if (venta.montoPendiente > 0 && venta.montoPendiente < venta.ingreso) {
+            venta.estadoPago = 'Pagado Parcial'; // Si sigue habiendo un saldo, es "Pagado Parcial"
+        } else if (venta.montoPendiente <= 0) { 
+            venta.montoPendiente = 0;
+            venta.estadoPago = 'Pagado Total'; // Si por alguna razón el monto llega a 0, es "Pagado Total"
+        }
+
+        await actualizarVenta(venta.id, venta); // Guardamos los cambios en la venta
+        await eliminarAbonoDB(abonoId); // Eliminamos el abono de la base de datos
+
+        // Opcional: Registramos un movimiento financiero como "egreso" por la reversión del abono
+        const descripcionMovimiento = `Reversión de abono a venta a crédito de ${venta.cliente} (ID Venta: ${venta.id}, Abono ID: ${abono.id})`;
+        await agregarMovimientoDB({ tipo: "egreso", monto: abono.montoAbonado, fecha: getNowDateTimeFormattedLocal(), descripcion: descripcionMovimiento });
+
+
+        mostrarToast("Abono revertido con éxito y monto ajustado. ✅", 'success');
+
+        // Recargamos la lista de abonos en el modal y la vista principal
+        if (ventaIdParaAbonoAccion) {
+             await mostrarAbonosPrevios(ventaIdParaAbonoAccion);
+            await abrirModalAbono(ventaIdParaAbonoAccion); // Reabrimos el modal para ver historial actualizado
+        } else {
+            cerrarModalAbono();
+        }
+        cargarYMostrarCuentasPorCobrar(); // Recargamos la tabla principal
+    } catch (error) {
+        console.error("Error al revertir abono:", error);
+        mostrarToast("Error al revertir abono. 😔", 'error');
+    } finally {
+        abonoEnProceso = false;
+        ventaIdParaAbonoAccion = null;
+    }
+}
+
+
+// Función para actualizar el listado de clientes con Vencimientos Urgentes
+async function actualizarRankingClientesUrgentes() {
+    const clientesConVencimientosUrgentes = new Map(); // Mapa para acumular montos por cliente
+
+    const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0); // Reiniciar la hora para comparar solo fechas
+
+    const tresDiasDespues = new Date();
+    tresDiasDespues.setDate(hoy.getDate() + 3);
+    tresDiasDespues.setHours(23, 59, 59, 999); // Establecer al final del 3er día
+
+    // Asumiendo que 'ventasCredito' y 'clientes' están cargados globalmente
+    for (const venta of ventasCredito) {
+        if (venta.montoPendiente > 0 && venta.fechaVencimiento) {
+            const fechaVencimiento = new Date(venta.fechaVencimiento);
+            fechaVencimiento.setHours(0, 0, 0, 0); // Reiniciar la hora para comparar solo fechas
+
+            // Verificar si está vencida O si vence en los próximos 3 días (incluyendo hoy)
+            if (fechaVencimiento < hoy || (fechaVencimiento >= hoy && fechaVencimiento <= tresDiasDespues)) {
+                const clienteId = venta.clienteId;
+                const clienteDatos = clientes.find(c => c.id === clienteId); // Buscar datos del cliente
+
+                if (clienteDatos) {
+                    let montoAcumulado = clientesConVencimientosUrgentes.has(clienteId) ? clientesConVencimientosUrgentes.get(clienteId).monto : 0;
+                    montoAcumulado += venta.montoPendiente;
+
+                    clientesConVencimientosUrgentes.set(clienteId, {
+                        nombre: clienteDatos.nombre,
+                        monto: montoAcumulado,
+                        // Añadir un indicador si la deuda ya está vencida
+                        esVencido: fechaVencimiento < hoy
+                    });
+                }
+            }
+        }
+    }
+
+    // Convertir el mapa a un array para poder ordenar y mostrar
+    let ranking = Array.from(clientesConVencimientosUrgentes.values());
+
+    // Ordenar: primero los vencidos, luego por monto descendente
+    ranking.sort((a, b) => {
+        // Si uno es vencido y el otro no, el vencido va primero
+        if (a.esVencido && !b.esVencido) return -1;
+        if (!a.esVencido && b.esVencido) return 1;
+
+        // Si ambos están en la misma categoría (ambos vencidos o ambos por vencer), ordenar por monto (mayor a menor)
+        return b.monto - a.monto;
+    });
+
+    const listaRankingElement = document.getElementById("listaRankingMorosos");
+    listaRankingElement.innerHTML = ''; // Limpiar la lista existente
+
+    if (ranking.length === 0) {
+        listaRankingElement.innerHTML = '<li class="no-urgentes-msg">¡Excelente! No hay clientes con vencimientos urgentes o vencidos.</li>';
+        return;
+    }
+
+    // Llenar la lista con los clientes encontrados
+    ranking.forEach(item => {
+        const li = document.createElement('li');
+        // Asignar clases para aplicar estilos diferentes a vencidos y por vencer
+        li.className = item.esVencido ? 'cliente-urgente vencido' : 'cliente-urgente por-vencer';
+        li.innerHTML = `
+            <span>${item.nombre}</span>
+            <span class="monto-urgente">$${item.monto.toFixed(2)}</span>
+            ${item.esVencido ? '<span class="estado-urgente vencido-tag">VENCIDO</span>' : ''}
+        `;
+        listaRankingElement.appendChild(li);
+    });
+}
+
+//MENSAJE PRIMER BOTÓN
 function construirMensajePrincipal(venta, clienteDatos, tasaValor) {
     const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
     return `Buen día, estimado/a ${clienteDatos.nombre}:
@@ -1989,6 +2442,7 @@ Esperamos que haya quedado conforme con los productos entregados recientemente. 
 Saludos cordiales.`;
 }
 
+//MENSAJE SEGUNDO BOTÓN (JOSÉ LUIS)
 function construirMensajeAlternativo(venta, clienteDatos, tasaValor) {
     const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
     return `Buen día, estimado/a ${clienteDatos.nombre}:
