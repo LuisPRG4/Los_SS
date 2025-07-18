@@ -1,0 +1,113 @@
+/* --- NUEVOS ESTILOS PARA EL DASHBOARD DE CUENTAS POR COBRAR --- */
+
+/* Contenedor principal del nuevo dashboard */
+.dashboard-cxc-nueva {
+    margin-top: 30px; /* Espacio superior */
+    margin-bottom: 40px; /* Espacio inferior antes de la siguiente sección */
+    padding: 30px; /* Relleno interno */
+    background-color: #f0f7ff; /* Un azul muy claro y agradable */
+    border-radius: 15px; /* Bordes más redondeados */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.12); /* Sombra suave pero visible */
+    text-align: center; /* Centrar el título */
+}
+
+.dashboard-cxc-nueva h2 {
+    color: #2c3e50; /* Un azul oscuro para el título */
+    font-size: 1.8em; /* Tamaño de fuente del título */
+    margin-bottom: 35px; /* Espacio debajo del título */
+    font-weight: 700;
+    text-transform: uppercase; /* Para que el título sea más impactante */
+    letter-spacing: 1px;
+}
+
+/* Contenedor de las tarjetas dentro del dashboard */
+.dashboard-cards-container {
+    display: flex; /* Para que las tarjetas se organicen en fila */
+    flex-wrap: wrap; /* Permite que las tarjetas salten a la siguiente línea */
+    gap: 25px; /* Espacio entre las tarjetas */
+    justify-content: center; /* Centra las tarjetas horizontalmente */
+}
+
+/* Estilo para cada tarjeta individual del dashboard */
+.dashboard-card-nueva {
+    flex: 1; /* Permite que las tarjetas crezcan */
+    min-width: 250px; /* Ancho mínimo para cada tarjeta */
+    max-width: 280px; /* Ancho máximo para evitar que sean demasiado grandes */
+    background-color: #ffffff; /* Fondo blanco para las tarjetas */
+    border-radius: 12px; /* Bordes redondeados */
+    padding: 25px; /* Relleno interno */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Sombra más suave */
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Transición para efectos */
+    text-align: center; /* Centrar contenido de la tarjeta */
+    border: 1px solid #e0e0e0; /* Un borde sutil */
+}
+
+.dashboard-card-nueva:hover {
+    transform: translateY(-8px); /* Elevación al pasar el ratón */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15); /* Sombra más intensa al pasar el ratón */
+}
+
+.dashboard-card-nueva h3 {
+    margin-top: 0;
+    margin-bottom: 15px; /* Espacio debajo del título de la tarjeta */
+    color: #555; /* Color para el título de la tarjeta */
+    font-size: 1.3em; /* Tamaño del título de la tarjeta */
+    font-weight: 600;
+}
+
+.dashboard-card-nueva p {
+    margin: 0;
+    font-size: 2.5em; /* Tamaño grande para los valores */
+    font-weight: bold;
+    color: #007bff; /* Color azul por defecto para los valores */
+}
+
+/* Colores específicos para los valores de cada tarjeta */
+.dashboard-card-nueva:nth-child(1) p { /* Total Pendiente */
+    color: #28a745; /* Verde vibrante */
+}
+.dashboard-card-nueva:nth-child(2) p { /* Cuentas Pendientes */
+    color: #ffc107; /* Naranja/Amarillo vibrante */
+}
+.dashboard-card-nueva:nth-child(3) p { /* Vencidas */
+    color: #dc3545; /* Rojo vibrante */
+}
+.dashboard-card-nueva:nth-child(4) p { /* Por Vencer */
+    color: #17a2b8; /* Azul claro/Cian */
+}
+
+/* Media Queries para responsividad (ajuste para pantallas pequeñas) */
+@media (max-width: 992px) {
+    .dashboard-card-nueva {
+        min-width: 200px;
+        max-width: 45%; /* Dos tarjetas por fila en tabletas */
+    }
+}
+
+@media (max-width: 768px) {
+    .dashboard-cards-container {
+        flex-direction: column; /* Apila las tarjetas verticalmente en móviles */
+        align-items: center; /* Centra las tarjetas apiladas */
+        gap: 20px; /* Menos espacio entre tarjetas apiladas */
+    }
+    .dashboard-card-nueva {
+        width: 90%; /* Ocupa la mayor parte del ancho */
+        max-width: 300px; /* Ancho máximo para móviles */
+        padding: 20px;
+    }
+    .dashboard-cxc-nueva {
+        padding: 20px;
+        margin-top: 20px;
+        margin-bottom: 30px;
+    }
+    .dashboard-cxc-nueva h2 {
+        font-size: 1.5em;
+        margin-bottom: 25px;
+    }
+    .dashboard-card-nueva h3 {
+        font-size: 1.1em;
+    }
+    .dashboard-card-nueva p {
+        font-size: 2em;
+    }
+}

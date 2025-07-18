@@ -1,0 +1,109 @@
+/* --- ESTILOS PARA LA SECCIÓN DE CLIENTES CON VENCIMIENTOS URGENTES --- */
+
+/* Contenedor principal de la sección de ranking */
+#rankingMorosos {
+    background-color: #ffffff; /* Fondo blanco */
+    border-radius: 12px; /* Bordes ligeramente redondeados */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); /* Sombra suave para que resalte */
+    padding: 30px; /* Relleno interno generoso */
+    margin-top: 30px; /* Espacio superior para separarlo del dashboard */
+    margin-bottom: 40px; /* Espacio inferior antes de la tabla principal */
+}
+
+/* Estilo para el título de la sección */
+#rankingMorosos h2 {
+    color: #e74c3c; /* Un color rojo para indicar urgencia */
+    font-size: 1.6em; /* Tamaño de fuente adecuado */
+    margin-bottom: 25px; /* Espacio debajo del título */
+    text-align: center; /* Centrar el título */
+    font-weight: 700; /* Negrita para el título */
+}
+
+/* Estilos generales para la lista de clientes */
+#listaRankingMorosos {
+    list-style: none; /* Eliminar viñetas predeterminadas de la lista */
+    padding: 0; /* Sin relleno interno */
+    margin: 0; /* Sin margen externo */
+}
+
+/* Estilos para cada elemento (cliente) de la lista */
+.cliente-urgente {
+    display: flex; /* Usar flexbox para alinear elementos */
+    justify-content: space-between; /* Espaciar el nombre y el monto */
+    align-items: center; /* Alinear verticalmente al centro */
+    padding: 15px 20px; /* Relleno interno de cada cliente */
+    margin-bottom: 10px; /* Espacio entre clientes */
+    background-color: #fcfcfc; /* Fondo casi blanco */
+    border-radius: 8px; /* Bordes redondeados */
+    border: 1px solid #eee; /* Borde sutil */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.03); /* Sombra muy ligera */
+    font-size: 1.1em; /* Tamaño de fuente */
+    font-weight: 500; /* Peso de la fuente */
+    color: #333; /* Color de texto oscuro */
+    transition: background-color 0.2s ease; /* Transición suave al pasar el ratón */
+}
+
+.cliente-urgente:hover {
+    background-color: #f5f5f5; /* Fondo más oscuro al pasar el ratón */
+}
+
+/* Estilo para el monto en la lista */
+.monto-urgente {
+    font-weight: bold; /* Negrita para el monto */
+    color: #007bff; /* Color azul para que destaque el monto */
+}
+
+/* Estilo específico para el tag "VENCIDO" */
+.vencido-tag {
+    background-color: #e74c3c; /* Fondo rojo fuerte */
+    color: white; /* Texto blanco */
+    padding: 5px 10px; /* Relleno */
+    border-radius: 5px; /* Bordes redondeados */
+    font-size: 0.8em; /* Tamaño de fuente más pequeño */
+    font-weight: 700; /* Negrita */
+    margin-left: 15px; /* Espacio a la izquierda */
+}
+
+/* Borde y fondo especiales para clientes con deudas VENCIDAS */
+.cliente-urgente.vencido {
+    border-left: 5px solid #e74c3c; /* Borde izquierdo rojo para énfasis */
+    background-color: #fff5f5; /* Fondo ligeramente rosado para vencidos */
+}
+
+/* Borde y fondo especiales para clientes con deudas POR VENCER */
+.cliente-urgente.por-vencer {
+    border-left: 5px solid #ffc107; /* Borde izquierdo amarillo para por vencer */
+    background-color: #fffdee; /* Fondo ligeramente amarillo claro */
+}
+
+/* Mensaje cuando no hay vencimientos urgentes */
+.no-urgentes-msg {
+    text-align: center;
+    color: #28a745; /* Color verde para mensaje positivo */
+    font-style: italic; /* Texto en cursiva */
+    padding: 20px;
+    background-color: #e6ffe6; /* Fondo verde muy claro */
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+/* Media Queries para responsividad (ajustes para pantallas más pequeñas) */
+@media (max-width: 768px) {
+    #rankingMorosos {
+        padding: 20px; /* Menos padding en pantallas pequeñas */
+    }
+    .cliente-urgente {
+        flex-direction: column; /* Apilar elementos verticalmente */
+        align-items: flex-start; /* Alinear a la izquierda */
+        padding: 10px 15px; /* Menos padding */
+    }
+    .monto-urgente {
+        margin-top: 5px;
+        margin-bottom: 5px;
+    }
+    .vencido-tag {
+        margin-left: 0; /* Quitar margen izquierdo */
+        margin-top: 5px;
+        align-self: flex-end; /* Alinear el tag a la derecha en columna */
+    }
+}
