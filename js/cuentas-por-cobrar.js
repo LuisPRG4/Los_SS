@@ -45,14 +45,14 @@ async function actualizarDashboardCxC() {
 }
 
 // Números de pago
-const NUMERO_VENDEDOR_PRINCIPAL = '342-56235'; // Cambia por el tuyo
-const NUMERO_VENDEDOR_ALTERNATIVO = '123-426423'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821'; // Cambia por el tuyo
 
 // Datos fijos que aparecerán en los mensajes
-const CEDULA_VENDEDOR = '12.345.235'; // OTRO
-const CEDULA_VENDEDOR_ALTERNATIVO = '1.542.563'; //JOSE
-const BANCO_VENDEDOR  = 'Banco 1';
-const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco 2';
+const CEDULA_VENDEDOR = 'V-19.317.877'; // OTRO
+const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663'; //JOSE
+const BANCO_VENDEDOR  = 'Banco de Venezuela';
+const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco de Venezuela';
 
 let currentVentaIdAbono = null; // Para el modal de abonos
 let abonoEnProceso = false;
