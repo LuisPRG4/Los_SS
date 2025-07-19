@@ -124,9 +124,21 @@
 
         <section id="rankingMorosos" style="margin-top: 20px;">
             <h2>🚨 Clientes con Vencimientos Urgentes</h2>
+
+             <!-- ✅ Selector dinámico -->
+            <div class="form-group" style="margin-top: 10px;">
+                <label for="selectorDiasUrgentes">Mostrar clientes con vencimiento en los próximos:</label>
+                <select id="selectorDiasUrgentes" class="form-control" style="width: 80px; display: inline-block;">
+                    <option value="1">1 día</option>
+                    <option value="3" selected>3 días</option>
+                    <option value="7">7 días</option>
+                    <option value="14">14 días</option>
+                    <option value="30">30 días</option>
+                </select>
+            </div>
+
             <ul id="listaRankingMorosos"></ul>
         </section>
-
 
         <section class="dashboard-cxc-nueva">
         <h2>📊 Resumen Financiero Pendiente</h2>
