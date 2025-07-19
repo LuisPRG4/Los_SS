@@ -9,63 +9,50 @@ let ventaIdParaAbonoAccion = null; // Para guardar el ID de la venta a la que pe
 const btnCancelarEdicionAbono = document.getElementById("btnCancelarEdicionAbono");
 
 // Función para actualizar las métricas del nuevo dashboard de Cuentas por Cobrar
+// ✅ FUNCIÓN CORREGIDA: actualizarDashboardCxC
 async function actualizarDashboardCxC() {
-    // --- Declaración de variables: Aquí creamos las "cajas" que vamos a usar ---
-    let totalCuentasPorCobrar = 0; // Esta "caja" guardará el total pendiente de dinero
-    let ventasVencidasMonto = 0; // Esta "caja" guardará el monto de ventas que ya pasaron su fecha
-    let ventasPorVencerMonto = 0; // Esta "caja" guardará el monto de ventas que vencen en los próximos 7 días (como dice tu dashboard)
-    // La variable 'ventasCasiVencidasMonto' ya no la necesitamos por separado, porque 'ventasPorVencerMonto'
-    // ahora va a incluir todo lo que vence en 7 días.
+    let totalCuentasPorCobrar = 0;
+    let ventasVencidasMonto = 0;
+    let ventasPorVencerMonto = 0;
 
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); // Establecer la hora a 00:00:00 para comparar solo la fecha
+    hoy.setHours(0, 0, 0, 0);
 
-    console.log("Hoy (normalizado para cálculo):", hoy.toISOString()); // Esto te ayudará a verificar la fecha de hoy
-
-    const unaSemanaDespues = new Date(hoy); // Creamos la fecha para 7 días desde hoy
+    const unaSemanaDespues = new Date(hoy);
     unaSemanaDespues.setDate(hoy.getDate() + 7);
-    unaSemanaDespues.setHours(23, 59, 59, 999); // Establecer al final del 7º día
+    unaSemanaDespues.setHours(23, 59, 59, 999);
 
-    // Asumimos que 'ventasCredito' es el array global que contiene todas las ventas a crédito
-    // y que ya está cargado por 'cargarYMostrarCuentasPorCobrar'.
     for (const venta of ventasCredito) {
-        if (venta.montoPendiente > 0) { // Solo consideramos ventas con saldo pendiente
-            totalCuentasPorCobrar += venta.montoPendiente; // Sumamos al total pendiente
+        if (venta.montoPendiente > 0 && venta.detallePago && venta.detallePago.fechaVencimiento) {
+            const fechaVencimiento = new Date(venta.detallePago.fechaVencimiento);
+            fechaVencimiento.setHours(0, 0, 0, 0);
 
-            if (venta.fechaVencimiento) {
-                const fechaVencimiento = new Date(venta.fechaVencimiento);
-                fechaVencimiento.setHours(0, 0, 0, 0); // Normalizar también la fecha de vencimiento
+            totalCuentasPorCobrar += venta.montoPendiente;
 
-                console.log(`DEBUG Venta ID ${venta.id} - Fecha Vencimiento (normalizada):`, fechaVencimiento.toISOString());
-                console.log(`DEBUG Venta ID ${venta.id} - Comparación: ¿${fechaVencimiento.toISOString()} < ${hoy.toISOString()}? Resultado: ${fechaVencimiento < hoy}`);
-
-                if (fechaVencimiento < hoy) {
-                    // Si la fecha de vencimiento es anterior a hoy, está vencida
-                    ventasVencidasMonto += venta.montoPendiente;
-                } else if (fechaVencimiento >= hoy && fechaVencimiento <= unaSemanaDespues) {
-                    // Si la fecha de vencimiento es hoy o en los próximos 7 días, es "por vencer"
-                    ventasPorVencerMonto += venta.montoPendiente;
-                }
+            if (fechaVencimiento < hoy) {
+                ventasVencidasMonto += venta.montoPendiente;
+            } else if (fechaVencimiento >= hoy && fechaVencimiento <= unaSemanaDespues) {
+                ventasPorVencerMonto += venta.montoPendiente;
             }
         }
     }
 
-    // --- ACTUALIZACIONES PARA TU DASHBOARD NUEVO (EL QUE IMPORTA) ---
+    // Actualizar dashboard
     document.getElementById("totalPendienteDashboard").textContent = `$${totalCuentasPorCobrar.toFixed(2)}`;
-    document.getElementById("ventasPendientesDashboard").textContent = ventasCredito.length.toString(); // Muestra la cantidad de ventas a crédito
+    document.getElementById("ventasPendientesDashboard").textContent = ventasCredito.filter(v => v.montoPendiente > 0).length.toString();
     document.getElementById("ventasVencidasDashboard").textContent = `$${ventasVencidasMonto.toFixed(2)}`;
-    document.getElementById("porVencerDashboard").textContent = `$${ventasPorVencerMonto.toFixed(2)}`; // Muestra el monto de ventas por vencer en 7 días
+    document.getElementById("porVencerDashboard").textContent = `$${ventasPorVencerMonto.toFixed(2)}`;
 }
 
 // Números de pago
-const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621'; // Cambia por el tuyo
-const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_PRINCIPAL = '342-56235'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_ALTERNATIVO = '123-426423'; // Cambia por el tuyo
 
 // Datos fijos que aparecerán en los mensajes
-const CEDULA_VENDEDOR = 'V-19.317.877';
-const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663';
-const BANCO_VENDEDOR  = 'Banco de Venezuela';
-const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco de Venezuela';
+const CEDULA_VENDEDOR = '12.345.235'; // OTRO
+const CEDULA_VENDEDOR_ALTERNATIVO = '1.542.563'; //JOSE
+const BANCO_VENDEDOR  = 'Banco 1';
+const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco 2';
 
 let currentVentaIdAbono = null; // Para el modal de abonos
 let abonoEnProceso = false;
@@ -178,6 +165,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
         console.error("Error en la inicialización:", error);
         mostrarToast("Error al inicializar la aplicación ❌", "error");
+    }
+
+    const selector = document.getElementById('selectorDiasUrgentes');
+    if (selector) {
+        // ✅ Restaurar valor guardado al cargar
+        const guardado = localStorage.getItem('diasUrgentes');
+        if (guardado) selector.value = guardado;
+
+        // ✅ Guardar cambio y actualizar lista
+        selector.addEventListener('change', () => {
+            localStorage.setItem('diasUrgentes', selector.value);
+            actualizarRankingClientesUrgentes();
+        });
     }
 });
 
@@ -373,7 +373,10 @@ function crearCardVentaCredito(venta) {
     let textoDias = '';
     if (fechaVencimiento !== "Sin fecha") {
         // Crear fecha de vencimiento correctamente
-        const fechaVencimientoSinHora = new Date(fechaVencimiento + 'T00:00:00');
+        // ✅ Normalizar ambas fechas sin hora
+        const fechaVencimientoSinHora = new Date(fechaVencimiento);
+        fechaVencimientoSinHora.setHours(0, 0, 0, 0);
+
         const fechaHoySinHora = new Date();
         fechaHoySinHora.setHours(0, 0, 0, 0);
         
@@ -2361,35 +2364,44 @@ async function revertirAbono(abonoId) {
 
 
 // Función para actualizar el listado de clientes con Vencimientos Urgentes
+// ✅ FUNCIÓN COMPLETA Y CORREGIDA
 async function actualizarRankingClientesUrgentes() {
-    const clientesConVencimientosUrgentes = new Map(); // Mapa para acumular montos por cliente
+    const clientesConVencimientosUrgentes = new Map();
 
     const hoy = new Date();
-    hoy.setHours(0, 0, 0, 0); // Reiniciar la hora para comparar solo fechas
+    hoy.setHours(0, 0, 0, 0);
 
-    const tresDiasDespues = new Date();
-    tresDiasDespues.setDate(hoy.getDate() + 3);
-    tresDiasDespues.setHours(23, 59, 59, 999); // Establecer al final del 3er día
+    // ✅ Usar localStorage para recordar la selección
+    const diasGuardados = localStorage.getItem("diasUrgentes");
+    const diasAlerta = parseInt(document.getElementById("selectorDiasUrgentes")?.value || diasGuardados || 3);
 
-    // Asumiendo que 'ventasCredito' y 'clientes' están cargados globalmente
+    // ✅ Actualizar selector si existe
+    const selector = document.getElementById("selectorDiasUrgentes");
+    if (selector) {
+        selector.value = diasAlerta;
+    }
+
+    const diasDespues = new Date(hoy);
+    diasDespues.setDate(hoy.getDate() + diasAlerta);
+    diasDespues.setHours(23, 59, 59, 999);
+
     for (const venta of ventasCredito) {
-        if (venta.montoPendiente > 0 && venta.fechaVencimiento) {
-            const fechaVencimiento = new Date(venta.fechaVencimiento);
-            fechaVencimiento.setHours(0, 0, 0, 0); // Reiniciar la hora para comparar solo fechas
+        if (venta.montoPendiente > 0 && venta.detallePago?.fechaVencimiento) {
+            const fechaVencimiento = new Date(venta.detallePago.fechaVencimiento);
+            fechaVencimiento.setHours(0, 0, 0, 0);
 
-            // Verificar si está vencida O si vence en los próximos 3 días (incluyendo hoy)
-            if (fechaVencimiento < hoy || (fechaVencimiento >= hoy && fechaVencimiento <= tresDiasDespues)) {
+            // ✅ Incluir hoy y los próximos días seleccionados
+            if (fechaVencimiento <= diasDespues) {
                 const clienteId = venta.clienteId;
-                const clienteDatos = clientes.find(c => c.id === clienteId); // Buscar datos del cliente
+                const clienteDatos = clientes.find(c => c.id === clienteId);
 
                 if (clienteDatos) {
-                    let montoAcumulado = clientesConVencimientosUrgentes.has(clienteId) ? clientesConVencimientosUrgentes.get(clienteId).monto : 0;
-                    montoAcumulado += venta.montoPendiente;
+                    let monto = clientesConVencimientosUrgentes.get(clienteId)?.monto || 0;
+                    monto += venta.montoPendiente;
 
                     clientesConVencimientosUrgentes.set(clienteId, {
                         nombre: clienteDatos.nombre,
-                        monto: montoAcumulado,
-                        // Añadir un indicador si la deuda ya está vencida
+                        monto,
                         esVencido: fechaVencimiento < hoy
                     });
                 }
@@ -2397,40 +2409,33 @@ async function actualizarRankingClientesUrgentes() {
         }
     }
 
-    // Convertir el mapa a un array para poder ordenar y mostrar
-    let ranking = Array.from(clientesConVencimientosUrgentes.values());
-
-    // Ordenar: primero los vencidos, luego por monto descendente
-    ranking.sort((a, b) => {
-        // Si uno es vencido y el otro no, el vencido va primero
+    const ranking = Array.from(clientesConVencimientosUrgentes.values()).sort((a, b) => {
         if (a.esVencido && !b.esVencido) return -1;
         if (!a.esVencido && b.esVencido) return 1;
-
-        // Si ambos están en la misma categoría (ambos vencidos o ambos por vencer), ordenar por monto (mayor a menor)
         return b.monto - a.monto;
     });
 
-    const listaRankingElement = document.getElementById("listaRankingMorosos");
-    listaRankingElement.innerHTML = ''; // Limpiar la lista existente
+    const lista = document.getElementById("listaRankingMorosos");
+    lista.innerHTML = '';
 
     if (ranking.length === 0) {
-        listaRankingElement.innerHTML = '<li class="no-urgentes-msg">¡Excelente! No hay clientes con vencimientos urgentes o vencidos.</li>';
+        lista.innerHTML = '<li class="no-urgentes-msg">¡Excelente! No hay clientes con vencimientos urgentes o vencidos.</li>';
         return;
     }
 
-    // Llenar la lista con los clientes encontrados
     ranking.forEach(item => {
         const li = document.createElement('li');
-        // Asignar clases para aplicar estilos diferentes a vencidos y por vencer
         li.className = item.esVencido ? 'cliente-urgente vencido' : 'cliente-urgente por-vencer';
         li.innerHTML = `
             <span>${item.nombre}</span>
             <span class="monto-urgente">$${item.monto.toFixed(2)}</span>
             ${item.esVencido ? '<span class="estado-urgente vencido-tag">VENCIDO</span>' : ''}
         `;
-        listaRankingElement.appendChild(li);
+        lista.appendChild(li);
     });
 }
+
+
 
 //MENSAJE PRIMER BOTÓN
 function construirMensajePrincipal(venta, clienteDatos, tasaValor) {
