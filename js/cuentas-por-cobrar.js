@@ -45,12 +45,12 @@ async function actualizarDashboardCxC() {
 }
 
 // Números de pago
-const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621'; // Cambia por el tuyo
-const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621';
+const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821';
 
 // Datos fijos que aparecerán en los mensajes
-const CEDULA_VENDEDOR = 'V-19.317.877'; // OTRO
-const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663'; //JOSE
+const CEDULA_VENDEDOR = 'V-19.317.877';
+const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663';
 const BANCO_VENDEDOR  = 'Banco de Venezuela';
 const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco de Venezuela';
 
@@ -369,14 +369,19 @@ function crearCardVentaCredito(venta) {
     const vencimientoDate = new Date(fechaVencimiento);
     const vencimientoOnlyDate = new Date(vencimientoDate.getFullYear(), vencimientoDate.getMonth(), vencimientoDate.getDate());
 
-    // Texto de días de mora o por vencer
+    // Texto de días de mora o por vencer y nivel de riesgo
     let textoDias = '';
+    let nivelRiesgo = 'Bajo';
+    
     if (fechaVencimiento !== "Sin fecha") {
         // Crear fecha de vencimiento correctamente
-        // ✅ Normalizar ambas fechas sin hora
-        const fechaVencimientoSinHora = new Date(fechaVencimiento);
-        fechaVencimientoSinHora.setHours(0, 0, 0, 0);
 
+        // ✅ Crear fechas normalizadas correctamente
+        // Parsear la fecha de vencimiento como fecha local
+        const fechaVencimientoParts = fechaVencimiento.split('-');
+        const fechaVencimientoSinHora = new Date(parseInt(fechaVencimientoParts[0]), parseInt(fechaVencimientoParts[1]) - 1, parseInt(fechaVencimientoParts[2]));
+
+        // Crear fecha de hoy normalizada
         const fechaHoySinHora = new Date();
         fechaHoySinHora.setHours(0, 0, 0, 0);
         
@@ -386,14 +391,29 @@ function crearCardVentaCredito(venta) {
             fechaVencimientoOriginal: fechaVencimiento
         });
         
-        // Calcular la diferencia en días
-        const diff = fechaVencimientoSinHora.getTime() - fechaHoySinHora.getTime();
-        const diasTotales = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        // Calcular la diferencia en días usando UTC para evitar problemas de zona horaria
+        const diffTime = fechaVencimientoSinHora.getTime() - fechaHoySinHora.getTime();
+        const diasTotales = Math.round(diffTime / (1000 * 60 * 60 * 24));
         
         console.log('Cálculo de días:', {
-            diferenciaMilisegundos: diff,
+            diferenciaMilisegundos: diffTime,
             diasTotales: diasTotales
         });
+        
+        // ✅ Calcular nivel de riesgo dinámico basado en días
+        if (diasTotales < 0) {
+            // Ya está vencida
+            nivelRiesgo = 'Alto';
+        } else if (diasTotales <= 2) {
+            // 2 días o menos para vencer
+            nivelRiesgo = 'Alto';
+        } else if (diasTotales < 5) {
+            // Menos de 5 días para vencer
+            nivelRiesgo = 'Medio';
+        } else {
+            // 5 o más días para vencer
+            nivelRiesgo = 'Bajo';
+        }
         
         if (diasTotales < 0) {
             const diasMora = Math.abs(diasTotales);
@@ -434,19 +454,7 @@ function crearCardVentaCredito(venta) {
         estadoPagoHTML = `<span class="tag-status tag-info">(Pendiente)</span>`;
     }
 
-    // 🧠 Nivel de riesgo
-    const ventasCliente = ventasCredito.filter(v => v.cliente === nombreCliente);
-    const vencidas = ventasCliente.filter(v => {
-        const fechaV = new Date(v.detallePago?.fechaVencimiento || '9999-12-31');
-        return v.montoPendiente > 0 && fechaV < new Date();
-    });
 
-    let nivelRiesgo = 'Bajo';
-    if (vencidas.length >= 3) {
-        nivelRiesgo = 'Alto';
-    } else if (vencidas.length >= 1) {
-        nivelRiesgo = 'Medio';
-    }
 
     const card = document.createElement("div");
     card.className = `venta-credito-card ${cardStatusClass}`;
@@ -2387,19 +2395,20 @@ async function actualizarRankingClientesUrgentes() {
 
     for (const venta of ventasCredito) {
         if (venta.montoPendiente > 0 && venta.detallePago?.fechaVencimiento) {
-            const fechaVencimiento = new Date(venta.detallePago.fechaVencimiento);
-            fechaVencimiento.setHours(0, 0, 0, 0);
+            // ✅ Usar el mismo método de parseo de fechas que corregimos antes
+            const fechaVencimientoParts = venta.detallePago.fechaVencimiento.split('-');
+            const fechaVencimiento = new Date(parseInt(fechaVencimientoParts[0]), parseInt(fechaVencimientoParts[1]) - 1, parseInt(fechaVencimientoParts[2]));
 
             // ✅ Incluir hoy y los próximos días seleccionados
             if (fechaVencimiento <= diasDespues) {
-                const clienteId = venta.clienteId;
-                const clienteDatos = clientes.find(c => c.id === clienteId);
+                const nombreCliente = venta.cliente || "Cliente desconocido";
+                const clienteDatos = clientes.find(c => c.nombre === nombreCliente);
 
                 if (clienteDatos) {
-                    let monto = clientesConVencimientosUrgentes.get(clienteId)?.monto || 0;
+                    let monto = clientesConVencimientosUrgentes.get(nombreCliente)?.monto || 0;
                     monto += venta.montoPendiente;
 
-                    clientesConVencimientosUrgentes.set(clienteId, {
+                    clientesConVencimientosUrgentes.set(nombreCliente, {
                         nombre: clienteDatos.nombre,
                         monto,
                         esVencido: fechaVencimiento < hoy
