@@ -1,5 +1,5 @@
-const CACHE_NAME = "los-ss-cache-v19";
-const APP_VERSION = "1.0.9"; // Incrementa esto cuando hagas cambios importantes
+const CACHE_NAME = "los-ss-cache-v20";
+const APP_VERSION = "1.1.0"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
 function getRepoPrefix() {
@@ -74,7 +74,7 @@ const urlsToCache = [
   `${REPO_PREFIX}js/chatbot-ayuda.js`,
   `${REPO_PREFIX}js/clientes.js`,
   `${REPO_PREFIX}js/connection-status.js`,
-  `${REPO_PREFIX}js/dasboard.js`,
+  `${REPO_PREFIX}js/dashboard.js`,
   `${REPO_PREFIX}js/dashboard-analitico.js`,
   `${REPO_PREFIX}js/cuentas-por-cobrar.js`,
   `${REPO_PREFIX}js/datos.js`,
