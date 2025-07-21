@@ -1,163 +1,527 @@
-/* Variables para colores dorados y brillos */
+/* ===== VARIABLES Y ESTILOS BASE ===== */
 :root {
-    --gold-primary: #FFD700; /* Gold */
-    --gold-light: #FFECB3;   /* Light Gold */
-    --gold-dark: #B8860B;    /* Dark Gold */
-    --gold-glow: rgba(255, 215, 0, 0.6); /* Gold glow effect */
+    /* Paleta de colores principal */
+    --gold-primary: #c0a04a;
+    --gold-light: #f0e6c5;
+    --gold-dark: #8a6d0b;
+    --gold-glow: rgba(255, 215, 0, 0.2);
+    
+    /* Colores de estado */
+    --success: #28a745;
+    --error: #dc3545;
+    --warning: #ffc107;
+    --info: #17a2b8;
+    
+    /* Colores de texto */
+    --text-primary: #2d3748;
+    --text-secondary: #4a5568;
+    
+    /* Fondos */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f7fafc;
+    
+    /* Sombras mejoradas */
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    
+    /* Transiciones mejoradas */
+    --transition-fast: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-normal: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    /* Bordes */
+    --border-radius-sm: 4px;
+    --border-radius: 8px;
+    --border-radius-lg: 12px;
+    
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
 }
 
-/* Base style for the decorated form section */
+/* ===== CONTENEDOR PRINCIPAL DEL FORMULARIO ===== */
 .golden-decorated-form {
-    position: relative; /* Necesario para posicionar los pseudo-elementos */
-    padding: 30px; /* Padding interno para los elementos del formulario */
-    margin: 40px auto; /* Centrar y dar espacio a la sección */
-    max-width: 700px; /* Ancho máximo para que el formulario se vea bien */
-    background-color: #fffaf0; /* Fondo cremita para el formulario */
-    border-radius: 15px; /* Esquinas suaves para la sección principal */
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Sombra suave principal */
-    overflow: hidden; /* Recorta los pseudo-elementos si se extienden demasiado */
-    z-index: 1; /* Asegura que esté por encima de elementos básicos de la página */
-
-    /* Estilo de "cadenitas" para el borde */
-    border: 2px dotted var(--gold-primary); /* Borde punteado dorado */
+    position: relative;
+    padding: 2.5rem;
+    margin: 2rem auto;
+    max-width: 800px;
+    background-color: var(--bg-primary);
+    border: 2px solid var(--gold-light);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    z-index: 1;
+    transition: var(--transition-normal);
 }
 
-/* Estilo para el título dentro de la sección decorada */
+/* Efecto sutil al pasar el ratón sobre el formulario */
+.golden-decorated-form:hover {
+    box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== TÍTULO DEL FORMULARIO ===== */
 .golden-decorated-form h2 {
-    font-size: 2.2rem;
-    color: var(--gold-dark); /* Dorado oscuro para el título */
-    margin-bottom: 30px;
+    font-size: 2rem;
+    color: var(--gold-dark);
+    margin: 0 0 2rem 0;
     text-align: center;
-    font-weight: 800;
-    text-shadow: 1px 1px 5px var(--gold-glow); /* Resplandor de texto para el título */
-    border-bottom: 2px solid var(--gold-light); /* Subrayado dorado claro */
-    padding-bottom: 10px;
-    position: relative; /* Para z-index */
-    z-index: 2; /* Asegura que el título esté por encima de los brillos */
+    font-weight: 700;
+    position: relative;
+    padding-bottom: 1rem;
+    z-index: 2;
 }
 
-/* Pseudo-elementos para los "puntos de anclaje" en las esquinas */
-
-/* Punto de anclaje superior izquierdo */
-.golden-decorated-form::before {
+/* Línea decorativa debajo del título */
+.golden-decorated-form h2::after {
     content: '';
     position: absolute;
-    top: -15px; /* Posición ligeramente fuera del borde superior */
-    left: -15px; /* Posición ligeramente fuera del borde izquierdo */
-    width: 40px; /* Tamaño del punto de anclaje */
-    height: 40px;
-    background: radial-gradient(circle at center, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%); /* Degradado radial dorado */
-    border-radius: 50%; /* Forma circular */
-    box-shadow: 0 0 15px var(--gold-glow), inset 0 0 8px var(--gold-light); /* Resplandor dorado e iluminación interna */
-    z-index: 3; /* Por encima de otros elementos */
-    border: 2px solid white; /* Borde blanco para definición */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--gold-primary), transparent);
+    border-radius: 3px;
 }
 
-/* Punto de anclaje inferior derecho (usando ::after) */
+/* Subtítulo opcional */
+.golden-decorated-form .form-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    text-align: center;
+    margin: -1.5rem 0 2rem 0;
+    font-weight: 400;
+}
+
+/* ===== ELEMENTOS DECORATIVOS ===== */
+/* Puntos de esquina decorativos */
+.golden-decorated-form::before,
 .golden-decorated-form::after {
     content: '';
     position: absolute;
-    bottom: -15px; /* Posición ligeramente fuera del borde inferior */
-    right: -15px; /* Posición ligeramente fuera del borde derecho */
-    width: 40px;
-    height: 40px;
-    background: radial-gradient(circle at center, var(--gold-light) 0%, var(--gold-primary) 50%, var(--gold-dark) 100%);
-    border-radius: 50%;
-    box-shadow: 0 0 15px var(--gold-glow), inset 0 0 8px var(--gold-light);
-    z-index: 3;
-    border: 2px solid white;
+    width: 30px;
+    height: 30px;
+    z-index: 2;
+    opacity: 0.8;
+    transition: var(--transition-normal);
 }
 
-/* Media queries para responsividad en dispositivos móviles */
+/* Esquina superior izquierda */
+.golden-decorated-form::before {
+    top: 0;
+    left: 0;
+    border-top: 3px solid var(--gold-primary);
+    border-left: 3px solid var(--gold-primary);
+    border-top-left-radius: var(--border-radius);
+    box-shadow: -2px -2px 10px var(--gold-glow);
+}
+
+/* Esquina inferior derecha */
+.golden-decorated-form::after {
+    bottom: 0;
+    right: 0;
+    border-bottom: 3px solid var(--gold-primary);
+    border-right: 3px solid var(--gold-primary);
+    border-bottom-right-radius: var(--border-radius);
+    box-shadow: 2px 2px 10px var(--gold-glow);
+}
+
+/* Efecto hover en los puntos decorativos */
+.golden-decorated-form:hover::before,
+.golden-decorated-form:hover::after {
+    opacity: 1;
+    width: 35px;
+    height: 35px;
+}
+
+/* ===== RESPONSIVIDAD ===== */
 @media (max-width: 768px) {
     .golden-decorated-form {
-        margin: 20px 10px; /* Margen ajustado para pantallas pequeñas */
-        padding: 20px; /* Padding reducido */
-        max-width: 100%; /* Ocupa todo el ancho disponible */
-        border-radius: 10px; /* Bordes un poco menos redondeados */
+        margin: 1rem;
+        padding: 1.5rem;
+        max-width: 100%;
+        border-radius: var(--border-radius);
     }
+    
     .golden-decorated-form h2 {
-        font-size: 1.8rem;
-        margin-bottom: 20px;
+        font-size: 1.6rem;
+        margin-bottom: 1.5rem;
     }
+    
     .golden-decorated-form::before,
     .golden-decorated-form::after {
-        width: 30px; /* Puntos de anclaje más pequeños en móvil */
+        width: 25px;
+        height: 25px;
+        opacity: 0.7;
+    }
+    
+    .golden-decorated-form:hover::before,
+    .golden-decorated-form:hover::after {
+        width: 30px;
         height: 30px;
-        top: -10px;
-        left: -10px;
-        bottom: -10px;
-        right: -10px;
-        box-shadow: 0 0 10px var(--gold-glow); /* Menos resplandor en móvil */
+    }
+    
+    .form-subtitle {
+        font-size: 1rem;
+        margin: -1rem 0 1.5rem 0;
     }
 }
 
-/* Estilos para los form-group y form-control dentro de esta sección */
-/* Asegúrate de que tus estilos generales de .form-group y .form-control
-   en style.css no tengan !important para que estos puedan sobrescribir si es necesario. */
-.golden-decorated-form label {
-    font-weight: 600;
-    color: #444;
-    margin-bottom: 5px;
-    display: block;
-    font-size: 1.05rem;
+/* ===== GRUPOS DE FORMULARIO ===== */
+.golden-decorated-form .form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
 }
 
+/* Etiquetas de los campos */
+.golden-decorated-form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    transition: var(--transition-fast);
+}
+
+/* Campos de formulario */
 .golden-decorated-form input[type="text"],
 .golden-decorated-form input[type="number"],
 .golden-decorated-form input[type="email"],
+.golden-decorated-form input[type="tel"],
+.golden-decorated-form input[type="date"],
+.golden-decorated-form input[type="password"],
+.golden-decorated-form select,
 .golden-decorated-form textarea {
-    width: calc(100% - 22px); /* Ajuste por el padding y borde */
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: var(--border-radius);
     font-size: 1rem;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Sombra interna sutil */
-    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    line-height: 1.5;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-sm);
 }
 
+/* Efectos de focus y hover */
 .golden-decorated-form input:focus,
+.golden-decorated-form select:focus,
 .golden-decorated-form textarea:focus {
-    border-color: var(--gold-primary); /* Borde dorado al enfocar */
-    box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3), inset 0 1px 3px rgba(0,0,0,0.05); /* Resplandor dorado al enfocar */
+    border-color: var(--gold-primary);
+    box-shadow: 0 0 0 3px var(--gold-glow);
     outline: none;
 }
 
-.golden-decorated-form button {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 10px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
-    font-weight: 700;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    /* Colores para tus botones btn-primario y btn-cancelar */
+.golden-decorated-form input:hover,
+.golden-decorated-form select:hover,
+.golden-decorated-form textarea:hover {
+    border-color: #cbd5e0;
 }
 
-/* Estilos específicos para tus botones en clientes.html */
+/* Placeholder con mejor contraste */
+.golden-decorated-form ::placeholder {
+    color: #a0aec0;
+    opacity: 1;
+}
+
+/* Campos deshabilitados */
+.golden-decorated-form input:disabled,
+.golden-decorated-form select:disabled,
+.golden-decorated-form textarea:disabled {
+    background-color: #f7fafc;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Campos de solo lectura */
+.golden-decorated-form input[readonly],
+.golden-decorated-form textarea[readonly] {
+    background-color: #f8f9fa;
+    border-color: #e2e8f0;
+}
+
+/* Campos con íconos */
+.form-group.has-icon {
+    position: relative;
+}
+
+.form-group.has-icon .form-control {
+    padding-left: 2.5rem;
+}
+
+.form-group .form-icon {
+    position: absolute;
+    left: 1rem;
+    top: 2.5rem;
+    color: #a0aec0;
+    pointer-events: none;
+    transition: var(--transition-normal);
+}
+
+.form-group:focus-within .form-icon {
+    color: var(--gold-primary);
+}
+
+/* ===== BOTONES ===== */
+.golden-decorated-form .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+    border: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Botón primario */
 .golden-decorated-form .btn-primario {
-    background: linear-gradient(145deg, #FFDF40, #DAA520); /* Degradado dorado para el botón primario */
-    color: #4a4a4a; /* Texto oscuro para contraste */
-    border: 1px solid var(--gold-dark);
+    background: linear-gradient(145deg, var(--gold-primary), var(--gold-dark));
+    color: white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .golden-decorated-form .btn-primario:hover {
-    background: linear-gradient(145deg, #FFE066, #E6B32E); /* Brillo al hover */
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3), 0 0 18px var(--gold-glow); /* Resplandor dorado más intenso */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
+.golden-decorated-form .btn-primario:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Botón secundario */
+.golden-decorated-form .btn-secundario {
+    background-color: white;
+    color: var(--gold-dark);
+    border: 2px solid var(--gold-primary);
+}
+
+.golden-decorated-form .btn-secundario:hover {
+    background-color: var(--gold-light);
+    transform: translateY(-2px);
+}
+
+/* Botón de cancelar/peligro */
 .golden-decorated-form .btn-cancelar {
-    background-color: #ef4444; /* Rojo */
+    background: linear-gradient(145deg, #ef4444, #dc2626);
     color: white;
 }
 
 .golden-decorated-form .btn-cancelar:hover {
-    background-color: #dc2626;
+    background: linear-gradient(145deg, #dc2626, #b91c1c);
     transform: translateY(-2px);
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Botón deshabilitado */
+.golden-decorated-form .btn:disabled,
+.golden-decorated-form .btn[disabled] {
+    background: #e2e8f0;
+    color: #a0aec0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Grupo de botones */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+/* ===== MENSAJES DE VALIDACIÓN ===== */
+.form-feedback {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* Mensajes de error */
+.invalid-feedback {
+    color: var(--error);
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+}
+
+/* Campos inválidos */
+.is-invalid,
+.was-validated .form-control:invalid {
+    border-color: var(--error) !important;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* Campos válidos */
+.is-valid,
+.was-validated .form-control:valid {
+    border-color: var(--success) !important;
+    padding-right: calc(1.5em + 0.75rem);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right calc(0.375em + 0.1875rem) center;
+    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+}
+
+/* ===== CHECKBOXES Y RADIOS ===== */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+    position: relative;
+    padding-left: 1.75rem;
+    min-height: 1.25rem;
+    cursor: pointer;
+}
+
+.form-check-input {
+    position: absolute;
+    margin-top: 0.2rem;
+    margin-left: -1.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: 2px solid #cbd5e0;
+    border-radius: 0.25rem;
+    background-color: white;
+    transition: var(--transition-fast);
+    cursor: pointer;
+}
+
+.form-check-input:checked {
+    background-color: var(--gold-primary);
+    border-color: var(--gold-primary);
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23fff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 1rem 1rem;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 3px var(--gold-glow);
+    outline: none;
+}
+
+/* Radio buttons */
+.form-check-input[type="radio"] {
+    border-radius: 50%;
+}
+
+.form-check-input[type="radio"]:checked {
+    background-image: radial-gradient(circle, white 35%, transparent 40%);
+}
+
+/* ===== SWITCHES ===== */
+.form-switch {
+    padding-left: 2.5rem;
+}
+
+.form-switch .form-check-input {
+    width: 2.25rem;
+    margin-left: -2.5rem;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='rgba%280, 0, 0, 0.25%29'/%3e%3c/svg%3e");
+    background-position: left center;
+    border-radius: 2rem;
+    transition: background-position 0.15s ease-in-out;
+}
+
+.form-switch .form-check-input:checked {
+    background-position: right center;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+}
+
+/* ===== SELECT PERSONALIZADO ===== */
+.select-container {
+    position: relative;
+}
+
+.select-container::after {
+    content: "";
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid var(--text-secondary);
+    pointer-events: none;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* ===== TOOLTIPS ===== */
+[data-tooltip] {
+    position: relative;
+    cursor: help;
+}
+
+[data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8rem;
+    white-space: nowrap;
+    z-index: 10;
+    margin-bottom: 0.5rem;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+[data-tooltip]:hover::before {
+    content: "";
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.8) transparent transparent transparent;
+    margin-bottom: -0.5rem;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+[data-tooltip]:hover::after,
+[data-tooltip]:hover::before {
+    opacity: 1;
 }
 
 /* INVENTARIO BOTÓN EXPORTAR E IMPORTAR */
