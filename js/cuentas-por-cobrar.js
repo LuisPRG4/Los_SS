@@ -45,12 +45,12 @@ async function actualizarDashboardCxC() {
 }
 
 // Números de pago
-const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621';
-const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821';
+const NUMERO_VENDEDOR_PRINCIPAL = '0414-0872621'; // Cambia por el tuyo
+const NUMERO_VENDEDOR_ALTERNATIVO = '0416-6963821'; // Cambia por el tuyo
 
 // Datos fijos que aparecerán en los mensajes
-const CEDULA_VENDEDOR = 'V-19.317.877';
-const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663';
+const CEDULA_VENDEDOR = 'V-19.317.877'; // OTRO
+const CEDULA_VENDEDOR_ALTERNATIVO = 'V-9.424.663'; //JOSE
 const BANCO_VENDEDOR  = 'Banco de Venezuela';
 const BANCO_VENDEDOR_ALTERNATIVO  = 'Banco de Venezuela';
 
@@ -335,7 +335,15 @@ function agregarEventosHistorial() {
 
 function crearCardVentaCredito(venta) {
     const nombreCliente = venta.cliente || "Cliente desconocido";
-    const productosTexto = venta.productos.map(p => `${p.nombre} x${p.cantidad}`).join(", ");
+    
+    // Validación defensiva para productos
+    let productosTexto = "Sin productos";
+    if (venta.productos && Array.isArray(venta.productos) && venta.productos.length > 0) {
+        productosTexto = venta.productos.map(p => `${p.nombre || 'Producto'} x${p.cantidad || 1}`).join(", ");
+    } else if (venta.productos && typeof venta.productos === 'string') {
+        // Si productos es un string, usarlo directamente
+        productosTexto = venta.productos;
+    }
     const fechaVencimiento = venta.detallePago?.fechaVencimiento || "Sin fecha";
 
     console.log('Datos de venta:', {
@@ -393,7 +401,9 @@ function crearCardVentaCredito(venta) {
         
         // Calcular la diferencia en días usando UTC para evitar problemas de zona horaria
         const diffTime = fechaVencimientoSinHora.getTime() - fechaHoySinHora.getTime();
-        const diasTotales = Math.round(diffTime / (1000 * 60 * 60 * 24));
+        const diasTotales = Math.floor(diffTime / (1000 * 60 * 60 * 24)); 
+
+                // const diasTotales = Math.round(diffTime / (1000 * 60 * 60 * 24));
         
         console.log('Cálculo de días:', {
             diferenciaMilisegundos: diffTime,
@@ -453,8 +463,6 @@ function crearCardVentaCredito(venta) {
         textColorClass = 'text-info';
         estadoPagoHTML = `<span class="tag-status tag-info">(Pendiente)</span>`;
     }
-
-
 
     const card = document.createElement("div");
     card.className = `venta-credito-card ${cardStatusClass}`;
@@ -669,7 +677,7 @@ async function actualizarEstadisticas(currentFilteredVentas = null) {
     const sevenDays = 7 * 24 * 60 * 60 * 1000; // 7 días en milisegundos
 
     ventasParaEstadisticas.forEach(venta => {
-        if (venta.montoPendiente > 0 && venta.detallePago.fechaVencimiento) {
+        if (venta.montoPendiente > 0 && venta.detallePago && venta.detallePago.fechaVencimiento) {
             const vencimientoDate = new Date(venta.detallePago.fechaVencimiento);
             const vencimientoOnlyDate = new Date(vencimientoDate.getFullYear(), vencimientoDate.getMonth(), vencimientoDate.getDate());
 
@@ -1626,23 +1634,72 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
                     <div class="detalle-item">
                         <strong>Cliente:</strong> ${venta.cliente}
                         ${clienteData.telefono ? (() => {
-                            const localNum = clienteData.telefono.replace(/\\D/g, '');
+                            const localNum = clienteData.telefono.replace(/\D/g, '');
                             const numeroIntl = `58${localNum}`; // Asumimos Venezuela
-                            const mensajeWhatsApp = `🥛 Hola, ${clienteData.nombre}! 🌟\n\n`+
-                              `Esperamos que estés disfrutando de nuestros yogures cremosos y llenos de cariño 😊. Solo queremos compartirte un recordatorio amable:\n\n`+
-                              `💳 Monto pendiente: $${venta.montoPendiente.toFixed(2)} USD (≈ [Monto BS] BS, Tasa del día: [Tasa Actual])\n\n`+
-                              `🍶 Pedido #: ${venta.id}\n\n`+
-                              `📌 Opciones de pago (fáciles y seguras):\n`+
-                              `1️⃣ Transferencia Bancaria: [Nombre del Banco] / Cuenta [Número de cuenta]\n`+
-                              `2️⃣ Pago Móvil: [Número de teléfono] / C.I. [Cédula] / [Banco]\n`+
-                              `3️⃣ Efectivo: Disponible al momento de entrega\n\n`+
-                              `⌚ Si necesitas más tiempo o tienes alguna consulta, no dudes en contactarnos. Estamos para ayudarte a seguir disfrutando sin preocupaciones 🧘.\n\n`+
-                              `Con especial atención,\n`+
-                              `El equipo de [Nombre de tu empresa] 🍓\n`+
-                              `📞 [Teléfono de contacto]`;
-
-                            const enlace = generarEnlaceWhatsApp(numeroIntl, mensajeWhatsApp);
-                            return `<a href="${enlace}" class="btn-link-whatsapp" target="_blank"><i class="fab fa-whatsapp"></i> Contactar</a>`;
+                            
+                            // Crear contenedor para el dropdown de WhatsApp
+                            return `
+                                <div class="whatsapp-dropdown-container-detalle" style="position: relative; display: inline-block; margin-left: 10px;">
+                                    <button type="button" class="btn-whatsapp-dropdown-detalle" style="
+                                        background: #25D366;
+                                        color: white;
+                                        border: none;
+                                        padding: 8px 12px;
+                                        border-radius: 6px;
+                                        cursor: pointer;
+                                        font-size: 14px;
+                                        display: inline-flex;
+                                        align-items: center;
+                                        gap: 6px;
+                                    ">
+                                        <i class="fab fa-whatsapp"></i> Contactar ▼
+                                    </button>
+                                    <div class="whatsapp-dropdown-menu-detalle" style="
+                                        display: none;
+                                        position: absolute;
+                                        top: 110%;
+                                        left: 0;
+                                        background: #fff;
+                                        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+                                        border-radius: 6px;
+                                        z-index: 1000;
+                                        min-width: 220px;
+                                        padding: 6px 0;
+                                        border: 1px solid #ddd;
+                                    ">
+                                        <button type="button" class="whatsapp-dropdown-option-detalle" data-tipo="principal" style="
+                                            width: 100%;
+                                            padding: 10px 15px;
+                                            border: none;
+                                            background: none;
+                                            text-align: left;
+                                            cursor: pointer;
+                                            font-size: 14px;
+                                            color: #333;
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                        ">
+                                            <i class="fab fa-whatsapp" style="color: #25D366;"></i> Contactar por WhatsApp
+                                        </button>
+                                        <button type="button" class="whatsapp-dropdown-option-detalle" data-tipo="alternativo" style="
+                                            width: 100%;
+                                            padding: 10px 15px;
+                                            border: none;
+                                            background: none;
+                                            text-align: left;
+                                            cursor: pointer;
+                                            font-size: 14px;
+                                            color: #333;
+                                            display: flex;
+                                            align-items: center;
+                                            gap: 8px;
+                                        ">
+                                            <i class="fab fa-whatsapp" style="color: #25D366;"></i> Btn. José Luis
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
                         })() : ''}
                     </div>
                     <div class="detalle-item">
@@ -1686,6 +1743,57 @@ window.mostrarDetalleVentaModal = async function(ventaId) {
             btnAbonarDesdeDetalle.style.display = 'none';
         } else {
             btnAbonarDesdeDetalle.style.display = 'inline-block';
+        }
+        
+        // Agregar event listeners para el dropdown de WhatsApp en el modal de detalle
+        const btnDropdownDetalle = modalDetalle.querySelector('.btn-whatsapp-dropdown-detalle');
+        const menuDropdownDetalle = modalDetalle.querySelector('.whatsapp-dropdown-menu-detalle');
+        const opcionesDropdownDetalle = modalDetalle.querySelectorAll('.whatsapp-dropdown-option-detalle');
+        
+        if (btnDropdownDetalle && menuDropdownDetalle) {
+            // Agregar estilos de hover a las opciones
+            opcionesDropdownDetalle.forEach(opcion => {
+                opcion.addEventListener('mouseenter', () => {
+                    opcion.style.backgroundColor = '#f5f5f5';
+                });
+                opcion.addEventListener('mouseleave', () => {
+                    opcion.style.backgroundColor = 'transparent';
+                });
+                
+                // Agregar funcionalidad de clic
+                opcion.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    menuDropdownDetalle.style.display = 'none';
+                    
+                    const tipo = opcion.getAttribute('data-tipo');
+                    const localNum = clienteData.telefono.replace(/\D/g, '');
+                    const numeroIntl = `58${localNum}`;
+                    
+                    // Crear mensajes usando las funciones existentes
+                    const mensajePrincipal = construirMensajePrincipal(venta, clienteData, 0);
+                    const mensajeAlternativo = construirMensajeAlternativo(venta, clienteData, 0);
+                    
+                    if (tipo === 'principal') {
+                        abrirModalWhatsApp(venta, clienteData, numeroIntl, mensajePrincipal, false);
+                    } else if (tipo === 'alternativo') {
+                        abrirModalWhatsApp(venta, clienteData, numeroIntl, mensajeAlternativo, true);
+                    }
+                });
+            });
+            
+            // Mostrar/ocultar menú al hacer clic en el botón
+            btnDropdownDetalle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isVisible = menuDropdownDetalle.style.display === 'block';
+                menuDropdownDetalle.style.display = isVisible ? 'none' : 'block';
+            });
+            
+            // Cerrar menú al hacer clic fuera
+            document.addEventListener('click', function cerrarMenuWhatsappDetalle(e) {
+                if (!modalDetalle.querySelector('.whatsapp-dropdown-container-detalle').contains(e.target)) {
+                    menuDropdownDetalle.style.display = 'none';
+                }
+            });
         }
         
         // Mostrar el modal
@@ -1899,9 +2007,6 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
       styleTag.id = 'whModalStyles';
       styleTag.textContent = `
         #modalWhatsApp .modal-content{max-width:95%;width:95%;}
-        #modalWhatsApp canvas{max-width:100%;height:auto;}
-        #modalWhatsApp .wh-tabs button{flex:1;padding:6px 8px;border:none;background:#ddd;border-radius:4px;cursor:pointer;}
-        #modalWhatsApp .wh-tabs .tab-active{background:#caa43b;color:#fff;}
       `;
       document.head.appendChild(styleTag);
     }
@@ -1912,23 +2017,11 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
           <span id="cerrarModalWhatsApp" class="close-button">&times;</span>
         </div>
 
-        <div class="wh-tabs" style="display:flex; gap:6px; margin-bottom:10px;">
-          <button id="tabTexto" class="tab-active">Mensaje</button>
-          <button id="tabSticker">Sticker</button>
-        </div>
-
-        <div class="modal-body" id="whTextoSection">
+        <div class="modal-body">
           <label style="display:block; margin-bottom:8px;">Tasa BCV (Bs/USD):
             <input type="number" id="whTasaInput" step="0.0001" style="width:120px; margin-left:6px;" />
           </label>
           <textarea id="whMessageText" rows="10" style="width:100%; resize:vertical;"></textarea>
-        </div>
-
-        <div class="modal-body" id="whStickerSection" style="display:none; text-align:center;">
-          <canvas id="whStickerCanvas" width="512" height="512" style="border:1px solid #ccc; background:#fff;"></canvas>
-          <div style="margin-top:10px;">
-            <button id="btnDescargarSticker" class="btn-secondary">📥 Descargar Sticker</button>
-          </div>
         </div>
 
         <div class="modal-footer">
@@ -1949,12 +2042,6 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
   const tasaInput = modal.querySelector('#whTasaInput');
   const txtArea   = modal.querySelector('#whMessageText');
   const btnEnviar = modal.querySelector('#btnEnviarWhatsApp');
-  const tabTexto  = modal.querySelector('#tabTexto');
-  const tabSticker= modal.querySelector('#tabSticker');
-  const textoSection = modal.querySelector('#whTextoSection');
-  const stickerSection = modal.querySelector('#whStickerSection');
-  const canvasSticker = modal.querySelector('#whStickerCanvas');
-  const btnDescargarSticker = modal.querySelector('#btnDescargarSticker');
 
   // Obtener tasa guardada o valor por defecto
   const storedTasa = parseFloat(localStorage.getItem('tasaBCV')) || 0;
@@ -1966,79 +2053,13 @@ window.abrirModalWhatsApp = function(venta, clienteDatos, numeroIntl, mensajePri
   // Rellenar mensaje inicial
   txtArea.value = mensajeFunc(venta, clienteDatos, tasaInicial);
 
-  // === FUNCIONES PARA STICKER ===
-  const wrapText = (context, text, x, y, maxWidth, lineHeight) => {
-    const words = text.split(' ');
-    let line = '';
-    for (let n = 0; n < words.length; n++) {
-      const testLine = line + words[n] + ' ';
-      const metrics = context.measureText(testLine);
-      const testWidth = metrics.width;
-      if (testWidth > maxWidth && n > 0) {
-        context.fillText(line, x, y);
-        line = words[n] + ' ';
-        y += lineHeight;
-      } else {
-        line = testLine;
-      }
-    }
-    context.fillText(line, x, y);
-  };
-
-  const renderSticker = () => {
-    const ctx = canvasSticker.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0,0,512,512);
-    ctx.fillStyle = '#000000';
-    ctx.font = '22px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    const margin = 20;
-    wrapText(ctx, txtArea.value, 256, margin, 472, 28);
-  };
-
-  // Dibujar inicialmente
-  renderSticker();
-
-  // Actualizar sticker al cambiar mensaje o tasa
-    const updateAll = ()=>{
-    const nuevaTasa = parseFloat(tasaInput.value)||0;
-    txtArea.value = mensajeFunc(venta, clienteDatos, nuevaTasa); // ✅ Ahora usa la función correcta
-    renderSticker();
+  // Actualizar mensaje al cambiar la tasa
+  const updateMessage = () => {
+    const nuevaTasa = parseFloat(tasaInput.value) || 0;
+    txtArea.value = mensajeFunc(venta, clienteDatos, nuevaTasa);
   };
   
-  tasaInput.oninput = updateAll;
-  txtArea.oninput = renderSticker;
-
-  // Tabs
-  const activateTab = (isTexto)=>{
-    if(isTexto){
-      tabTexto.classList.add('tab-active');
-      tabSticker.classList.remove('tab-active');
-      textoSection.style.display='block';
-      stickerSection.style.display='none';
-    }else{
-      tabSticker.classList.add('tab-active');
-      tabTexto.classList.remove('tab-active');
-      textoSection.style.display='none';
-      stickerSection.style.display='block';
-      renderSticker();
-    }
-  };
-  tabTexto.onclick = ()=>activateTab(true);
-  tabSticker.onclick = ()=>activateTab(false);
-
-  // Descargar sticker
-  btnDescargarSticker.onclick = ()=>{
-    canvasSticker.toBlob(blob=>{
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `sticker_pedido_${venta.id}.png`;
-      a.click();
-      URL.revokeObjectURL(url);
-    });
-  };
+  tasaInput.oninput = updateMessage;
 
   // Acción enviar
   btnEnviar.onclick = ()=>{
