@@ -1,5 +1,5 @@
-const CACHE_NAME = "los-ss-cache-v22";
-const APP_VERSION = "1.1.2"; // Incrementa esto cuando hagas cambios importantes
+const CACHE_NAME = "los-ss-cache-v25";
+const APP_VERSION = "1.1.3"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
 function getRepoPrefix() {
@@ -32,7 +32,6 @@ const urlsToCache = [
   `${REPO_PREFIX}proveedores.html`,
   `${REPO_PREFIX}reportesGraficos.html`,
   `${REPO_PREFIX}ventas.html`,
-  `${REPO_PREFIX}dashboard-analitico.html`,
   `${REPO_PREFIX}datos.html`,
   `${REPO_PREFIX}modal-productos.html`,
 
@@ -63,7 +62,6 @@ const urlsToCache = [
   `${REPO_PREFIX}css/reportes.css`,
   `${REPO_PREFIX}css/ventas-pagadas.css`,
   `${REPO_PREFIX}css/whatsapp.css`,
-  `${REPO_PREFIX}css/dashboard-analitico.css`,
   `${REPO_PREFIX}css/modal-productos.css`,
   `${REPO_PREFIX}css/dashboard-cpc.css`,
   `${REPO_PREFIX}css/morosos.css`,
@@ -75,7 +73,6 @@ const urlsToCache = [
   `${REPO_PREFIX}js/clientes.js`,
   `${REPO_PREFIX}js/connection-status.js`,
   `${REPO_PREFIX}js/dashboard.js`,
-  `${REPO_PREFIX}js/dashboard-analitico.js`,
   `${REPO_PREFIX}js/cuentas-por-cobrar.js`,
   `${REPO_PREFIX}js/datos.js`,
   `${REPO_PREFIX}js/db.js`,
