@@ -131,7 +131,6 @@ async function registrarVenta() {
 
     const clienteExiste = clientes.some(c => c.nombre.toLowerCase() === clienteNombre.toLowerCase());
 
-    // ¡MODIFICADO! Usar modal de confirmación en lugar de prompt
     if (!clienteNombre) {
         mostrarToast("Por favor ingresa o selecciona un cliente. 🚫");
         return;
@@ -170,7 +169,8 @@ async function registrarVenta() {
             mostrarToast("Selecciona el método de pago. 🚫");
             return;
         }
-        detallePago = { metodo };
+        // CORRECCIÓN AQUÍ: Asegurar que el método no se guarde como un string vacío
+        detallePago = { metodo: metodo || "Efectivo/Otro" }; // <-- Cambié la línea aquí
         montoPendiente = 0; // Contado, no hay monto pendiente
         estadoPago = 'Pagado Total';
     } else if (tipoPago === "credito") {
@@ -180,10 +180,10 @@ async function registrarVenta() {
             return;
         }
         const metodo = document.getElementById("metodoCredito").value;
-        detallePago = { 
-            acreedor: clienteNombre, 
+        detallePago = {
+            acreedor: clienteNombre,
             fechaVencimiento,
-            metodo: metodo || "No especificado"  // Si no se selecciona, usamos "No especificado"
+            metodo: metodo || "No especificado"
         };
         montoPendiente = ingreso; // Al inicio, el monto pendiente es el total del ingreso
         estadoPago = 'Pendiente'; // Estado inicial para crédito
@@ -196,7 +196,7 @@ async function registrarVenta() {
 
     const nuevaVenta = {
         cliente: clienteNombre,
-        productos: [...productosVenta], // Aquí los productos ya tienen la unidad de medida
+        productos: [...productosVenta],
         tipoPago,
         detallePago,
         ingreso,
@@ -205,20 +205,17 @@ async function registrarVenta() {
         montoPendiente: montoPendiente,
         estadoPago: estadoPago,
         observaciones: document.getElementById('observacionesVenta').value.trim(),
-        archivado: false // Nueva bandera
+        archivado: false
     };
 
     try {
-        let productosActualizados = [...productos]; // Copia de los productos actuales en memoria
+        let productosActualizados = [...productos];
 
-        // Cargar movimientos para la actualización
         movimientos = await obtenerTodosLosMovimientos();
 
-        if (editVentaId !== null) { // Usamos editVentaId
-            // Edición de venta existente
+        if (editVentaId !== null) {
             const ventaAnterior = ventas.find(v => v.id === editVentaId);
             if (ventaAnterior) {
-                // Revertir stock de la venta anterior
                 ventaAnterior.productos.forEach(p => {
                     const prod = productosActualizados.find(prod => prod.nombre === p.nombre);
                     if (prod) {
@@ -228,7 +225,6 @@ async function registrarVenta() {
                 });
             }
 
-            // Aplicar stock de la nueva venta (cantidad vendida)
             productosVenta.forEach(p => {
                 const prod = productosActualizados.find(prod => prod.nombre === p.nombre);
                 if (prod) {
@@ -237,14 +233,12 @@ async function registrarVenta() {
                 }
             });
 
-            // Actualizar la venta en IndexedDB usando su ID
-            nuevaVenta.id = editVentaId; // Asegura que el ID esté en el objeto para put()
+            nuevaVenta.id = editVentaId;
             await actualizarVenta(editVentaId, nuevaVenta);
             mostrarToast("Venta actualizada ✅");
 
         } else {
-            // Nueva venta
-            const idGenerado = await agregarVenta(nuevaVenta); // Añadir a IndexedDB y obtener el ID
+            const idGenerado = await agregarVenta(nuevaVenta);
 
             productosVenta.forEach(p => {
                 const prod = productosActualizados.find(prod => prod.nombre === p.nombre);
@@ -256,7 +250,6 @@ async function registrarVenta() {
 
             const costoTotal = productosVenta.reduce((total, p) => total + (p.costo * p.cantidad), 0);
 
-            // Añadir movimientos a IndexedDB
             await agregarMovimientoDB({
                 tipo: "ingreso",
                 monto: ingreso,
@@ -274,24 +267,22 @@ async function registrarVenta() {
             mostrarToast("Venta registrada con éxito ✅");
         }
 
-        // Actualizar todos los productos modificados en IndexedDB
         for (const prod of productosActualizados) {
-            await actualizarProducto(prod.id, prod); // Asegúrate de que 'prod' tenga un ID
+            await actualizarProducto(prod.id, prod);
         }
 
-        // Recargar los datos en memoria después de las operaciones de DB
         ventas = await obtenerTodasLasVentas();
-        productos = await obtenerTodosLosProductos(); // Recargar productos para actualizar stock en UI
+        productos = await obtenerTodosLosProductos();
         movimientos = await obtenerTodosLosMovimientos();
-        abonos = await obtenerTodosLosAbonos(); // Sincroniza abonos también
+        abonos = await obtenerTodosLosAbonos();
 
-        editVentaId = null; // Resetea el ID de edición
+        editVentaId = null;
         document.getElementById("btnRegistrarVenta").textContent = "Registrar Venta";
 
-        guardarVentas(); // Para actualizar gráficos si aplica
-        mostrarVentas(); // Recarga la UI
-        await cargarProductos(); // <-- ¡NUEVA LÍNEA! Esto recarga el select de productos con el stock actualizado.
-        
+        guardarVentas();
+        mostrarVentas();
+        await cargarProductos();
+
         limpiarFormulario();
     } catch (error) {
         console.error("Error al registrar/actualizar venta:", error);
@@ -965,13 +956,13 @@ async function cargarVenta(id) {
         mostrarOpcionesPago(); // Esto asegurará que los campos correctos estén visibles
 
         if (venta.tipoPago === "contado") {
-            document.getElementById("metodoContado").value = venta.detallePago.metodo || '';
+            document.getElementById("metodoContado").value = (venta.detallePago && venta.detallePago.metodo) ? venta.detallePago.metodo : '';
             // Desactivar fecha manual si se edita una venta al contado (opcional, pero lógico)
             document.getElementById("activarFechaManual").checked = false;
             toggleFechaManual(); // Para ocultar los inputs de fecha manual
         } else { // Venta a crédito
-            document.getElementById("fechaVencimiento").value = venta.detallePago.fechaVencimiento || '';
-            document.getElementById("metodoCredito").value = venta.detallePago.metodo || '';
+            document.getElementById("fechaVencimiento").value = (venta.detallePago && venta.detallePago.fechaVencimiento) ? venta.detallePago.fechaVencimiento : '';
+            document.getElementById("metodoCredito").value = (venta.detallePago && venta.detallePago.metodo) ? venta.detallePago.metodo : '';
             // Si hay una fecha de venta personalizada guardada, cargarla y activar
             if (venta.fecha) {
                 const fechaParte = venta.fecha.slice(0, 10); // Formato YYYY-MM-DD
@@ -991,18 +982,22 @@ async function cargarVenta(id) {
         // Asumimos que los 'productos' guardados en 'venta.productos' ya tienen
         // toda la información necesaria, incluyendo 'unidadMedida' y 'costo',
         // ya que así se guardaron en 'registrarVenta'.
-        productosVenta = venta.productos.map(p => ({
-            nombre: p.nombre,
-            precio: p.precio,
-            costo: p.costo, // Asegurarse de que el costo esté en el objeto del producto guardado
-            cantidad: p.cantidad,
-            subtotal: p.subtotal,
-            unidadMedida: p.unidadMedida || 'unidad(es)' // Fallback por si acaso la unidad de medida no se guardó
-        }));
+        // CORRECCIÓN ADICIONAL AQUÍ: Verificar si venta.productos es un array
+        if (Array.isArray(venta.productos)) { // <--- NUEVA LÍNEA CLAVE
+            productosVenta = venta.productos.map(p => ({
+                nombre: p.nombre,
+                precio: p.precio,
+                costo: p.costo, // Asegurarse de que el costo esté en el objeto del producto guardado
+                cantidad: p.cantidad,
+                subtotal: p.subtotal,
+                unidadMedida: p.unidadMedida || 'unidad(es)' // Fallback por si acaso la unidad de medida no se guardó
+            }));
+        } else {
+            productosVenta = []; // Si no es un array, inicializar como array vacío para evitar errores
+        }
         actualizarTablaProductos(); // Volver a renderizar la tabla con los productos cargados
 
         // 3. Desplazarse al formulario de registro para editar
-        // Usamos el ID del formulario principal de registro de ventas
         const formulario = document.getElementById("formularioVenta"); // Asegúrate de que tu formulario principal tiene este ID
         if (formulario) {
             formulario.scrollIntoView({ behavior: "smooth", block: "start" });
