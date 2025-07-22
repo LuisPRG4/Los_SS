@@ -42,6 +42,14 @@ async function actualizarDashboardCxC() {
     document.getElementById("ventasPendientesDashboard").textContent = ventasCredito.filter(v => v.montoPendiente > 0).length.toString();
     document.getElementById("ventasVencidasDashboard").textContent = `$${ventasVencidasMonto.toFixed(2)}`;
     document.getElementById("porVencerDashboard").textContent = `$${ventasPorVencerMonto.toFixed(2)}`;
+
+    // Nuevo KPI: Diferencia entre Total Cuentas Pendientes y Cuentas Vencidas
+    const diferenciaPendienteVencido = totalCuentasPorCobrar - ventasVencidasMonto;
+    // Asegúrate de que exista un elemento con el ID 'diferenciaPendienteVencidoDashboard' en tu HTML
+    const elementoDiferencia = document.getElementById("diferenciaPendienteVencidoDashboard");
+    if (elementoDiferencia) {
+        elementoDiferencia.textContent = `$${diferenciaPendienteVencido.toFixed(2)}`;
+    }
 }
 
 // Números de pago
