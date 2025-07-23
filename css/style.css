@@ -212,15 +212,15 @@ ul li button:hover {
 }
 
 .toast {
-    background-color: #5b2d90;
-    color: #fff;
+    background-color: #FFF8DC;
+    color: #333;
     padding: 12px 18px;
     margin-top: 10px;
     border-radius: 8px;
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     opacity: 0;
     transform: translateX(100%);
-    transition: all 0.4s ease;
+    transition: all 0.5s ease;
 }
 
 .toast.show {
