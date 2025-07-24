@@ -1910,7 +1910,7 @@ async function mostrarRecibo(id) {
         }
 
         // Teléfono de contacto del negocio (ejemplo)
-        document.getElementById('recibo-telefono').textContent = '+58 424-0000000';
+        document.getElementById('recibo-telefono').textContent = '+58 416-6963821 / 414-0872621';
 
         // Estado de la venta
         document.getElementById('recibo-estado').textContent = venta.estadoPago;
