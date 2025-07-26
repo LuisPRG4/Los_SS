@@ -124,6 +124,10 @@ const sortOptionsCxC = [
 let sortKeyCxC = 'fechaVencimiento';
 let sortAscCxC = true;
 
+// Variables globales
+let filtroClienteBusquedaDinamica;
+let sugerenciasClientes;
+
 document.addEventListener("DOMContentLoaded", async () => {
     try {
         await abrirDB(); // Abre la base de datos
@@ -134,8 +138,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         llenarDatalistClientes();
 
         // --- Lógica para el buscador dinámico y autocompletado ---
-        const filtroClienteBusquedaDinamica = document.getElementById('filtroClienteBusquedaDinamica');
-        const sugerenciasClientes = document.getElementById('sugerenciasClientes');
+        filtroClienteBusquedaDinamica = document.getElementById('filtroClienteBusquedaDinamica');
+        sugerenciasClientes = document.getElementById('sugerenciasClientes');
         const modalDetalleVenta = document.getElementById('modalDetalleVenta');
         const cerrarModalDetalleVenta = document.getElementById('cerrarModalDetalleVenta');
 
@@ -154,43 +158,32 @@ document.addEventListener("DOMContentLoaded", async () => {
                     const li = document.createElement('li');
                     li.textContent = cliente.nombre;
                     li.addEventListener('click', async () => {
+
                         filtroClienteBusquedaDinamica.value = cliente.nombre;
                         sugerenciasClientes.innerHTML = '';
                         // Scroll automático a la tarjeta del cliente
-                        const ventaDelCliente = ventasCredito.find(v => v.cliente === cliente.nombre && v.montoPendiente > 0);
-                        if (ventaDelCliente) {
-                            const cardId = `venta-${ventaDelCliente.id}`;
-                            const cardElement = document.getElementById(cardId);
-                            if (cardElement) {
-                                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                // Opcional: resaltar la tarjeta brevemente
-                                cardElement.classList.add('highlight');
-                                setTimeout(() => {
-                                    cardElement.classList.remove('highlight');
-                                }, 2000);
-                            } else {
-                                // Si la tarjeta no está visible (ej. por filtros), recargar y luego hacer scroll
-                                await cargarYMostrarCuentasPorCobrar();
-                                const updatedCardElement = document.getElementById(cardId);
-                                if (updatedCardElement) {
-                                    updatedCardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                    updatedCardElement.classList.add('highlight');
-                                    setTimeout(() => {
-                                        updatedCardElement.classList.remove('highlight');
-                                    }, 2000);
+                        // Consolidar ventas para el cliente seleccionado
+                        const ventasDelCliente = ventasCredito.filter(v => v.cliente === cliente.nombre && v.montoPendiente > 0);
 
+                        if (ventasDelCliente.length > 0) {
+                            const totalPendienteCliente = ventasDelCliente.reduce((sum, v) => sum + v.montoPendiente, 0);
+                            // Limpiar todas las tarjetas existentes
+                            limpiarContenedorTarjetas();
 
-                            }
+                            // Crear y mostrar la tarjeta consolidada
+                            const tarjetaConsolidada = crearTarjetaConsolidada(cliente.nombre, totalPendienteCliente, ventasDelCliente.length, ventasDelCliente);
+                            document.getElementById('listaCuentasPorCobrar').appendChild(tarjetaConsolidada);
 
-                            setTimeout(() => {
-                                filtroClienteBusquedaDinamica.value = ''; // Limpiar el input
-                                sugerenciasClientes.innerHTML = ''; // Limpiar las sugerencias
-                                cargarYMostrarCuentasPorCobrar(); // Recargar las cuentas para mostrar todo de nuevo
-                            }, 12000); // 12 segundos
-                            }
+                            // Añadir scroll automático a la tarjeta consolidada
+                            tarjetaConsolidada.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                            // Opcional: Deshabilitar el filtro de búsqueda hasta que se limpie
+                            // filtroClienteBusquedaDinamica.disabled = true; 
 
                         } else {
                             mostrarToast(`No hay ventas pendientes para ${cliente.nombre}.`, 'info');
+                            limpiarContenedorTarjetas(); // Limpiar si no hay ventas pendientes
+                            cargarYMostrarCuentasPorCobrar(); // Volver a cargar todas las tarjetas
                         }
                     });
                     sugerenciasClientes.appendChild(li);
@@ -340,6 +333,66 @@ function llenarDatalistClientes() {
     });
 }
 
+// Función para limpiar el contenedor de tarjetas
+function limpiarContenedorTarjetas() {
+    const contenedor = document.getElementById('listaCuentasPorCobrar');
+    if (contenedor) {
+        contenedor.innerHTML = '';
+    }
+}
+
+// Función para crear una tarjeta consolidada para un cliente
+function crearTarjetaConsolidada(nombreCliente, totalPendiente, numVentas, ventasDelCliente) {
+    // Ordenar las ventas por fecha para encontrar la primera y última
+    const ventasOrdenadasPorFecha = [...ventasDelCliente].sort((a, b) => {
+        const fechaA = new Date(a.fechaVenta); // Asumiendo que existe 'fechaVenta'
+        const fechaB = new Date(b.fechaVenta);
+        return fechaA - fechaB;
+    });
+
+    const primeraVentaFecha = ventasOrdenadasPorFecha.length > 0 ? new Date(ventasOrdenadasPorFecha[0].fechaVenta).toLocaleDateString() : 'N/A';
+    const ultimaVentaFecha = ventasOrdenadasPorFecha.length > 0 ? new Date(ventasOrdenadasPorFecha[ventasOrdenadasPorFecha.length - 1].fechaVenta).toLocaleDateString() : 'N/A';
+
+
+    const card = document.createElement('div');
+    card.classList.add('card', 'mb-3', 'shadow-sm', 'border-primary'); // Clases de Bootstrap y personalizadas
+    card.innerHTML = `
+        <div class="card-body">
+            <h5 class="card-title text-primary">${nombreCliente}</h5>
+            <p class="card-text">Total Pendiente: <strong>$${totalPendiente.toFixed(2)} USD</strong></p>
+            <p class="card-text text-muted">(${numVentas} ventas asociadas)</p>
+            <p class="card-text"><small class="text-muted">Primera venta pendiente: ${primeraVentaFecha}</small></p>
+            <p class="card-text"><small class="text-muted">Última venta pendiente: ${ultimaVentaFecha}</small></p>
+            <div class="card-actions mt-3">
+                <button class="btn btn-outline-secondary btn-sm" id="btnLimpiarFiltro">Limpiar Filtro</button>
+                <button class="btn btn-primary btn-sm ms-2" id="btnVerDetalles">Ver Detalles</button>
+            </div>
+        </div>
+    `;
+
+    // Añadir event listener al botón de limpiar filtro
+    const btnLimpiarFiltro = card.querySelector('#btnLimpiarFiltro');
+    if (btnLimpiarFiltro) {
+        btnLimpiarFiltro.addEventListener('click', () => {
+            console.log('Intentando limpiar filtro. Valor de filtroClienteBusquedaDinamica:', filtroClienteBusquedaDinamica);
+            filtroClienteBusquedaDinamica.value = ''; // Limpiar el input de búsqueda
+            sugerenciasClientes.innerHTML = ''; // Limpiar las sugerencias
+            cargarYMostrarCuentasPorCobrar(); // Recargar todas las cuentas
+        });
+    }
+
+    const btnVerDetalles = card.querySelector('#btnVerDetalles');
+    if (btnVerDetalles) {
+        btnVerDetalles.addEventListener('click', () => {
+            limpiarContenedorTarjetas();
+            mostrarCuentasEnUI(ventasDelCliente, nombreCliente);
+
+        });
+    }
+
+    return card;
+}
+
 async function cargarYMostrarCuentasPorCobrar() {
     try {
         // Limpiar el contenedor de cuentas
@@ -405,7 +458,8 @@ async function cargarYMostrarCuentasPorCobrar() {
     await actualizarRankingClientesUrgentes(); // ¡AÑADE ESTA LÍNEA AQUÍ!
 }
 
-function mostrarCuentasEnUI(cuentasParaMostrar) {
+function mostrarCuentasEnUI(cuentasParaMostrar, clienteNombreParaVolver = null) {
+
     // Ordenar segun sortKeyCxC antes de filtros adicionales
     cuentasParaMostrar.sort((a,b)=>{
       let valA,valB;
@@ -435,6 +489,9 @@ function mostrarCuentasEnUI(cuentasParaMostrar) {
     });
 
     agregarEventosHistorial(); // ¡Agrega los eventos a los botones!
+
+
+
 }
 
 //FUNCIÓN RECORDARTORIOS 25 DE JUNIO 2025
@@ -806,7 +863,8 @@ async function aplicarFiltros() {
 }
 
 function limpiarFiltros() {
-    document.getElementById("filtroCliente").value = "";
+    filtroClienteBusquedaDinamica.value = "";
+    sugerenciasClientes.innerHTML = "";
     document.getElementById("filtroEstado").value = ""; // Restablece al valor inicial "Todas las Pendientes"
     document.getElementById("filtroFechaVencimiento").value = "";
     cargarYMostrarCuentasPorCobrar(); // Recargar sin filtros
