@@ -24,6 +24,7 @@
     <link rel="stylesheet" href="css/ventas-pagadas.css">
     <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
     <link rel="stylesheet" href="css/dashboard-cpc.css">
+    <link rel="stylesheet" href="css/logo.css"/>
     
 </head>
 <body>
@@ -96,10 +97,14 @@
             <div class="filtros-container">
 
                 <div class="form-group">
-                    <label for="filtroCliente">Buscar por Cliente:</label>
-                    <input list="clientesLista" id="filtroCliente" class="form-control" placeholder="Nombre del cliente" autocomplete="off">
+                    <label for="filtroClienteBusquedaDinamica">Buscar por Cliente (Dinámico):</label>
+                    <div class="autocomplete-container">
+                        <input type="text" id="filtroClienteBusquedaDinamica" class="form-control" placeholder="Escribe el nombre del cliente..." autocomplete="off" list="clientesLista">
                     <datalist id="clientesLista"></datalist>
+                    <ul id="sugerenciasClientes" class="autocomplete-suggestions"></ul>
+                    </div>
                 </div>
+
 
                 <div class="form-group">
                     <label for="filtroEstado">Estado de Pago:</label>
@@ -303,6 +308,36 @@
     <script src="js/chatbot-ayuda.js" defer></script>
     <script src="js/modal-productos.js"></script>
     <script src="js/connection-status.js"></script>
+
+    <!-- Modal de Detalle de Venta -->
+    <div id="modalDetalleVenta" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalDetalleVentaTitulo">Detalle de Venta</h2>
+                <span class="close-button" id="cerrarModalDetalleVenta">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="contenidoModalDetalleVenta">
+                    <!-- Aquí se cargará dinámicamente el contenido de la tarjeta de venta -->
+                </div>
+                <div class="modal-actions mt-4">
+                    <h3>Acciones:</h3>
+                    <button id="btnAbrirModalAbonoDesdeDetalle" class="btn-primary mb-2">Registrar Abono</button>
+                    <button id="btnVerHistorialPagosDesdeDetalle" class="btn-secondary mb-2">Ver Historial de Pagos</button>
+                    <button id="btnEditarVentaDesdeDetalle" class="btn-info mb-2">Editar Venta</button>
+                    <div class="whatsapp-dropdown-container">
+                        <button class="btn-whatsapp dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="fab fa-whatsapp"></i> Enviar WhatsApp
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <li><a class="dropdown-item" href="#" id="btnWhatsappPrincipal">Contactar por WhatsApp</a></li>
+                            <li><a class="dropdown-item" href="#" id="btnWhatsappAlternativo">Btn. José Luis</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <script>
         
