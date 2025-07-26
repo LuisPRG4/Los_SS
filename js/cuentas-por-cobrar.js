@@ -38,10 +38,65 @@ async function actualizarDashboardCxC() {
     }
 
     // Actualizar dashboard
-    document.getElementById("totalPendienteDashboard").textContent = `$${totalCuentasPorCobrar.toFixed(2)}`;
-    document.getElementById("ventasPendientesDashboard").textContent = ventasCredito.filter(v => v.montoPendiente > 0).length.toString();
-    document.getElementById("ventasVencidasDashboard").textContent = `$${ventasVencidasMonto.toFixed(2)}`;
-    document.getElementById("porVencerDashboard").textContent = `$${ventasPorVencerMonto.toFixed(2)}`;
+    const totalPendienteEl = document.getElementById("totalPendienteDashboard");
+    const ventasPendientesEl = document.getElementById("ventasPendientesDashboard");
+    const ventasVencidasEl = document.getElementById("ventasVencidasDashboard");
+    const porVencerEl = document.getElementById("porVencerDashboard");
+
+    totalPendienteEl.textContent = `$${totalCuentasPorCobrar.toFixed(2)}`;
+    ventasPendientesEl.textContent = ventasCredito.filter(v => v.montoPendiente > 0).length.toString();
+    ventasVencidasEl.textContent = `$${ventasVencidasMonto.toFixed(2)}`;
+    porVencerEl.textContent = `$${ventasPorVencerMonto.toFixed(2)}`;
+
+    // Función auxiliar para manejar el scroll y resaltado
+    const scrollToAndHighlight = (ventasFiltradas) => {
+        if (ventasFiltradas.length > 0) {
+            const primeraVenta = ventasFiltradas[0];
+            const cardId = `venta-${primeraVenta.id}`;
+            const cardElement = document.getElementById(cardId);
+            if (cardElement) {
+                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                cardElement.classList.add('highlight');
+                setTimeout(() => {
+                    cardElement.classList.remove('highlight');
+                }, 2000);
+            }
+        }
+    };
+
+
+
+    // Event Listener para 'Cuentas Pendientes'
+    ventasPendientesEl.onclick = () => {
+        const ventasFiltradas = ventasCredito.filter(v => v.montoPendiente > 0);
+        scrollToAndHighlight(ventasFiltradas);
+    };
+
+    // Event Listener para 'Vencidas'
+    ventasVencidasEl.onclick = () => {
+        const ventasFiltradas = ventasCredito.filter(venta => {
+            if (venta.montoPendiente > 0 && venta.detallePago && venta.detallePago.fechaVencimiento) {
+                const fechaVencimiento = new Date(venta.detallePago.fechaVencimiento);
+                fechaVencimiento.setHours(0, 0, 0, 0);
+                return fechaVencimiento < hoy;
+            }
+            return false;
+        });
+        scrollToAndHighlight(ventasFiltradas);
+    };
+
+    // Event Listener para 'Por Vencer'
+    porVencerEl.onclick = () => {
+        const ventasFiltradas = ventasCredito.filter(venta => {
+            if (venta.montoPendiente > 0 && venta.detallePago && venta.detallePago.fechaVencimiento) {
+                const fechaVencimiento = new Date(venta.detallePago.fechaVencimiento);
+                fechaVencimiento.setHours(0, 0, 0, 0);
+                return fechaVencimiento >= hoy && fechaVencimiento <= unaSemanaDespues;
+            }
+            return false;
+        });
+        scrollToAndHighlight(ventasFiltradas);
+    };
 
 }
 
@@ -77,6 +132,94 @@ document.addEventListener("DOMContentLoaded", async () => {
         ventas = await obtenerTodasLasVentas();
         clientes = await obtenerTodosLosClientes();
         llenarDatalistClientes();
+
+        // --- Lógica para el buscador dinámico y autocompletado ---
+        const filtroClienteBusquedaDinamica = document.getElementById('filtroClienteBusquedaDinamica');
+        const sugerenciasClientes = document.getElementById('sugerenciasClientes');
+        const modalDetalleVenta = document.getElementById('modalDetalleVenta');
+        const cerrarModalDetalleVenta = document.getElementById('cerrarModalDetalleVenta');
+
+        let ventasCreditoOriginal = []; // Para mantener una copia de las ventas originales
+
+        filtroClienteBusquedaDinamica.addEventListener('input', () => {
+            const textoBusqueda = filtroClienteBusquedaDinamica.value.toLowerCase();
+            sugerenciasClientes.innerHTML = '';
+
+            if (textoBusqueda.length > 0) {
+                const clientesFiltrados = clientes.filter(cliente =>
+                    cliente.nombre.toLowerCase().includes(textoBusqueda)
+                );
+
+                clientesFiltrados.forEach(cliente => {
+                    const li = document.createElement('li');
+                    li.textContent = cliente.nombre;
+                    li.addEventListener('click', async () => {
+                        filtroClienteBusquedaDinamica.value = cliente.nombre;
+                        sugerenciasClientes.innerHTML = '';
+                        // Scroll automático a la tarjeta del cliente
+                        const ventaDelCliente = ventasCredito.find(v => v.cliente === cliente.nombre && v.montoPendiente > 0);
+                        if (ventaDelCliente) {
+                            const cardId = `venta-${ventaDelCliente.id}`;
+                            const cardElement = document.getElementById(cardId);
+                            if (cardElement) {
+                                cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                // Opcional: resaltar la tarjeta brevemente
+                                cardElement.classList.add('highlight');
+                                setTimeout(() => {
+                                    cardElement.classList.remove('highlight');
+                                }, 2000);
+                            } else {
+                                // Si la tarjeta no está visible (ej. por filtros), recargar y luego hacer scroll
+                                await cargarYMostrarCuentasPorCobrar();
+                                const updatedCardElement = document.getElementById(cardId);
+                                if (updatedCardElement) {
+                                    updatedCardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    updatedCardElement.classList.add('highlight');
+                                    setTimeout(() => {
+                                        updatedCardElement.classList.remove('highlight');
+                                    }, 2000);
+
+
+                            }
+
+                            setTimeout(() => {
+                                filtroClienteBusquedaDinamica.value = ''; // Limpiar el input
+                                sugerenciasClientes.innerHTML = ''; // Limpiar las sugerencias
+                                cargarYMostrarCuentasPorCobrar(); // Recargar las cuentas para mostrar todo de nuevo
+                            }, 12000); // 12 segundos
+                            }
+
+                        } else {
+                            mostrarToast(`No hay ventas pendientes para ${cliente.nombre}.`, 'info');
+                        }
+                    });
+                    sugerenciasClientes.appendChild(li);
+                });
+            }
+        });
+
+        // Cerrar sugerencias al hacer clic fuera
+        document.addEventListener('click', (event) => {
+            if (!filtroClienteBusquedaDinamica.contains(event.target) && !sugerenciasClientes.contains(event.target)) {
+                sugerenciasClientes.innerHTML = '';
+            }
+        });
+
+        // Lógica para cerrar el modal de detalle de venta
+        if (cerrarModalDetalleVenta) {
+            cerrarModalDetalleVenta.addEventListener('click', () => {
+                modalDetalleVenta.style.display = 'none';
+            });
+        }
+
+        if (modalDetalleVenta) {
+            modalDetalleVenta.addEventListener('click', (event) => {
+                if (event.target === modalDetalleVenta) {
+                    modalDetalleVenta.style.display = 'none';
+                }
+            });
+        }
+        // --- Fin de la lógica para el buscador dinámico y autocompletado ---
         abonos = await obtenerTodosLosAbonos();
 
         // NUEVO: Verificar y normalizar las fechas de vencimiento
@@ -334,7 +477,12 @@ function agregarEventosHistorial() {
     // --- FIN NUEVA SECCIÓN ---
 }
 
-function crearCardVentaCredito(venta) {
+function crearCardVentaCredito(venta, forModal = false) {
+    const card = document.createElement('div');
+    card.className = 'card-venta';
+    if (!forModal) {
+        card.id = `venta-${venta.id}`;
+    }
     const nombreCliente = venta.cliente || "Cliente desconocido";
     
     // Validación defensiva para productos
@@ -465,7 +613,6 @@ function crearCardVentaCredito(venta) {
         estadoPagoHTML = `<span class="tag-status tag-info">(Pendiente)</span>`;
     }
 
-    const card = document.createElement("div");
     card.className = `venta-credito-card ${cardStatusClass}`;
 
     card.innerHTML = `
@@ -966,7 +1113,7 @@ async function mostrarResumenCliente(clienteNombre) { // <--- AÑADE 'async' AQU
 
     const totalPendiente = ventasDelCliente.reduce((sum, v) => sum + v.montoPendiente, 0);
 
-    const card = document.createElement("div");
+
     card.className = "venta-credito-card card-status-primary"; // Tarjeta azul/morado
 
     card.innerHTML = `
@@ -1201,7 +1348,7 @@ async function cargarYMostrarVentasPagadas() {
         ventasPagadas.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
         ventasPagadas.forEach(venta => {
-            const card = document.createElement("div");
+        
             card.className = "venta-pagada-card"; // Clase CSS nueva para estas tarjetas
             
             // Determinar el método de pago y su etiqueta
@@ -2462,16 +2609,46 @@ async function actualizarRankingClientesUrgentes() {
             <span class="monto-urgente">$${item.monto.toFixed(2)}</span>
             ${item.esVencido ? '<span class="estado-urgente vencido-tag">VENCIDO</span>' : ''}
         `;
+        li.addEventListener('click', async () => {
+            const clienteNombre = item.nombre;
+            const ventasDelCliente = ventasCredito.filter(v => v.cliente === clienteNombre && v.montoPendiente > 0);
+
+            if (ventasDelCliente.length > 0) {
+                // Hacer scroll a la primera tarjeta encontrada
+                const primeraVenta = ventasDelCliente[0];
+                const cardId = `venta-${primeraVenta.id}`;
+                const cardElement = document.getElementById(cardId);
+
+                if (cardElement) {
+                    cardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    cardElement.classList.add('highlight');
+                    setTimeout(() => {
+                        cardElement.classList.remove('highlight');
+                    }, 2000);
+                } else {
+                    // Si la tarjeta no está visible (ej. por filtros), recargar y luego hacer scroll
+                    await cargarYMostrarCuentasPorCobrar();
+                    const updatedCardElement = document.getElementById(cardId);
+                    if (updatedCardElement) {
+                        updatedCardElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        updatedCardElement.classList.add('highlight');
+                        setTimeout(() => {
+                            updatedCardElement.classList.remove('highlight');
+                        }, 2000);
+                    }
+                }
+            } else {
+                mostrarToast(`No hay ventas pendientes para ${clienteNombre}.`, 'info');
+            }
+        });
+
         lista.appendChild(li);
     });
 }
 
-
-
-//MENSAJE PRIMER BOTÓN
 function construirMensajePrincipal(venta, clienteDatos, tasaValor) {
-    const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
-    return `Buen día, estimado/a ${clienteDatos.nombre}:
+        const montoBs = (venta.montoPendiente * tasaValor).toFixed(2);
+        return `Buen día, estimado/a ${clienteDatos.nombre}:
 
 Esperamos que haya quedado conforme con los productos entregados recientemente. Por este medio, le recordamos de manera respetuosa el saldo pendiente correspondiente a su crédito:
 
@@ -2482,6 +2659,97 @@ Esperamos que haya quedado conforme con los productos entregados recientemente. 
 2️⃣ Divisas o bolívares: Aceptados al momento de la cancelación, según disponibilidad
 
 Saludos cordiales.`;
+}
+
+
+// Función para abrir el modal de detalle de venta
+async function abrirModalDetalleVenta(ventaId) {
+    console.log(`Abriendo modal para venta ID: ${ventaId}`);
+    const venta = await obtenerVentaPorId(ventaId);
+    if (!venta) {
+        mostrarToast('Venta no encontrada.', 'error');
+        return;
+    }
+
+    const modalDetalleVenta = document.getElementById('modalDetalleVenta');
+    const detalleVentaModalContent = document.getElementById('detalleVentaModalContent');
+
+    // Limpiar contenido previo
+    detalleVentaModalContent.innerHTML = '';
+
+    // Crear la tarjeta de venta para el modal
+    const cardVenta = crearCardVentaCredito(venta, true); // true para indicar que es para modal
+    detalleVentaModalContent.appendChild(cardVenta);
+
+    // Asegurar que los botones de acción dentro del modal funcionen
+    // (Abonar, Editar, Ver Historial, WhatsApp)
+    // Re-asignar event listeners ya que el contenido se recrea
+    const btnAbonarModal = cardVenta.querySelector('.btn-success');
+    if (btnAbonarModal) {
+        btnAbonarModal.onclick = () => {
+            abrirModalAbono(venta.id);
+            modalDetalleVenta.style.display = 'none'; // Cerrar modal de detalle al abrir el de abono
+        };
+    }
+
+    const btnEditarModal = cardVenta.querySelector('.btn-warning');
+    if (btnEditarModal) {
+        btnEditarModal.onclick = () => {
+            cargarVentaParaEditar(venta.id);
+        };
+    }
+
+    const btnVerHistorialModal = cardVenta.querySelector('.btn-info.btn-ver-historial');
+    if (btnVerHistorialModal) {
+        btnVerHistorialModal.onclick = (e) => {
+            toggleHistorialPagos(e);
+        };
+    }
+
+    // Lógica para el dropdown de WhatsApp dentro del modal
+    const whatsappDropdownContainer = cardVenta.querySelector('.whatsapp-dropdown-container');
+    if (whatsappDropdownContainer) {
+        const botonDropdown = whatsappDropdownContainer.querySelector('.btn-whatsapp-dropdown');
+        const menu = whatsappDropdownContainer.querySelector('.whatsapp-dropdown-menu');
+
+        if (botonDropdown && menu) {
+            botonDropdown.onclick = (e) => {
+                e.stopPropagation();
+                menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+            };
+
+            document.addEventListener('click', function cerrarMenuWhatsapp(e) {
+                if (!whatsappDropdownContainer.contains(e.target)) {
+                    menu.style.display = 'none';
+                }
+            });
+        }
+
+        // Re-asignar eventos a las opciones del dropdown de WhatsApp
+        const opcion1 = whatsappDropdownContainer.querySelector('.whatsapp-dropdown-option:nth-child(1)');
+        const opcion2 = whatsappDropdownContainer.querySelector('.whatsapp-dropdown-option:nth-child(2)');
+
+        const clienteDatos = clientes.find(c => c.nombre === venta.cliente);
+        const localNum = clienteDatos?.telefono.replace(/\D/g, '');
+        const numeroIntl = `58${localNum}`; // Asumimos Venezuela
+
+        if (opcion1) {
+            opcion1.onclick = (e) => {
+                e.stopPropagation();
+                menu.style.display = 'none';
+                abrirModalWhatsApp(venta, clienteDatos, numeroIntl, construirMensajePrincipal(venta, clienteDatos, parseFloat(document.getElementById('tasaBCV').value)));
+            };
+        }
+        if (opcion2) {
+            opcion2.onclick = (e) => {
+                e.stopPropagation();
+                menu.style.display = 'none';
+                abrirModalWhatsApp(venta, clienteDatos, numeroIntl, construirMensajeAlternativo(venta, clienteDatos, parseFloat(document.getElementById('tasaBCV').value)), true);
+            };
+        }
+    }
+
+    modalDetalleVenta.style.display = 'flex'; // Mostrar el modal
 }
 
 //MENSAJE SEGUNDO BOTÓN (JOSÉ LUIS)
