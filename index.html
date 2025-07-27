@@ -16,9 +16,6 @@
   <link rel="stylesheet" href="css/update-button.css" />
   <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
   <link rel="stylesheet" href="css/modal-productos.css"/> 
-  <link rel="stylesheet" href="css/logo.css"/>
-
-  <!-- Librería JsBarcode para códigos de barras -->
 </head>
 <body>
   <div id="toastContainer" class="toast-container"> </div>
@@ -236,12 +233,12 @@
       
   <script> 
     // Esta parte es importante si tu login.html y manejo de sesión están activos
-    if (localStorage.getItem("sesionIniciada") !== "true") {
+    if (sessionStorage.getItem("sesionIniciada") !== "true") {
       window.location.href = "login.html";
     }
 
     function cerrarSesion() {
-      localStorage.removeItem("sesionIniciada");
+      sessionStorage.removeItem("sesionIniciada");
       window.location.href = "login.html";
     }
   </script> 
