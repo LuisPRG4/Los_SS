@@ -14,44 +14,33 @@
 
 body {
   margin: 0;
-  /* CAMBIO: Usamos una fuente más adecuada para el cuerpo que complemente el tema de lujo */
-  font-family: 'Montserrat', sans-serif; /* O 'Raleway', 'Lato', etc. - Elige la que más te guste */
+  font-family: 'Montserrat', sans-serif;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  /* Fondo con tu imagen local: ¡RUTA CORREGIDA AQUÍ! */
-  background: url('../resources/ORO.jpg') no-repeat center center fixed;
+  min-height: 100vh;
+  padding: 20px 0; /* Añadir padding vertical para que no ocupe toda la pantalla */
+  /* Nueva imagen de fondo y ajustes para un look sobrio */
+  background: url('../resources/FONDO.png') no-repeat center center fixed; /* Usando la nueva imagen */
   background-size: cover;
-  animation: brillo 10s ease-in-out infinite alternate;
-}
-
-@keyframes brillo {
-  0% { background-position: 0% 50%; }
-  100% { background-position: 100% 50%; }
+  background-color: rgba(0, 0, 0, 0.7); /* Capa oscura para mantener la sobriedad */
+  background-blend-mode: overlay; /* Mezcla la imagen con el color oscuro */
 }
 
 main {
-  /* ANTES: background: white; */
-  /* AHORA: Simula un metal dorado pulido con gradientes y una sombra interior */
-  background: linear-gradient(to bottom, #FFD700, #DAA520, #B8860B); /* Tonos de oro más ricos */
-  padding: 2rem;
+  /* Fondo más oscuro y sobrio para el contenedor principal */
+  background: linear-gradient(to bottom, #333333, #222222, #111111); /* Tonos de gris oscuro */
+  padding: 1.5rem; /* Reducir el padding interno del formulario */
   border-radius: 1.5rem;
-  /* ANTES: box-shadow: 0 8px 30px rgba(218, 165, 32, 0.25); */
-  /* AHORA: Múltiples sombras para profundidad y brillo exterior e interior */
+  /* Sombras más sutiles para un look sobrio */
   box-shadow:
-    0 8px 30px rgba(255, 215, 0, 0.5), /* Sombra exterior dorada más intensa */
-    0 0 40px rgba(255, 215, 0, 0.2), /* Un halo más amplio */
-    inset 0 0 15px rgba(255, 255, 255, 0.7), /* Reflejo blanco en el borde interno */
-    inset 0 0 30px rgba(255, 215, 0, 0.3); /* Brillo dorado interno */
+    0 5px 15px rgba(0, 0, 0, 0.5), /* Sombra exterior más suave */
+    inset 0 0 10px rgba(255, 255, 255, 0.1); /* Brillo interior muy sutil */
   width: 100%;
   max-width: 400px;
   text-align: center;
-  /* ANTES: border: 2px solid #d4af37; */
-  /* AHORA: Borde más sutil o removido si el inset box-shadow es suficiente */
-  border: none; /* Quitamos el borde sólido para dejar que las sombras y el gradiente hagan el trabajo */
+  border: 1px solid #444444; /* Borde sutil para definir el contorno */
   animation: fadeInScale 0.8s ease-out forwards;
-  /* Agregamos una ligera perspectiva para que la sombra se vea mejor */
   transform-style: preserve-3d;
 }
 
@@ -62,10 +51,9 @@ main {
 
 
 .titulo {
-  /* CAMBIO: Fuente para título y nuevo color plata oscuro con sombra */
-  font-family: 'Playfair Display', serif; /* Usamos Playfair Display para el título */
-  color: #fff8dc; /* como marfil brillante */
-  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.9), 0 0 8px #ffd700;
+  font-family: 'Playfair Display', serif;
+  color: #E0E0E0; /* Gris claro para el título */
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Sombra más sutil */
   
   font-size: 2.5rem; /* Un poco más grande para el impacto */
   font-weight: bold;
@@ -73,12 +61,10 @@ main {
 }
 
 .subtitulo {
-  margin-top: 0;
-  /* CAMBIO: Fuente para subtítulo y nuevo color plata oscuro con sombra */
-  font-family: 'Handlee', cursive; /* Si quieres mantener Handlee aquí como un toque distintivo */
-  /* O puedes usar: font-family: 'Montserrat', sans-serif; para un estilo más uniforme */
-  color: #f5f5dc;
-  text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6), 0 0 4px #ffe680;
+  margin-top: 1rem;
+  font-family: 'Montserrat', sans-serif; /* Usamos Montserrat para uniformidad */
+  color: #B0B0B0; /* Gris medio para el subtítulo */
+  text-shadow: none; /* Sin sombra para un look más limpio */
   
   font-weight: normal;
   font-size: 1.2rem; /* Podría ser un poco más grande */
@@ -89,10 +75,9 @@ label {
   text-align: left;
   margin-top: 1rem;
   font-size: 0.95rem;
-  /* CAMBIO: Fuente para etiquetas y nuevo color plata oscuro con sombra */
-  font-family: 'Montserrat', sans-serif; /* Usamos Montserrat para las etiquetas */
-  color: #fffaf0;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
+  font-family: 'Montserrat', sans-serif;
+  color: #C0C0C0; /* Gris claro para las etiquetas */
+  text-shadow: none; /* Sin sombra */
 
   
   font-weight: bold;
@@ -101,83 +86,61 @@ label {
 input {
   width: 100%;
   padding: 0.75rem;
-  /* ANTES: border: 1px solid #ccc; */
-  /* AHORA: Bordes dorados sutiles */
-  border: 1px solid #B8860B; /* Tono de oro oscuro para el borde */
+  border: 1px solid #555555; /* Borde gris oscuro */
   border-radius: 0.75rem;
   margin-top: 0.25rem;
   font-size: 1rem;
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
-  /* Fondo muy claro, casi transparente, para dejar pasar algo del brillo del contenedor */
-  background-color: rgba(255, 255, 255, 0.15); /* Blanco muy translúcido */
-  
-  /* CAMBIO: Color del texto ingresado (mantener oscuro para legibilidad) */
-  color: #333; /* Color oscuro para el texto que el usuario escribe, crucial para legibilidad */
-
-  
+  background-color: rgba(0, 0, 0, 0.3); /* Fondo oscuro semi-transparente */
+  color: #E0E0E0; /* Texto claro para los inputs */
 }
 
 input::placeholder {
-  color: #e6e6e6;
-  text-shadow: 0.5px 0.5px 1px rgba(0, 0, 0, 0.5);
+  color: #888888; /* Gris más oscuro para el placeholder */
+  text-shadow: none;
 }
 
 
 input:focus {
   outline: none;
-  border-color: #FFD700; /* Oro más brillante al enfocar */
-  /* ANTES: box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.3); */
-  /* AHORA: Sombra de brillo dorado más pronunciada al enfocar */
-  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.5), /* Halo de brillo dorado */
-              inset 0 0 5px rgba(255, 255, 255, 0.5); /* Reflejo interior al enfocar */
-  background-color: rgba(255, 255, 255, 0.3); /* Ligeramente más opaco al enfocar */
+  border-color: #FFD700; /* Borde dorado al enfocar */
+  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5), /* Halo dorado al enfocar */
+              inset 0 0 3px rgba(255, 255, 255, 0.2); /* Reflejo interior sutil */
+  background-color: rgba(0, 0, 0, 0.5); /* Fondo más oscuro al enfocar */
 }
 
 button {
   margin-top: 1.5rem;
   width: 100%;
   padding: 0.75rem;
-  /* ANTES: background: linear-gradient(90deg, #d4af37, #b98c1c); */
-  /* AHORA: Gradiente más vibrante y efecto de luz */
-  background: linear-gradient(90deg, #FFD700, #FFA500, #FFD700); /* Oro a naranja a oro */
-  
-  /* CAMBIO: Color plata oscuro para el texto del botón y sombra pronunciada */
-  color: #A9A9A9; /* Plateado oscuro para el texto del botón */
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* Sombra oscura para que el texto resalte */
-  
-  /* CAMBIO: Fuente para el botón */
-  font-family: 'Montserrat', sans-serif; /* Usamos Montserrat para el botón */
-  
-  border: none;
+  background: linear-gradient(90deg, #444444, #333333, #444444); /* Gradiente de gris oscuro */
+  color: #E0E0E0; /* Texto claro para los botones */
+  text-shadow: none;
+  font-family: 'Montserrat', sans-serif;
+  border: 1px solid #666666; /* Borde sutil */
   border-radius: 0.75rem;
-  font-size: 1.1rem; /* Un poco más grande para el botón */
+  font-size: 1.1rem;
   cursor: pointer;
   transition: background 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease, color 0.3s ease;
-  /* Sombra del botón para darle volumen y brillo */
   box-shadow:
-    0 5px 15px rgba(255, 215, 0, 0.7), /* Sombra principal dorada */
-    0 0 30px rgba(255, 215, 0, 0.4), /* Halo de brillo */
-    inset 0 0 10px rgba(255, 255, 255, 0.6); /* Reflejo interior blanco */
-  font-weight: bold; /* Hacer el texto del botón más fuerte */
+    0 3px 10px rgba(0, 0, 0, 0.5), /* Sombra más sutil */
+    inset 0 0 5px rgba(255, 255, 255, 0.05); /* Reflejo interior muy sutil */
+  font-weight: bold;
 }
 
 button:hover {
-  /* ANTES: background: linear-gradient(90deg, #b98c1c, #d4af37); */
-  /* AHORA: Brillo más intenso al pasar el ratón */
-  background: linear-gradient(90deg, #FFFACD, #FFD700, #FFFACD); /* Oro más claro y brillante */
-  transform: translateY(-3px); /* Ligeramente más elevado */
-  /* Sombra más dramática al hacer hover */
+  background: linear-gradient(90deg, #FFD700, #DAA520, #FFD700); /* Gradiente dorado al pasar el ratón */
+  transform: translateY(-2px); /* Ligeramente elevado */
   box-shadow:
-    0 8px 20px rgba(255, 215, 0, 0.9), /* Sombra principal más fuerte */
-    0 0 40px rgba(255, 215, 0, 0.6), /* Halo de brillo más amplio */
-    inset 0 0 12px rgba(255, 255, 255, 0.8); /* Reflejo interior más intenso */
+    0 5px 15px rgba(255, 215, 0, 0.7), /* Sombra dorada más pronunciada */
+    inset 0 0 8px rgba(255, 255, 255, 0.3); /* Reflejo interior dorado */
 }
 
 button:active {
     transform: translateY(0);
     box-shadow:
-      0 2px 10px rgba(255, 215, 0, 0.5), /* Sombra al presionar */
-      inset 0 0 8px rgba(0, 0, 0, 0.3); /* Oscurecimiento interno al presionar */
+      0 1px 5px rgba(0, 0, 0, 0.4), /* Sombra al presionar */
+      inset 0 0 5px rgba(0, 0, 0, 0.2); /* Oscurecimiento interno al presionar */
 }
 
 #error {
@@ -187,22 +150,18 @@ button:active {
   animation: shake 0.5s;
 }
 
+.separator-line {
+  border: none;
+  height: 2px; /* Grosor de la línea */
+  background: linear-gradient(to right, transparent, #FFD700, transparent); /* Gradiente dorado */
+  margin: 2rem 0; /* Espaciado */
+  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Brillo sutil */
+}
+
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
     20%, 60% { transform: translateX(-5px); }
     40%, 80% { transform: translateX(5px); }
-}
-
-@media (max-width: 500px) {
-  main {
-    margin: 1rem;
-    padding: 1.5rem;
-    font-family: 'Playfair Display';
-  }
-  .titulo {
-    font-size: 2rem;
-    font-family: 'Playfair Display';
-  }
 }
 
 main {
@@ -365,7 +324,7 @@ main * {
     display: block; /* Para que ocupe una línea completa y podamos centrarlo */
     max-width: 200px; /* Ajusta el tamaño máximo según necesites */
     height: auto; /* Para mantener la proporción */
-    margin: 0 auto 20px auto; /* Centrar horizontalmente y añadir un poco de margen inferior */
+    margin: 0 auto 30px auto; /* Aumentar el margen inferior para separar del subtítulo */
 }
 
 /* Estilos para el texto del sistema */
