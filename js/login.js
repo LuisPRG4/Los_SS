@@ -22,6 +22,13 @@ async function hash(texto) {
   // localStorage.removeItem("credencialesWebAuthn"); // Para pruebas, asegura que no hay registro previo
 })();
 
+// ------------------ Verificación de sesión al cargar la página ------------------
+document.addEventListener("DOMContentLoaded", () => {
+  if (localStorage.getItem("sesionIniciada") === "true") {
+    window.location.href = "index.html";
+  }
+});
+
 // ------------------ LOGIN TRADICIONAL ------------------
 async function iniciarSesion() {
   const user = document.getElementById("usuario").value.trim();
@@ -31,7 +38,7 @@ async function iniciarSesion() {
   const cred = JSON.parse(localStorage.getItem("credenciales"));
 
   if (cred && user === cred.usuario && hashPass === cred.contrasena) {
-    sessionStorage.setItem("sesionIniciada", "true");
+    localStorage.setItem("sesionIniciada", "true");
     // ¡IMPORTANTE! Eliminada la llamada a registrarBiometria() aquí.
     // Ahora el registro se gestiona desde el botón de biometría.
     window.location.href = "index.html";
@@ -40,12 +47,13 @@ async function iniciarSesion() {
   }
 }
 
+
 // ------------------ LOGIN CON PIN ------------------
 function loginConPIN() {
   const pinIngresado = document.getElementById("pinInput").value;
   const pinGuardado = localStorage.getItem("pin");
   if (pinIngresado === pinGuardado) {
-    sessionStorage.setItem("sesionIniciada", "true");
+    localStorage.setItem("sesionIniciada", "true");
     window.location.href = "index.html";
   } else {
     document.getElementById("error").textContent = "PIN incorrecto";
@@ -124,7 +132,7 @@ async function autenticarBiometria() {
         });
 
         // ✅ Si llega aquí, autenticación fue exitosa
-        sessionStorage.setItem("sesionIniciada", "true");
+        localStorage.setItem("sesionIniciada", "true");
         mostrarToast("✅ Bienvenido, autenticación biométrica exitosa", "success");
         setTimeout(() => {
             window.location.href = "index.html";
@@ -254,4 +262,10 @@ function mostrarToast(mensaje, tipo = "info") {
     setTimeout(() => {
         toast.remove();
     }, 3000);
+}
+
+// ------------------ Función para cerrar sesión ------------------
+function cerrarSesion() {
+  localStorage.removeItem("sesionIniciada");
+  window.location.href = "login.html"; // Redirigir a la página de login
 }
