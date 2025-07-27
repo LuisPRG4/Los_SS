@@ -3,39 +3,251 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login - Sistema de Ventas</title>
-  <link rel="icon" href="fav/SALAZAR.png" />
+  <title>Los SS - Inicio</title>
+
+  <link rel="icon" type="image/png" href="fav/SALAZAR.png">
+
+  <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="css/style.css" />
-  <link rel="stylesheet" href="css/login.css" />
-  <link rel="stylesheet" href="css/recibo-venta.css" />
+  <link rel="stylesheet" href="css/navigation.css">
+  <link rel="stylesheet" href="css/form-decoration.css" />
+  <link rel="stylesheet" href="css/index.css"/>
+  <link rel="stylesheet" href="css/stockAlert.css"/>
+  <link rel="stylesheet" href="css/update-button.css" />
+  <link rel="stylesheet" href="css/fontawesome web/css/all.min.css">
+  <link rel="stylesheet" href="css/modal-productos.css"/> 
 </head>
 <body>
+  <div id="toastContainer" class="toast-container"> </div>
+
+  <header class="header-elegante">
+  <div class="header-container">
+    <img src="logo/BIOMÉTRICA.png" alt="Logo" class="logo-libre" />
+    <div class="texto-header">
+      <h1 class="titulo-header">🏠 Inicio</h1>
+      <p class="descripcion-header">Explora los indicadores clave de tu negocio. Desde aquí puedes monitorear rápidamente tus ventas, productos destacados y alertas importantes.</p>
+      <span class="connection-icon online" title="En línea">●</span>
+    </div>
+  </div>
+</header>
+
+<div id="sidebar-menu" class="sidebar">
+  <div class="close-btn" onclick="toggleMenu()">×</div>
+  <ul class="sidebar-nav-list">
+      <li><a href="index.html">🏠 Inicio</a></li>
+      <li><a href="inventario.html">🧃 Inventario</a></li>
+      <li><a href="ventas.html">🧾 Ventas</a></li>
+      <li><a href="clientes.html">👥 Clientes</a></li>
+      <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
+      <li><a href="mermas.html">📉 Mermas</a></li>
+      <li><a href="proveedores.html">🚚 Proveedores</a></li>
+      <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+      <li><a href="finanzas.html">💰 Finanzas</a></li>
+      <li><a href="novedades.html">🐶 Novedades</a></li>
+      <li><a href="pedidos.html">📦 Pedidos</a></li>
+      <li><a href="datos.html">💾 Datos</a></li>
+  </ul>
+</div>
+
+  <div id="nav-overlay" class="nav-overlay" onclick="toggleMenu()"></div>
+
+  <div id="main-content-wrapper" class="main-content">
+    <nav class="top-nav-bar-mobile">
+        <div class="menu-toggle-mobile" onclick="toggleMenu()">☰</div> <div class="nav-title-mobile"></div>
+    </nav>
+
+    <nav class="desktop-nav">
+      <ul>
+          <li><a href="index.html">🏠 Inicio</a></li>
+          <li><a href="inventario.html">🧃 Inventario</a></li>
+          <li><a href="ventas.html">🧾 Ventas</a></li>
+          <li><a href="clientes.html">👥 Clientes</a></li>
+          <li class="active"><a href="cuentas-por-cobrar.html">💸 Cuentas por Cobrar</a></li>
+          <li><a href="mermas.html">📉 Mermas</a></li>
+          <li><a href="proveedores.html">🚚 Proveedores</a></li>
+          <li><a href="reportesGraficos.html">📊 Reportes</a></li>
+          <li><a href="finanzas.html">💰 Finanzas</a></li>
+          <li><a href="novedades.html">🐶 Novedades</a></li>
+          <li><a href="pedidos.html">📦 Pedidos</a></li>
+          <li><a href="datos.html">💾 Datos</a></li>
+      </ul>
+  </nav>
+
   <main>
+    <section class="kpi-box">
+      <h2>📈 Indicadores</h2>
+      <div class="kpis">
+        <div class="kpi">
+            <span class="kpi-icon ventas">💵</span>
+            <strong>Ventas Hoy:</strong> $<span id="ventasHoy">0</span>
+            <span class="kpi-pernos-adicionales"></span>
+        </div>
+        <div class="kpi">
+            <span class="kpi-icon semana">📅</span>
+            <strong>Ventas Semana:</strong> $<span id="ventasSemana">0</span>
+            <span class="kpi-pernos-adicionales"></span>
+        </div>
+        <div class="kpi">
+            <span class="kpi-icon top">🏆</span>
+            <strong>Más Vendido:</strong> <span id="productoTop">-</span>
+            <span class="kpi-pernos-adicionales"></span>
+        </div>
+      </div>
+    </section>
 
-      <img src="logo/LOGIN.png" alt="Logo Los SS" class="logo">
-  
-    <h2 class="subtitulo">Bienvenido</h2>
+    <section class="alertas">
+      <h2>⚠️ Alertas de Stock Bajo</h2>
+      <ul id="alertasStock"></ul>
+      <button id="btnRestaurarStock" class="btn-restaurar-stock" style="display: none;">Restaurar Stock de Productos Seleccionados</button>
+    </section>
 
-    <label for="usuario">👤 Usuario</label>
-    <input type="text" id="usuario" placeholder="Ingresa tu usuario" />
+    <div id="modalRestaurarStock" class="modal-stock">
+      <div class="modal-content golden-decorated-form">
+        <span class="close-modal">&times;</span>
+        <h2>🔄 Restaurar Stock de Productos</h2>
+        <p>Selecciona los productos que deseas actualizar:</p>
 
-    <label for="contrasena">🔒 Contraseña</label>
-    <input type="password" id="contrasena" placeholder="Ingresa tu contraseña" />
+        <div class="productos-lista-stock">
+          <ul id="listaProductosStock"></ul>
+        </div>
 
-    <button onclick="iniciarSesion()">🔑 Entrar</button>
+        <div class="form-group">
+          <label for="nuevoStock">Nuevo valor de stock:</label>
+          <input type="number" id="nuevoStock" min="1" value="10" class="form-control">
+        </div>
 
-    <hr class="separator-line">
+        <div class="modal-actions">
+          <button id="btnCancelarRestauracion" class="btn-cancelar">Cancelar</button>
+          <button id="btnConfirmarRestauracion" class="btn-confirmar">Actualizar Stock</button>
+        </div>
+      </div>
+    </div>
 
-    <button onclick="intentarLoginORegistroBiometrico()">🧬 Acceder con biometría</button>
+    <section class="dashboard-section golden-decorated-form">
+      <h2 class="dashboard-title">⚙️ Panel de Control</h2>
 
-    <label for="pinInput">🔢 Acceder con PIN</label>
-    <input type="password" id="pinInput" placeholder="PIN">
-    <button onclick="loginConPIN()">Entrar con PIN</button>
+      <div class="quick-access">
+        <h3>⚡ Accesos Rápidos</h3>
+        <div class="quick-buttons">
+          <a href="ventas.html" class="quick-button">
+            <div class="quick-icon">🛒</div>
+            <span>Nueva Venta</span>
+          </a>
+          <a href="inventario.html" class="quick-button">
+            <div class="quick-icon">📦</div>
+            <span>Añadir Producto</span>
+          </a>
+          <a href="cuentas-por-cobrar.html" class="quick-button" data-badge="cxc">
+            <div class="quick-icon">💰</div>
+            <span>Registrar Pago</span>
+            <span class="badge-count" style="display:none"></span>
+          </a>
+          <a href="reportesGraficos.html" class="quick-button">
+            <div class="quick-icon">📊</div>
+            <span>Ver Reportes</span>
+          </a>
+          <a href="novedades.html" class="quick-button">
+            <div class="quick-icon">🐶</div>
+            <span>Actualizaciones</span>
+          </a>
+          <a href="datos.html" class="quick-button">
+            <div class="quick-icon">💾</div>
+            <span>Respaldar Datos</span>
+          </a>
 
-    <p id="error"></p>
+          <a href="#" id="btnReporteProductos" class="quick-button">
+            <div class="quick-icon">📋</div>
+            <span>Reporte Productos</span>
+          </a>
+        </div>
+      </div>
+
+      <div class="daily-tip">
+        <h3>💡 Consejo del Día</h3>
+        <div class="tip-content" id="dailyTip">
+          <p>Cargando consejo...</p>
+        </div>
+        <button id="newTipBtn" class="btn-tip">Mostrar otro consejo</button>
+      </div>
+
+      <div class="recent-activity">
+        <h3>🔔 Actividad Reciente</h3>
+        <div class="activity-timeline" id="activityTimeline">
+          <div class="timeline-loader">Cargando actividades recientes...</div>
+        </div>
+      </div>
+
+        <div class="quick-notes">
+        <h3>📝 Recordatorios</h3>
+        <div class="notes-container">
+          <div id="notesContainer" class="notes-list">
+            </div>
+          <div class="notes-input-container">
+            <input type="text" id="newNoteInput" placeholder="Añadir nuevo recordatorio..." class="note-input">
+            <button id="addNoteBtn" class="btn-add-note">➕</button>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
   </main>
 
-  <script src="js/login.js"></script>
+    <div id="modalReporteProductos" class="modal">
+        <div class="modal-contenido">
+            <span class="cerrar-modal">&times;</span>
+            <h2>📋 Reporte de Productos</h2>
+            <div id="reporteVistasContainer">
+                <div id="listaReporteProductos" class="reporte-lista">
+                    </div>
+                <div id="tablaReporteProductos" class="reporte-tabla" style="display: none;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Categoría</th>
+                                <th>Stock</th>
+                                <th>Precio Venta</th>
+                                <th>Proveedor</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+            <button id="btnCambiarVista" class="btn-cambiar-vista">Cambiar a Vista de Tabla</button>
+        </div>
+    </div>
+    <script src="js/db.js"></script>
   <script src="js/sw-register.js"></script>
+  <script src="js/script.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/nav-highlighter.js" defer></script>
+   <script src="js/modal-productos.js"></script>
+  <script src="js/connection-status.js"></script>
+ 
+  <!--  function toggleMenu() {
+      document.getElementById("navMenu").classList.toggle("open");
+    } --> 
+      
+  <script> 
+    // Esta parte es importante si tu login.html y manejo de sesión están activos
+    if (sessionStorage.getItem("sesionIniciada") !== "true") {
+      window.location.href = "login.html";
+    }
+
+    function cerrarSesion() {
+      sessionStorage.removeItem("sesionIniciada");
+      window.location.href = "login.html";
+    }
+  </script> 
+
+    <button id="update-app-button">Actualizar Aplicación</button>
+
+  <div id="button" class="button-sesion">
+    <button onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+
 </body>
 </html>
