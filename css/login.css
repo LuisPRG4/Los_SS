@@ -19,29 +19,30 @@ body {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  padding: 20px 0; /* Añadir padding vertical para que no ocupe toda la pantalla */
-  /* Nueva imagen de fondo y ajustes para un look sobrio */
-  background: url('../resources/FONDO.png') no-repeat center center fixed; /* Usando la nueva imagen */
+  padding: 20px 0;
+  background: linear-gradient(135deg, #e5e0d5 0%, #d8d0c5 100%);
   background-size: cover;
-  background-color: rgba(0, 0, 0, 0.7); /* Capa oscura para mantener la sobriedad */
-  background-blend-mode: overlay; /* Mezcla la imagen con el color oscuro */
+  background-blend-mode: multiply;
+  background-color: rgba(229, 224, 213, 0.95);
+  position: relative;
+  overflow: hidden;
 }
 
 main {
-  /* Fondo más oscuro y sobrio para el contenedor principal */
-  background: linear-gradient(to bottom, #333333, #222222, #111111); /* Tonos de gris oscuro */
-  padding: 1.5rem; /* Reducir el padding interno del formulario */
-  border-radius: 1.5rem;
-  /* Sombras más sutiles para un look sobrio */
+  background: linear-gradient(145deg, #e8e4d8 0%, #e0dbd0 100%);
+  padding: 1.5rem;
+  border-radius: 1rem;
   box-shadow:
-    0 5px 15px rgba(0, 0, 0, 0.5), /* Sombra exterior más suave */
-    inset 0 0 10px rgba(255, 255, 255, 0.1); /* Brillo interior muy sutil */
+    0 8px 20px rgba(0, 0, 0, 0.1),
+    inset 0 0 15px rgba(255, 255, 255, 0.6);
   width: 100%;
-  max-width: 400px;
+  max-width: 320px;
   text-align: center;
-  border: 1px solid #444444; /* Borde sutil para definir el contorno */
+  border: 2px solid rgba(255, 215, 0, 0.3);
   animation: fadeInScale 0.8s ease-out forwards;
   transform-style: preserve-3d;
+  position: relative;
+  overflow: hidden;
 }
 
 @keyframes fadeInScale {
@@ -49,15 +50,18 @@ main {
     to { opacity: 1; transform: scale(1); }
 }
 
-
 .titulo {
   font-family: 'Playfair Display', serif;
-  color: #E0E0E0; /* Gris claro para el título */
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7); /* Sombra más sutil */
-  
-  font-size: 2.5rem; /* Un poco más grande para el impacto */
-  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 2px 2px 10px rgba(255, 215, 0, 0.5);
+  font-size: 2.25rem;
+  font-weight: 800;
   margin-bottom: 0.2rem;
+  letter-spacing: 0.5px;
+  position: relative;
+  display: inline-block;
+  padding: 0 8px;
+  background: linear-gradient(135deg, transparent 0%, rgba(255, 215, 0, 0.2) 50%, transparent 100%);
 }
 
 .subtitulo {
@@ -65,7 +69,6 @@ main {
   font-family: 'Montserrat', sans-serif; /* Usamos Montserrat para uniformidad */
   color: #B0B0B0; /* Gris medio para el subtítulo */
   text-shadow: none; /* Sin sombra para un look más limpio */
-  
   font-weight: normal;
   font-size: 1.2rem; /* Podría ser un poco más grande */
 }
@@ -78,21 +81,19 @@ label {
   font-family: 'Montserrat', sans-serif;
   color: #C0C0C0; /* Gris claro para las etiquetas */
   text-shadow: none; /* Sin sombra */
-
-  
   font-weight: bold;
 }
 
 input {
   width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #555555; /* Borde gris oscuro */
-  border-radius: 0.75rem;
-  margin-top: 0.25rem;
-  font-size: 1rem;
+  padding: 0.6rem;
+  border: 1px solid #d0c8b8;
+  border-radius: 0.6rem;
+  margin-top: 0.2rem;
+  font-size: 0.95rem;
   transition: border-color 0.2s, box-shadow 0.2s, background-color 0.2s;
-  background-color: rgba(0, 0, 0, 0.3); /* Fondo oscuro semi-transparente */
-  color: #E0E0E0; /* Texto claro para los inputs */
+  background-color: rgba(232, 228, 216, 0.95);
+  color: #222222;
 }
 
 input::placeholder {
@@ -100,62 +101,101 @@ input::placeholder {
   text-shadow: none;
 }
 
-
 input:focus {
   outline: none;
-  border-color: #FFD700; /* Borde dorado al enfocar */
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.5), /* Halo dorado al enfocar */
-              inset 0 0 3px rgba(255, 255, 255, 0.2); /* Reflejo interior sutil */
-  background-color: rgba(0, 0, 0, 0.5); /* Fondo más oscuro al enfocar */
+  border-color: #FFD700;
+  box-shadow: 0 0 0 4px rgba(255, 215, 0, 0.3),
+              inset 0 0 5px rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.95);
 }
 
 button {
-  margin-top: 1.5rem;
+  margin-top: 1rem;
   width: 100%;
   padding: 0.75rem;
-  background: linear-gradient(90deg, #444444, #333333, #444444); /* Gradiente de gris oscuro */
-  color: #E0E0E0; /* Texto claro para los botones */
-  text-shadow: none;
+  background: linear-gradient(135deg, #e8e4d8 0%, #e0dbd0 100%);
+  color: #222222;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
   font-family: 'Montserrat', sans-serif;
-  border: 1px solid #666666; /* Borde sutil */
+  border: 2px solid rgba(128, 128, 128, 0.7);
   border-radius: 0.75rem;
-  font-size: 1.1rem;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease, color 0.3s ease;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow:
-    0 3px 10px rgba(0, 0, 0, 0.5), /* Sombra más sutil */
-    inset 0 0 5px rgba(255, 255, 255, 0.05); /* Reflejo interior muy sutil */
-  font-weight: bold;
+    0 6px 15px rgba(0, 0, 0, 0.15),
+    inset 0 2px 5px rgba(255, 255, 255, 0.8),
+    inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+  font-weight: 600;
+  position: relative;
+  overflow: hidden;
 }
 
 button:hover {
-  background: linear-gradient(90deg, #FFD700, #DAA520, #FFD700); /* Gradiente dorado al pasar el ratón */
-  transform: translateY(-2px); /* Ligeramente elevado */
+  background: linear-gradient(135deg, #e8e4d8 0%, #e0dbd0 100%);
+  transform: translateY(-3px);
   box-shadow:
-    0 5px 15px rgba(255, 215, 0, 0.7), /* Sombra dorada más pronunciada */
-    inset 0 0 8px rgba(255, 255, 255, 0.3); /* Reflejo interior dorado */
-}
-
-button:active {
-    transform: translateY(0);
-    box-shadow:
-      0 1px 5px rgba(0, 0, 0, 0.4), /* Sombra al presionar */
-      inset 0 0 5px rgba(0, 0, 0, 0.2); /* Oscurecimiento interno al presionar */
+    0 10px 25px rgba(0, 0, 0, 0.2),
+    inset 0 2px 8px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+  color: #1a1a1a;
+  border-color: rgba(192, 192, 192, 0.9);
 }
 
 #error {
-  color: red;
+  color: #ff4444;
   font-size: 0.9rem;
   margin-top: 0.8rem;
   animation: shake 0.5s;
+  background: rgba(255, 215, 0, 0.15);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 215, 0, 0.2);
 }
 
 .separator-line {
   border: none;
-  height: 2px; /* Grosor de la línea */
-  background: linear-gradient(to right, transparent, #FFD700, transparent); /* Gradiente dorado */
-  margin: 2rem 0; /* Espaciado */
-  box-shadow: 0 0 10px rgba(255, 215, 0, 0.5); /* Brillo sutil */
+  height: 2px;
+  background: linear-gradient(to right, transparent, #FFD700, transparent);
+  margin: 2.5rem 0;
+  box-shadow: 0 0 20px rgba(255, 215, 0, 0.7);
+  position: relative;
+  overflow: hidden;
+  animation: shine 3s infinite;
+}
+
+@keyframes shine {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+.separator-line::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 215, 0, 0.8) 0%,
+    rgba(255, 215, 0, 0.1) 50%,
+    rgba(255, 215, 0, 0.8) 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 @keyframes shake {
@@ -221,26 +261,25 @@ main * {
     transition: opacity 0.3s ease-in-out;
 }
 
-
 .custom-confirm-overlay.show {
     opacity: 1;
 }
 
 .custom-confirm-box {
     /* Aquí el toque de oro y metal */
-    background: linear-gradient(145deg, #FFD700, #DAA520, #B8860B); /* Gradiente de oro */
-    color: #4B4A48; /* Texto oscuro que contraste con el oro, un gris metálico */
-    padding: 30px;
-    border-radius: 15px; /* Un poco más redondeado para un look premium */
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), /* Sombra más pronunciada */
-                inset 0 2px 5px rgba(255, 255, 255, 0.5), /* Brillo superior */
-                inset 0 -2px 5px rgba(0, 0, 0, 0.3); /* Sombra inferior para profundidad */
-    max-width: 400px;
+    background: linear-gradient(145deg, #e8e4d8 0%, #e0dbd0 100%);
+    color: #222222;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1),
+                inset 0 2px 4px rgba(255, 255, 255, 0.6),
+                inset 0 -2px 4px rgba(0, 0, 0, 0.05);
+    max-width: 320px;
     width: 90%;
     text-align: center;
     transform: scale(0.9);
     transition: transform 0.3s ease-in-out;
-    border: 1px solid rgba(255, 215, 0, 0.5); /* Borde sutil de oro */
+    border: 1px solid rgba(255, 215, 0, 0.4);
 }
 
 .custom-confirm-overlay.show .custom-confirm-box {
@@ -268,58 +307,37 @@ main * {
     gap: 15px;
 }
 
-/*Confimación mejorada */
 .custom-confirm-buttons button {
-    padding: 12px 25px;
-    border: none;
-    border-radius: 8px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease; /* Transición para todos los cambios al pasar el ratón */
-    flex: 1;
-    text-transform: uppercase; /* Mayúsculas para un toque elegante */
-    letter-spacing: 0.5px;
-    font-weight: bold;
-}
-
-.custom-confirm-buttons button.confirm-yes {
-    background-color: #4CAF50; /* Verde brillante para confirmar */
-    color: white;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.custom-confirm-buttons button.confirm-yes:hover {
-    background-color: #45a049;
-    transform: translateY(-2px); /* Pequeño efecto al pasar el ratón */
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.custom-confirm-buttons button.confirm-no {
-    background-color: #f44336; /* Rojo para cancelar */
-    color: white;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
-}
-
-.custom-confirm-buttons button.confirm-no:hover {
-    background-color: #da190b;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.custom-confirm-buttons button {
-    background: linear-gradient(180deg, #FFEB3B, #FFC107);
-    color: #4B4A48;
-    border: 1px solid #FFD700;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2), inset 0 1px 3px rgba(255,255,255,0.4);
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+  background: linear-gradient(180deg, #e8e4d8, #e0dbd0);
+  color: #222222;
+  border: 1px solid rgba(128, 128, 128, 0.7);
+  box-shadow:
+    0 2px 5px rgba(0,0,0,0.15),
+    inset 0 1px 3px rgba(255,255,255,0.8),
+    inset 0 -1px 3px rgba(0,0,0,0.2);
 }
 
 .custom-confirm-buttons button:hover {
-    background: linear-gradient(180deg, #FFC107, #FFEB3B);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+  background: linear-gradient(135deg, #e8e4d8, #e0dbd0);
+  transform: translateY(-3px);
+  box-shadow:
+    0 10px 25px rgba(0, 0, 0, 0.2),
+    inset 0 2px 8px rgba(255, 255, 255, 0.9),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+  color: #1a1a1a;
+  border-color: rgba(192, 192, 192, 0.9);
 }
 
-/* Estilos para el logo */
 .logo {
     display: block; /* Para que ocupe una línea completa y podamos centrarlo */
     max-width: 200px; /* Ajusta el tamaño máximo según necesites */
