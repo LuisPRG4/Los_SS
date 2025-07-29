@@ -74,22 +74,24 @@
         </nav>
 
         <main>
-            <section class="golden-decorated-form">
+            <div class="form-toggle-container">
+                <button id="toggleFormClientesBtn" class="toggle-form-btn">➕ Agregar Cliente</button>
+            </div>
+            
+            <section id="formularioCliente" class="golden-decorated-form" style="display: none;">
                 <h2>➕ Agregar Cliente</h2>
                 <label>Ingresa el nombre del cliente:</label>
                 <input type="text" id="nombreCliente" placeholder="Nombre completo" />
                 <label>Ingresa la dirección del cliente:</label>
                 <input type="text" id="direccion" placeholder="Dirección" />
-                <label>Número de contacto del cliente:</label>
-                <input type="number" id="telefono" placeholder="Teléfono" />
-                <label>Correo electrónico del cliente:</label>
-                <input type="email" id="email" placeholder="Correo electrónico" />
-
-                <label>Nota sobre el cliente (opcional):</label>
-                <textarea id="notaCliente" placeholder="Escribe una nota especial, comportamiento de pago, referencias, etc." rows="3"></textarea>
-
-                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 10px;">
-                    <button id="btnGuardarCliente" class="btn-primario">Guardar Cliente</button>
+                <label>Número de contacto:</label>
+                <input type="tel" id="telefono" placeholder="Teléfono" />
+                <label>Correo electrónico:</label>
+                <input type="email" id="email" placeholder="Email" />
+                <label>Nota adicional (opcional):</label>
+                <textarea id="notaCliente" placeholder="Agrega cualquier detalle relevante sobre el cliente..."></textarea>
+                <div class="form-buttons">
+                    <button id="btnGuardarCliente" class="btn-save">Guardar Cliente</button>
                     <button onclick="cancelarEdicionCliente()" id="btnCancelarEdicionCliente" class="btn-cancelar" style="display:none;">Cancelar</button>
                 </div>
             </section>
