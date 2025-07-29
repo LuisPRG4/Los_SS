@@ -25,6 +25,35 @@ let sortAscVentas = false;
 
 let mostrarArchivadas = false; // Controla si se muestran ventas archivadas
 
+// *** NUEVO: Event Listener para el botón de toggle del formulario de ventas ***
+window.addEventListener('DOMContentLoaded', () => {
+    const toggleFormVentasBtn = document.getElementById('toggleFormVentasBtn');
+    const formularioVenta = document.getElementById('formularioVenta');
+    
+    if (toggleFormVentasBtn && formularioVenta) {
+        toggleFormVentasBtn.addEventListener('click', () => {
+            // Remover clases de animación previas
+            formularioVenta.classList.remove('formulario-animado', 'slide-down', 'slide-up');
+            
+            const isVisible = formularioVenta.style.display === 'block' && formularioVenta.style.display !== 'none';
+            
+            if (isVisible) {
+                // Ocultar formulario con animación
+                formularioVenta.classList.add('formulario-animado', 'slide-up');
+                setTimeout(() => {
+                    formularioVenta.style.display = 'none';
+                }, 500); // Duración de la animación
+                toggleFormVentasBtn.textContent = '➕ Registrar Venta Multiproducto';
+            } else {
+                // Mostrar formulario con animación
+                formularioVenta.style.display = 'block';
+                formularioVenta.classList.add('formulario-animado', 'slide-down');
+                toggleFormVentasBtn.textContent = '➖ Ocultar Formulario';
+            }
+        });
+    }
+});
+
 async function guardarVentas() {
     // Las ventas ya se guardan/actualizan a través de las funciones de db.js en registrarVenta.
     // Esta función solo necesita recargar los gráficos si es necesario.
@@ -999,7 +1028,18 @@ async function cargarVenta(id) {
 
         // 3. Desplazarse al formulario de registro para editar
         const formulario = document.getElementById("formularioVenta"); // Asegúrate de que tu formulario principal tiene este ID
+        const toggleFormVentasBtn = document.getElementById("toggleFormVentasBtn");
+        
         if (formulario) {
+            // Mostrar formulario con animación al editar una venta
+            formulario.style.display = 'block';
+            formulario.classList.add('formulario-animado', 'slide-down');
+            
+            // Actualizar texto del botón
+            if (toggleFormVentasBtn) {
+                toggleFormVentasBtn.textContent = '➖ Ocultar Formulario';
+            }
+            
             formulario.scrollIntoView({ behavior: "smooth", block: "start" });
         }
 
