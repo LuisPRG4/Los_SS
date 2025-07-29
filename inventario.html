@@ -73,7 +73,11 @@
     </nav>
 
     <main>
-        <section class="golden-decorated-form">
+        <div class="form-toggle-container">
+            <button id="toggleFormBtn" class="toggle-form-btn">➕ Agregar Producto</button>
+        </div>
+        
+        <section class="golden-decorated-form" id="productoForm" style="display: none;">
             <h2>➕ Agregar / Editar Producto</h2>
             <label>Producto:</label>
             <input type="text" id="nombre" placeholder="Nombre del producto" />
