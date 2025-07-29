@@ -227,14 +227,19 @@ document.addEventListener("DOMContentLoaded", async () => {
     await abrirDB();
     await mostrarClientes();
 
-    document.getElementById("btnGuardarCliente").addEventListener("click", manejarGuardarCliente);
-    document.getElementById("btnCancelarEdicionCliente").addEventListener("click", cancelarEdicionCliente);
-    document.getElementById("buscadorClientes").addEventListener("input", filtrarClientes);
-    document.getElementById("btnAgregarDesdeBusqueda").addEventListener("click", agregarDesdeBusqueda);
+    // Inicializar el toggle del formulario de clientes
+    inicializarToggleFormulario();
 
-    // *** NUEVO: Event Listeners para los botones de Exportar/Importar/Plantilla (JSON) ***
-    document.getElementById('exportarClientesBtn').addEventListener('click', exportarClientesJSON);
+    document.getElementById("btnGuardarCliente").addEventListener("click", manejarGuardarCliente);
+    document.getElementById("buscadorClientes").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            filtrarClientes();
+        }
+    });
+
+    // Event listeners para importar/exportar
     document.getElementById('importarClientesInput').addEventListener('change', importarClientesJSON);
+    document.getElementById('exportarClientesBtn').addEventListener('click', exportarClientesJSON);
     document.getElementById('descargarPlantillaClientesBtn').addEventListener('click', descargarPlantillaClientesJSON);
 });
 
@@ -480,3 +485,57 @@ window.mostrarHistorialCompras = async function(clienteId, clienteNombre, boton)
         tablaBody.appendChild(fila);
     });
 }
+
+// Función para inicializar el toggle del formulario de clientes
+function inicializarToggleFormulario() {
+    const toggleBtn = document.getElementById('toggleFormClientesBtn');
+    const formulario = document.getElementById('formularioCliente');
+    
+    if (toggleBtn && formulario) {
+        toggleBtn.addEventListener('click', function() {
+            if (formulario.style.display === 'none') {
+                // Mostrar formulario con animación
+                formulario.style.display = 'block';
+                formulario.classList.add('formulario-animado', 'slide-down');
+                toggleBtn.textContent = '➖ Ocultar Formulario';
+                
+                // Remover la clase después de la animación para permitir repetirla
+                setTimeout(() => {
+                    formulario.classList.remove('slide-down');
+                }, 500);
+            } else {
+                // Ocultar formulario con animación
+                formulario.classList.add('slide-up');
+                toggleBtn.textContent = '➕ Agregar Cliente';
+                
+                // Después de la animación, ocultar el formulario
+                setTimeout(() => {
+                    formulario.style.display = 'none';
+                    formulario.classList.remove('slide-up');
+                }, 500);
+            }
+        });
+    }
+}
+
+// Modificar la función editarCliente para mostrar el formulario cuando se edite un cliente
+const editarClienteOriginal = editarCliente;
+window.editarCliente = async function(id) {
+    // Mostrar el formulario si está oculto
+    const formulario = document.getElementById('formularioCliente');
+    const toggleBtn = document.getElementById('toggleFormClientesBtn');
+    
+    if (formulario && formulario.style.display === 'none') {
+        formulario.style.display = 'block';
+        formulario.classList.add('formulario-animado', 'slide-down');
+        toggleBtn.textContent = '➖ Ocultar Formulario';
+        
+        // Remover la clase después de la animación para permitir repetirla
+        setTimeout(() => {
+            formulario.classList.remove('slide-down');
+        }, 500);
+    }
+    
+    // Llamar a la función original
+    return editarClienteOriginal(id);
+};
