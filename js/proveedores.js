@@ -3,6 +3,75 @@
 let proveedores = [];
 let editProveedorId = null; // Ahora usamos ID real (IndexedDB)
 
+// Función para inicializar el toggle del formulario de proveedores
+function inicializarToggleFormularioProveedores() {
+  const toggleBtn = document.getElementById('toggleFormProveedoresBtn');
+  const formulario = document.getElementById('formularioProveedor');
+  
+  if (toggleBtn && formulario) {
+    toggleBtn.addEventListener('click', function() {
+      if (formulario.style.display === 'none') {
+        // Mostrar formulario con animación
+        formulario.style.display = 'block';
+        formulario.classList.add('formulario-animado', 'slide-down');
+        toggleBtn.textContent = '➖ Ocultar Formulario';
+        
+        // Remover la clase después de la animación para permitir repetirla
+        setTimeout(() => {
+          formulario.classList.remove('slide-down');
+        }, 500);
+      } else {
+        // Ocultar formulario con animación
+        formulario.classList.add('slide-up');
+        toggleBtn.textContent = '➕ Agregar Proveedor';
+        
+        // Después de la animación, ocultar el formulario
+        setTimeout(() => {
+          formulario.style.display = 'none';
+          formulario.classList.remove('slide-up');
+        }, 500);
+      }
+    });
+  }
+}
+
+// Modificar la función editarProveedor para mostrar el formulario con animación al editar
+function editarProveedor(id) {
+  const proveedor = proveedores.find(p => p.id === id);
+  if (proveedor) {
+    // Mostrar el formulario con animación si está oculto
+    const formulario = document.getElementById('formularioProveedor');
+    const toggleBtn = document.getElementById('toggleFormProveedoresBtn');
+    
+    if (formulario && formulario.style.display === 'none') {
+      formulario.style.display = 'block';
+      formulario.classList.add('formulario-animado', 'slide-down');
+      if (toggleBtn) {
+        toggleBtn.textContent = '➖ Ocultar Formulario';
+      }
+      
+      // Remover la clase después de la animación
+      setTimeout(() => {
+        formulario.classList.remove('slide-down');
+      }, 500);
+    }
+    
+    // Llenar los campos del formulario con los datos del proveedor
+    document.getElementById("nombreProveedor").value = proveedor.nombre;
+    document.getElementById("empresa").value = proveedor.empresa || '';
+    document.getElementById("telefono").value = proveedor.telefono || '';
+    document.getElementById("productos").value = proveedor.productos || '';
+    
+    // Configurar el modo de edición
+    editProveedorId = id;
+    document.getElementById("btnGuardarProveedor").textContent = "Actualizar Proveedor";
+    document.getElementById("btnCancelarProveedor").style.display = "block";
+    
+    // Desplazar hacia el formulario
+    formulario.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
     await abrirDB();
     proveedores = await obtenerTodosLosProveedoresDB() || [];
@@ -17,6 +86,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('exportarProveedoresBtn').addEventListener('click', exportarProveedoresJSON);
     document.getElementById('importarProveedoresInput').addEventListener('change', importarProveedoresJSON);
     document.getElementById('descargarPlantillaProveedoresBtn').addEventListener('click', descargarPlantillaProveedoresJSON);
+    
+    // Inicializar el toggle del formulario de proveedores
+    inicializarToggleFormularioProveedores();
 });
 
 // Guardar o actualizar proveedor
