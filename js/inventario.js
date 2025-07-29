@@ -35,12 +35,48 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.getElementById('importarInventarioInput').addEventListener('change', importarInventarioJSON); // Cambiado a JSON
     document.getElementById('descargarPlantillaBtn').addEventListener('click', descargarPlantillaInventarioJSON); // Cambiado a JSON
 
+    // *** NUEVO: Event Listener para el botón de toggle del formulario ***
+    const toggleFormBtn = document.getElementById('toggleFormBtn');
+    const productoForm = document.getElementById('productoForm');
+    
+    if (toggleFormBtn && productoForm) {
+        toggleFormBtn.addEventListener('click', () => {
+            // Remover clases de animación previas
+            productoForm.classList.remove('formulario-animado', 'slide-down', 'slide-up');
+            
+            const isVisible = productoForm.style.display === 'block' && productoForm.style.display !== 'none';
+            
+            if (isVisible) {
+                // Ocultar formulario con animación
+                productoForm.classList.add('formulario-animado', 'slide-up');
+                setTimeout(() => {
+                    productoForm.style.display = 'none';
+                }, 500); // Duración de la animación
+                toggleFormBtn.textContent = '➕ Agregar Producto';
+            } else {
+                // Mostrar formulario con animación
+                productoForm.style.display = 'block';
+                productoForm.classList.add('formulario-animado', 'slide-down');
+                toggleFormBtn.textContent = '➖ Ocultar Formulario';
+            }
+        });
+    }
+
     //ESTO ES PARA IR DE INICIO AL INVENTARIO A REPONER EL STOCK DEL PRODUCTO BAJO ALERTA
     // --- INICIO: CÓDIGO AÑADIDO PARA LA NAVEGACIÓN DESDE DASHBOARD ---
     const productoIdParaEditar = sessionStorage.getItem('productoParaEditar');
     if (productoIdParaEditar) {
         // Limpiar el sessionStorage inmediatamente para que no se active de nuevo al recargar
         sessionStorage.removeItem('productoParaEditar'); 
+        
+        // Mostrar el formulario cuando se edita un producto
+        if (productoForm) {
+            productoForm.style.display = 'block';
+            productoForm.classList.add('formulario-animado', 'slide-down');
+            if (toggleFormBtn) {
+                toggleFormBtn.textContent = '➖ Ocultar Formulario';
+            }
+        }
         
         // Llamar a tu función existente para cargar el producto en el formulario
         // Asegúrate de convertir el ID a número porque sessionStorage lo guarda como string
