@@ -51,5 +51,40 @@ function cerrarConfiguracionKPI() {
   if (contenedor) contenedor.style.display = "none";
 }
 
+// Función para inicializar el toggle del formulario de mermas
+function inicializarToggleFormularioMermas() {
+  const toggleBtn = document.getElementById('toggleFormMermasBtn');
+  const formulario = document.getElementById('formularioMerma');
+  
+  if (toggleBtn && formulario) {
+    toggleBtn.addEventListener('click', function() {
+      if (formulario.style.display === 'none') {
+        // Mostrar formulario con animación
+        formulario.style.display = 'block';
+        formulario.classList.add('formulario-animado', 'slide-down');
+        toggleBtn.textContent = '➖ Ocultar Formulario';
+        
+        // Remover la clase después de la animación para permitir repetirla
+        setTimeout(() => {
+          formulario.classList.remove('slide-down');
+        }, 500);
+      } else {
+        // Ocultar formulario con animación
+        formulario.classList.add('slide-up');
+        toggleBtn.textContent = '➕ Agregar Merma';
+        
+        // Después de la animación, ocultar el formulario
+        setTimeout(() => {
+          formulario.style.display = 'none';
+          formulario.classList.remove('slide-up');
+        }, 500);
+      }
+    });
+  }
+}
 
-document.addEventListener("DOMContentLoaded", filtrarKPIsVisuales);
+// Inicializar el toggle cuando el DOM esté cargado
+document.addEventListener("DOMContentLoaded", function() {
+  filtrarKPIsVisuales();
+  inicializarToggleFormularioMermas();
+});
