@@ -608,6 +608,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     } else {
         console.warn("Botón 'descargarPlantillaPedidosBtn' no encontrado. Asegúrate de que el HTML está actualizado.");
     }
+    
+    // Inicializar el toggle del formulario de pedidos
+    inicializarToggleFormularioPedidos();
 });
 
 // Script para el botón flotante de ayuda (ya lo tenías en el HTML)
@@ -620,6 +623,75 @@ function mostrarAyuda() {
 document.getElementById("cerrarAyuda").addEventListener("click", () => {
     document.getElementById("ayuda").classList.remove("visible");
 });
+
+// Función para inicializar el toggle del formulario de pedidos
+function inicializarToggleFormularioPedidos() {
+  const toggleBtn = document.getElementById('toggleFormPedidosBtn');
+  const formulario = document.getElementById('formularioPedido');
+  
+  if (toggleBtn && formulario) {
+    toggleBtn.addEventListener('click', function() {
+      if (formulario.style.display === 'none') {
+        // Mostrar formulario con animación
+        formulario.style.display = 'block';
+        formulario.classList.add('formulario-animado', 'slide-down');
+        toggleBtn.textContent = '➖ Ocultar Formulario';
+        
+        // Remover la clase después de la animación para permitir repetirla
+        setTimeout(() => {
+          formulario.classList.remove('slide-down');
+        }, 500);
+      } else {
+        // Ocultar formulario con animación
+        formulario.classList.add('slide-up');
+        toggleBtn.textContent = '➕ Nuevo Pedido';
+        
+        // Después de la animación, ocultar el formulario
+        setTimeout(() => {
+          formulario.style.display = 'none';
+          formulario.classList.remove('slide-up');
+        }, 500);
+      }
+    });
+  }
+}
+
+// Modificar la función editarPedido para mostrar el formulario con animación al editar
+function editarPedido(id) {
+  const pedido = pedidos.find(p => p.id === id);
+  if (pedido) {
+    // Mostrar el formulario con animación si está oculto
+    const formulario = document.getElementById('formularioPedido');
+    const toggleBtn = document.getElementById('toggleFormPedidosBtn');
+    
+    if (formulario && formulario.style.display === 'none') {
+      formulario.style.display = 'block';
+      formulario.classList.add('formulario-animado', 'slide-down');
+      if (toggleBtn) {
+        toggleBtn.textContent = '➖ Ocultar Formulario';
+      }
+      
+      // Remover la clase después de la animación
+      setTimeout(() => {
+        formulario.classList.remove('slide-down');
+      }, 500);
+    }
+    
+    // Llenar los campos del formulario con los datos del pedido
+    document.getElementById("cliente").value = pedido.cliente;
+    document.getElementById("producto").value = pedido.productoId;
+    document.getElementById("cantidad").value = pedido.cantidad;
+    document.getElementById("precioUnitario").value = pedido.precioUnitario;
+    
+    // Configurar el modo de edición
+    editPedidoId = id;
+    document.getElementById("btnAgregarPedido").textContent = "Actualizar Pedido";
+    document.getElementById("btnCancelarEdicion").style.display = "block";
+    
+    // Desplazar hacia el formulario
+    formulario.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+}
 
 // Redirección si la sesión no está iniciada (ya la tenías en el HTML)
 if (sessionStorage.getItem("sesionIniciada") !== "true") {
