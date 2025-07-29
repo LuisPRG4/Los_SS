@@ -803,3 +803,101 @@
         font-size: 0.97em;
     }
 }
+
+/* ===== BOTÓN DE MOSTRAR/OCULTAR FORMULARIO ===== */
+.form-toggle-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.toggle-form-btn {
+    margin-top: 1rem;
+    width: 100%;
+    max-width: 320px;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #e8e4d8 0%, #e0dbd0 100%);
+    color: #222222;
+    text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2);
+    font-family: 'Montserrat', sans-serif;
+    border: 2px solid rgba(128, 128, 128, 0.7);
+    border-radius: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 6px 15px rgba(0, 0, 0, 0.15),
+        inset 0 2px 5px rgba(255, 255, 255, 0.8),
+        inset 0 -2px 5px rgba(0, 0, 0, 0.2);
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.toggle-form-btn:hover {
+    background: linear-gradient(135deg, #e8e4d8 0%, #e0dbd0 100%);
+    transform: translateY(-3px);
+    box-shadow:
+        0 10px 25px rgba(0, 0, 0, 0.2),
+        inset 0 2px 8px rgba(255, 255, 255, 0.9),
+        inset 0 -2px 8px rgba(0, 0, 0, 0.3);
+    color: #1a1a1a;
+    border-color: rgba(192, 192, 192, 0.9);
+}
+
+.toggle-form-btn:active {
+    transform: translateY(0);
+}
+
+@media (max-width: 768px) {
+    .form-toggle-container {
+        margin: 15px 0;
+    }
+    
+    .toggle-form-btn {
+        padding: 10px 20px;
+        font-size: 1rem;
+        max-width: 100%;
+    }
+}
+
+/* ===== ANIMACIÓN DEL FORMULARIO ===== */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.formulario-animado {
+    animation-duration: 0.5s;
+    animation-fill-mode: forwards;
+}
+
+.formulario-animado.slide-down {
+    animation-name: slideDown;
+}
+
+.formulario-animado.slide-up {
+    animation-name: slideUp;
+}
+
+/* ===== FIN BOTÓN DE MOSTRAR/OCULTAR FORMULARIO ===== */
