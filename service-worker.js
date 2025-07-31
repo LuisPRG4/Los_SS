@@ -95,6 +95,7 @@ const urlsToCache = [
   `${REPO_PREFIX}js/sw-register.js`,
   `${REPO_PREFIX}js/modal-productos.js`,
   `${REPO_PREFIX}js/sweetalert2@11.js`,
+  `${REPO_PREFIX}js/chatbot-voz.js`,
 
   // Archivos externos (siempre y cuando GitHub Pages pueda acceder a ellos)
   `https://unpkg.com/xlsx/dist/xlsx.full.min.js`,
