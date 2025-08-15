@@ -812,21 +812,93 @@ async function toggleHistorialPagos(event) {
             historialDiv.innerHTML = '<p>No hay abonos registrados para esta venta.</p>';
         } else {
             // Crear listado bonito de abonos
-            historialDiv.innerHTML = abonos.map(abono => {
-                // Formatear método de pago legible
-                let metodo = abono.formaPago || abono.metodoPago || '';
-                if (metodo === 'pago_movil') metodo = 'Pago Móvil';
-                else if (metodo) metodo = metodo.charAt(0).toUpperCase() + metodo.slice(1);
-
-                return `
-                    <div class="abono-item">
-                        <p><strong>Fecha y Hora:</strong> ${abono.fechaAbono}</p>
-                        <p><strong>Monto Abonado:</strong> $${abono.montoAbonado.toFixed(2)}</p>
-                        ${metodo ? `<p><strong>Método de Pago:</strong> ${metodo}</p>` : ''}
-                    </div>
-                    <hr>
-                `;
-            }).join('');
+            historialDiv.innerHTML = `
+                <div class="historial-header">
+                    <h4>Historial de Pagos</h4>
+                    <p>Total de pagos: ${abonos.length}</p>
+                </div>
+                <div class="abonos-list">
+                    ${abonos.map((abono, index) => {
+                        let metodo = abono.formaPago || abono.metodoPago || '';
+                        if (metodo === 'pago_movil') metodo = 'Pago Móvil';
+                        else if (metodo) metodo = metodo.charAt(0).toUpperCase() + metodo.slice(1);
+                        
+                        // Verificar si este pago es similar a otros (potencial duplicado)
+                        const esPosibleDuplicado = abonos.some((a, i) => 
+                            i !== index && 
+                            a.montoAbonado === abono.montoAbonado && 
+                            a.fechaAbono === abono.fechaAbono
+                        );
+                        
+                        return `
+                            <div class="abono-item ${esPosibleDuplicado ? 'posible-duplicado' : ''}">
+                                <div class="abono-info">
+                                    <p><strong>Fecha y Hora:</strong> ${abono.fechaAbono}</p>
+                                    <p><strong>Monto Abonado:</strong> $${abono.montoAbonado.toFixed(2)}</p>
+                                    ${metodo ? `<p><strong>Método de Pago:</strong> ${metodo}</p>` : ''}
+                                    ${esPosibleDuplicado ? '<span class="duplicado-tag">Posible duplicado</span>' : ''}
+                                </div>
+                                <div class="abono-actions">
+                                    <button onclick="marcarComoDuplicado(${abono.id}, this)" class="btn-sm btn-warning" title="Marcar como duplicado">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button onclick="abrirModalEditarAbono(${abono.id})" class="btn-sm btn-info" title="Editar pago">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button onclick="confirmarRevertirAbono(${abono.id})" class="btn-sm btn-danger" title="Revertir pago">
+                                        <i class="fas fa-undo"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <hr>
+                        `;
+                    }).join('')}
+                </div>
+                <style>
+                    .historial-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 15px;
+                        padding-bottom: 10px;
+                        border-bottom: 1px solid #eee;
+                    }
+                    .abono-item {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        padding: 10px;
+                        margin: 5px 0;
+                        border-radius: 4px;
+                        background-color: #f9f9f9;
+                    }
+                    .abono-item.posible-duplicado {
+                        background-color: #fff3cd;
+                        border-left: 4px solid #ffc107;
+                    }
+                    .abono-info {
+                        flex: 1;
+                    }
+                    .abono-actions {
+                        display: flex;
+                        gap: 5px;
+                    }
+                    .duplicado-tag {
+                        display: inline-block;
+                        background-color: #ffc107;
+                        color: #000;
+                        padding: 2px 6px;
+                        border-radius: 10px;
+                        font-size: 0.8em;
+                        margin-left: 10px;
+                        font-weight: bold;
+                    }
+                    .btn-sm {
+                        padding: 4px 8px;
+                        font-size: 0.8em;
+                    }
+                </style>
+            `;
         }
         historialDiv.style.display = 'block';
     } catch (error) {
