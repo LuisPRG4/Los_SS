@@ -1,5 +1,5 @@
 const CACHE_NAME = "los-ss-cache-v32";
-const APP_VERSION = "1.1.7"; // Incrementa esto cuando hagas cambios importantes
+const APP_VERSION = "1.1.8"; // Incrementa esto cuando hagas cambios importantes
 
 // Función para determinar la ruta base según el entorno
 function getRepoPrefix() {
@@ -242,4 +242,5 @@ self.addEventListener('message', event => {
         });
     }
 });
+
 
